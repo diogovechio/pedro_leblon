@@ -1,0 +1,30 @@
+{
+  "token": "",
+  "face_classifier": {
+    "face_tolerance": 0.6,
+    "face_min_accepted_matches": 0.7,
+    "box_min_size": 64
+  },
+  "random_params": {
+    "random_mock_frequency": 0.07,
+    "words_react_frequency": 0.4,
+    "mock_drunk_decaptor_frequency": 0.1
+  },
+  "rss_feed": {
+    "url": ""
+  },
+  "allowed_ids": [
+    {
+      "name": "",
+      "id": 0
+    }
+  ],
+  "mock_messages": {
+    "username": {
+      "lastmock": 0,
+      "messages": [
+        "",
+      ]
+    }
+    }
+}
