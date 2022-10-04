@@ -28,6 +28,7 @@ async def message_processing(
                     method='cropper' if from_samuel or from_debug_chats else 'face_classifier'
                 )
             )
+
         if message.text:
             if message.from_.username in ['nands93', 'theyuush'] or from_samuel or from_debug_chats:
                 if bot.sent_news != bot.datetime_now.hour:
@@ -35,7 +36,8 @@ async def message_processing(
                         bot.loop.create_task(
                             bot.send_message(
                                 message_text=random.choice(
-                                    [url.link for url in feedparser.parse(bot.config.rss_feed.url).entries]),
+                                    [url.link for url in feedparser.parse(bot.config.rss_feed.url).entries]
+                                ),
                                 chat_id=message.chat.id,
                                 reply_to=message.message_id
                             )
@@ -128,24 +130,24 @@ async def message_processing(
                         if len(response.choices[0].text) > bot.config.openai.sleep_token_limit:
                             bot.openai_use_limit = bot.datetime_now.hour
             if not openai_block_word_detected and '?' in message.text.lower() and len(set(list(message.text.lower()))) > 2:
-                if bot.openai_use_limit != bot.datetime_now.hour:
-                    response = openai.Completion.create(
-                        model="ada" if message.from_.username in ["nands93", "thommazk"] or from_samuel
-                        else "text-davinci-002",
-                        prompt=f"responda essa pergunta: {message.text.lower()}",
-                        api_key=bot.config.openai.api_key,
-                        **openai_default_params
+                response = openai.Completion.create(
+                    model="curie" if bot.openai_use_limit == bot.datetime_now.hour else (
+                        "ada" if message.from_.username in ["nands93", "thommazk"]
+                        else "text-davinci-002"),
+                    prompt=f"responda essa pergunta: {message.text.lower()}",
+                    api_key=bot.config.openai.api_key,
+                    **openai_default_params
+                )
+                if len(response.choices[0].text):
+                    bot.loop.create_task(
+                        bot.send_message(
+                            message_text=await normalize_openai_text(response.choices[0].text),
+                            chat_id=message.chat.id,
+                            sleep_time=1 + (round(random.random()) * 2),
+                            reply_to=message.message_id)
                     )
-                    if len(response.choices[0].text):
-                        bot.loop.create_task(
-                            bot.send_message(
-                                message_text=await normalize_openai_text(response.choices[0].text),
-                                chat_id=message.chat.id,
-                                sleep_time=1 + (round(random.random()) * 2),
-                                reply_to=message.message_id)
-                        )
-                        if len(response.choices[0].text) > bot.config.openai.sleep_token_limit:
-                            bot.openai_use_limit = bot.datetime_now.hour
+                    if len(response.choices[0].text) > bot.config.openai.sleep_token_limit:
+                        bot.openai_use_limit = bot.datetime_now.hour
 
             for word in ask_photos:
                 if word in message.text.lower() and random.random() < bot.config.random_params.words_react_frequency:
