@@ -129,10 +129,11 @@ async def message_processing(
                         )
                         if len(response.choices[0].text) > bot.config.openai.sleep_token_limit:
                             bot.openai_use_limit = bot.datetime_now.hour
+                        break
             if not openai_block_word_detected and '?' in message.text.lower() and len(set(list(message.text.lower()))) > 2:
                 response = openai.Completion.create(
                     model="curie" if bot.openai_use_limit == bot.datetime_now.hour else (
-                        "ada" if message.from_.username in ["nands93", "thommazk"] or from_samuel
+                        "ada" if message.from_.username in ["nands93", "thommazk"]
                         else "text-davinci-002"),
                     prompt=f"responda essa pergunta: {message.text.lower()}",
                     api_key=bot.config.openai.api_key,
