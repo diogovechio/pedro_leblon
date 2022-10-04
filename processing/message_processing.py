@@ -1,13 +1,15 @@
 import asyncio
 import feedparser
+import openai
 
-from constants.constants import drunk_decaptor_taunt_list, swear_words, ask_photos, cocao_list
+from constants.constants import drunk_decaptor_taunt_list, ask_photos, openai_react_words, \
+    openai_block_words, openai_default_params
 import random
 
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
 from utils.face_utils import face_cropper, face_classifier, faces_locator
-from utils.text_utils import message_miguxer, greeter
+from utils.text_utils import message_miguxer, greeter, normalize_openai_text
 
 
 async def message_processing(
@@ -50,14 +52,22 @@ async def message_processing(
                                 reply_to=None),
                         )
                         bot.config.mock_messages[message.from_.username].lastmock = bot.datetime_now.hour
-            if message.from_.username == 'decaptor':
+            if message.from_.username == f"{'decaptor' if not bot.debug_mode else 'diogovechio'}":
                 if random.random() < bot.config.random_params.random_mock_frequency:
-                    bot.loop.create_task(
-                        bot.send_video(
-                            video=open(f'gifs/kardashian{round(random.random())}.mp4', 'rb').read(),
-                            chat_id=message.chat.id,
-                            reply_to=message.message_id),
-                    )
+                    if 'lula' in message.text.lower():
+                        bot.loop.create_task(
+                            bot.send_video(
+                                video=open(f'gifs/kardashian_disappointed.mp4', 'rb').read(),
+                                chat_id=message.chat.id,
+                                reply_to=message.message_id),
+                        )
+                    else:
+                        bot.loop.create_task(
+                            bot.send_video(
+                                video=open(f'gifs/kardashian{round(random.random())}.mp4', 'rb').read(),
+                                chat_id=message.chat.id,
+                                reply_to=message.message_id),
+                        )
                 if bot.datetime_now.hour > 21 or (0 <= bot.datetime_now.hour < 6):
                     if random.random() < bot.config.random_params.mock_drunk_decaptor_frequency:
                         bot.loop.create_task(
@@ -74,7 +84,7 @@ async def message_processing(
                             chat_id=message.chat.id,
                             reply_to=None)
                     )
-                for word in swear_words:
+                for word in openai_block_words:
                     if word in message.text.lower() and random.random() < bot.config.random_params.words_react_frequency:
                         bot.loop.create_task(
                             bot.send_video(
@@ -91,6 +101,52 @@ async def message_processing(
                         message_text=message.text,
                         chat_id=message.chat.id)
                 )
+
+            openai_block_word_detected = False
+            for block_word in openai_block_words:
+                if openai_block_word_detected := block_word in message.text.lower():
+                    break
+
+            if not openai_block_word_detected:
+                for react_word in openai_react_words:
+                    if '?' not in message.text.lower() and react_word in message.text.lower(
+
+                    ) and random.random() < bot.config.random_params.words_react_frequency:
+                        response = openai.Completion.create(
+                            model="ada" if bot.openai_use_limit == bot.datetime_now.hour else "text-davinci-002",
+                            prompt=f"fale sobre esse tema: {message.text.lower()}",
+                            api_key=bot.config.openai.api_key,
+                            **openai_default_params
+                        )
+                        bot.loop.create_task(
+                            bot.send_message(
+                                message_text=await normalize_openai_text(response.choices[0].text),
+                                chat_id=message.chat.id,
+                                sleep_time=1 + (round(random.random()) * 2),
+                                reply_to=message.message_id)
+                        )
+                        if len(response.choices[0].text) > bot.config.openai.sleep_token_limit:
+                            bot.openai_use_limit = bot.datetime_now.hour
+            if not openai_block_word_detected and '?' in message.text.lower() and len(set(list(message.text.lower()))) > 2:
+                if bot.openai_use_limit != bot.datetime_now.hour:
+                    response = openai.Completion.create(
+                        model="ada" if message.from_.username in ["nands93", "thommazk"] or from_samuel
+                        else "text-davinci-002",
+                        prompt=f"responda essa pergunta: {message.text.lower()}",
+                        api_key=bot.config.openai.api_key,
+                        **openai_default_params
+                    )
+                    if len(response.choices[0].text):
+                        bot.loop.create_task(
+                            bot.send_message(
+                                message_text=await normalize_openai_text(response.choices[0].text),
+                                chat_id=message.chat.id,
+                                sleep_time=1 + (round(random.random()) * 2),
+                                reply_to=message.message_id)
+                        )
+                        if len(response.choices[0].text) > bot.config.openai.sleep_token_limit:
+                            bot.openai_use_limit = bot.datetime_now.hour
+
             for word in ask_photos:
                 if word in message.text.lower() and random.random() < bot.config.random_params.words_react_frequency:
                     if bot.asked_for_photo != round(bot.datetime_now.hour / 8):
@@ -102,8 +158,8 @@ async def message_processing(
                         bot.loop.create_task(
                             bot.send_message(
                                 message_text=f"{message.from_.first_name.lower()} manda uma foto do "
-                                    f"{random.choice(low_photo_count)} {'aí rapidão' if round(random.random()) else 'aí'}, "
-                                    f"eu ainda nao coheço ele tanto quanto o {random.choice(high_photo_count)}",
+                                f"{random.choice(low_photo_count)} {'aí rapidão' if round(random.random()) else 'aí'}, "
+                                f"eu ainda nao coheço ele tanto quanto o {random.choice(high_photo_count)}",
                                 chat_id=message.chat.id,
                                 sleep_time=2 + round(random.random() * 5),
                                 reply_to=message.message_id)

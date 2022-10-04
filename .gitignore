@@ -1,0 +1,10 @@
+/bot_configs.json
+/.idea/
+/tmp/
+/faces/
+/face_lake/
+/debug/
+/gifs/
+/venv/
+__pycache__/
+*__pycache__*

@@ -35,8 +35,15 @@ class MockMessage:
 
 
 @dataclass
+class OpenAI:
+    api_key: str
+    sleep_token_limit: int
+
+
+@dataclass
 class BotConfig:
     token: str
+    openai: OpenAI
     face_classifier: FaceClassifier
     random_params: RandomParams
     rss_feed: RSSFeed

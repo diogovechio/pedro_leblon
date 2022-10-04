@@ -13,10 +13,18 @@ drunk_decaptor_taunt_list = [
     'já vai arrumar problema com a polícia de novo?',
 ]
 
-swear_words = [
-    'merda',
-    'porra',
-    'caralho'
-]
+ask_photos = ['melhorar', 'fotos', 'foto', 'melhorou', 'ia']
 
-ask_photos = ['melhorar', 'fotos', 'foto', 'melhorou', 'bolsonaro', 'ia']
+openai_block_words = ['viado', 'merda', 'porra', 'fuck', 'fucker', 'cock', 'shit', 'transar', 'buceta', 'boceta',
+                      'piroca', 'pornô', 'porno', 'sexo', 'sex', 'cu?', ' cu ', 'caralho', 'transa', 'foder', 'matar',
+                      'cú']
+openai_react_words = ['bolsonaro', 'segundo turno', 'stadia', 'playstation', 'nvidia', 'amd', 'eleições',
+                      'eleição', 'machismo', 'machista', 'homofobia', 'homofôbico', 'racismo', 'temer']
+
+openai_default_params = {
+    'temperature': 0,
+    'max_tokens': 80,
+    'top_p': 1,
+    'frequency_penalty': 1.0,
+    'presence_penalty': 2.0,
+}
