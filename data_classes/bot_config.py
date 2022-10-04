@@ -37,7 +37,9 @@ class MockMessage:
 @dataclass
 class OpenAI:
     api_key: str
-    sleep_token_limit: int
+    davinci_daily_limit: int
+    curie_daily_limit: int
+    only_ada_users: T.List[str]
 
 
 @dataclass

@@ -58,7 +58,7 @@ class FakePedro:
         self.asked_for_photo = 0
         self.sent_news = 0
 
-        self.openai_use_limit = 0
+        self.openai_used = 0
 
         self.loop: T.Optional[AbstractEventLoop] = None
 
@@ -93,7 +93,7 @@ class FakePedro:
 
             self.config = BotConfig(**bot_config)
 
-            self.openai_use_limit = 0
+            self.openai_used = 0
             self.allowed_list = [8375482] if self.debug_mode else [*[value.id for value in self.config.allowed_ids]]
             self.api_route = f"https://api.telegram.org/bot{self.config.token}"
 

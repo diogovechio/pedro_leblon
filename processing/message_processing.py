@@ -9,6 +9,7 @@ import random
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
 from utils.face_utils import face_cropper, face_classifier, faces_locator
+from utils.openai_utils import model_selector
 from utils.text_utils import message_miguxer, greeter, normalize_openai_text
 
 
@@ -16,6 +17,8 @@ async def message_processing(
         bot: FakePedro,
         message: TelegramMessage
 ) -> None:
+    if bot.datetime_now.hour == 1:
+        bot.openai_used = 0
     if message.chat.id in bot.allowed_list:
         from_samuel = message.from_.is_premium
         from_debug_chats = message.chat.id in (-20341310, 8375482)
@@ -115,7 +118,7 @@ async def message_processing(
 
                     ) and random.random() < bot.config.random_params.words_react_frequency:
                         response = openai.Completion.create(
-                            model="ada" if bot.openai_use_limit == bot.datetime_now.hour else "text-davinci-002",
+                            model=await model_selector(bot=bot, message=message, mock_message=True),
                             prompt=f"fale sobre esse tema: {message.text.lower()}",
                             api_key=bot.config.openai.api_key,
                             **openai_default_params
@@ -124,18 +127,17 @@ async def message_processing(
                             bot.send_message(
                                 message_text=await normalize_openai_text(response.choices[0].text),
                                 chat_id=message.chat.id,
-                                sleep_time=1 + (round(random.random()) * 2),
+                                sleep_time=1 + (round(random.random()) * 5),
                                 reply_to=message.message_id)
                         )
-                        if len(response.choices[0].text) > bot.config.openai.sleep_token_limit:
-                            bot.openai_use_limit = bot.datetime_now.hour
+                        bot.openai_used += 1
                         break
-            if not openai_block_word_detected and '?' in message.text.lower() and len(set(list(message.text.lower()))) > 2:
+
+            if not openai_block_word_detected and 'pedr' in message.text.lower()[0:4]:
+                question = '?' in message.text.lower()
                 response = openai.Completion.create(
-                    model="curie" if bot.openai_use_limit == bot.datetime_now.hour else (
-                        "ada" if message.from_.username in ["nands93", "thommazk"]
-                        else "text-davinci-002"),
-                    prompt=f"responda essa pergunta: {message.text.lower()}",
+                    model=await model_selector(bot, message),
+                    prompt=f"{'fale sobre esse tema' if not question else 'responda essa pergunta'}: {message.text.lower()}",
                     api_key=bot.config.openai.api_key,
                     **openai_default_params
                 )
@@ -144,11 +146,25 @@ async def message_processing(
                         bot.send_message(
                             message_text=await normalize_openai_text(response.choices[0].text),
                             chat_id=message.chat.id,
-                            sleep_time=1 + (round(random.random()) * 2),
                             reply_to=message.message_id)
                     )
-                    if len(response.choices[0].text) > bot.config.openai.sleep_token_limit:
-                        bot.openai_use_limit = bot.datetime_now.hour
+                    bot.openai_used += 1
+            elif not openai_block_word_detected:
+                if random.random() < bot.config.random_params.random_mock_frequency:
+                    response = openai.Completion.create(
+                        model=await model_selector(bot=bot, message=message, random_model=True),
+                        prompt=f"comente sobre isso: {message.text.lower()}",
+                        api_key=bot.config.openai.api_key,
+                        **openai_default_params
+                    )
+                    bot.loop.create_task(
+                        bot.send_message(
+                            message_text=await normalize_openai_text(response.choices[0].text),
+                            chat_id=message.chat.id,
+                            sleep_time=1 + (round(random.random()) * 5),
+                            reply_to=message.message_id)
+                    )
+                    bot.openai_used += 1
 
             for word in ask_photos:
                 if word in message.text.lower() and random.random() < bot.config.random_params.words_react_frequency:
