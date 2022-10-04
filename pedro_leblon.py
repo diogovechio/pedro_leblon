@@ -223,7 +223,7 @@ if __name__ == '__main__':
     pedro_leblon = FakePedro(
         bot_name='nao ta servindo pra nada',
         bot_config_file='bot_configs.json',
-        debug_mode=True
+        debug_mode=False
     )
 
     asyncio.run(
