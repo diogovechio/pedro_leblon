@@ -29,3 +29,9 @@ openai_default_params = {
     'frequency_penalty': 1.0,
     'presence_penalty': 2.0,
 }
+
+openai_prompts = {
+    'fale': 'fale sobre esse tema:',
+    'responda': 'responda essa pergunta:',
+    'comente': 'comente sobre isso:'
+}

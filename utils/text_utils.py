@@ -1,6 +1,5 @@
 import logging
 import random
-import re
 
 
 async def greeter(
@@ -28,15 +27,3 @@ async def message_miguxer(message: str) -> str:
             for letter in message
         ]
     )
-
-
-async def normalize_openai_text(message: str) -> str:
-    message = (', '.join(message.split('.')[:2]).replace('\n', ' ')).lower()
-    message = re.sub(' +', ' ', message)
-    message = message.replace('pedro', '')
-    message = message.strip()
-    while '.' in message[0] or ' ' in message[0] or '?' in message[0] or ',' in message[0]:
-        message = message[1:]
-    while '.' in message[-1] or ' ' in message[0] or ',' in message[-1]:
-        message = message[:-1]
-    return message
