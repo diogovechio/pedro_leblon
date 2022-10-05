@@ -153,6 +153,9 @@ class FakePedro:
                                 message_processing(self, TelegramMessage(**message['message']))
                             )
 
+                if self.datetime_now.hour == 1:
+                    self.openai_used = 0
+
                 await asyncio.sleep(self.polling_rate)
             except Exception as exc:
                 logging.exception(exc)

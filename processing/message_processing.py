@@ -17,8 +17,6 @@ async def message_processing(
         bot: FakePedro,
         message: TelegramMessage
 ) -> None:
-    if bot.datetime_now.hour == 1:
-        bot.openai_used = 0
     if message.chat.id in bot.allowed_list:
         from_samuel = message.from_.is_premium
         from_debug_chats = message.chat.id in (-20341310, 8375482)
@@ -137,7 +135,8 @@ async def message_processing(
                 question = '?' in message.text.lower()
                 response = openai.Completion.create(
                     model=await model_selector(bot, message),
-                    prompt=f"{'fale sobre esse tema' if not question else 'responda essa pergunta'}: {message.text.lower()}",
+                    prompt=(f"{'fale sobre esse tema' if not question else 'responda essa pergunta'}: "
+                            f"{message.text.lower().replace('pedro', '')}"),
                     api_key=bot.config.openai.api_key,
                     **openai_default_params
                 )
