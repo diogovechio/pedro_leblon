@@ -20,7 +20,7 @@ from aiohttp import ClientSession
 from data_classes.bot_config import BotConfig
 from data_classes.received_message import MessagesResults, TelegramMessage
 from data_structures.max_size_list import MaxSizeList
-from processing import message_processing
+from processing import messages_coordinator
 
 logging.basicConfig(level=logging.INFO)
 
@@ -57,6 +57,7 @@ class FakePedro:
 
         self.asked_for_photo = 0
         self.sent_news = 0
+        self.reacted_random_command = 0
 
         self.openai_used = 0
 
@@ -150,7 +151,7 @@ class FakePedro:
 
                         if message['message'] is not None:
                             self.loop.create_task(
-                                message_processing(self, TelegramMessage(**message['message']))
+                                messages_coordinator(self, TelegramMessage(**message['message']))
                             )
 
                 if self.datetime_now.hour == 1:

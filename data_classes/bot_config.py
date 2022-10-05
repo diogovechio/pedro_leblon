@@ -30,7 +30,7 @@ class UserID:
 
 @dataclass
 class MockMessage:
-    lastmock: int = 0
+    last_mock_hour: int = 0
     messages: T.List[str] = Field(default_factory=list)
 
 

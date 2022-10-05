@@ -6,7 +6,7 @@ import face_recognition
 from PIL import Image
 
 
-async def faces_locator(image: bytes, min_size: int) -> T.Optional[iter]:
+async def faces_detector(image: bytes, min_size: int) -> T.Optional[iter]:
     temp_filename = f'tmp/{uuid.uuid4()}.tmp'
     with open(temp_filename, 'wb') as file:
         file.write(image)
@@ -20,7 +20,7 @@ async def faces_locator(image: bytes, min_size: int) -> T.Optional[iter]:
         return filtered_by_size
 
 
-async def face_cropper(image: bytes, coords: tuple) -> bytes:
+async def image_cropper(image: bytes, coords: tuple) -> bytes:
     temp_load = f'tmp/{uuid.uuid4()}.tmp'
     with open(temp_load, 'wb') as file:
         file.write(image)

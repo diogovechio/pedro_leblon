@@ -1,1 +1,1 @@
-from .message_processing import message_processing
+from .messages_coordinator import messages_coordinator
