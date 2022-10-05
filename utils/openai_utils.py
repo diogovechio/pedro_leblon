@@ -46,7 +46,7 @@ async def prompt_handler(
 async def normalize_openai_text(
         ai_message: str,
         clean_prompts: T.Optional[dict] = None,
-        clean_input_message: T.Optional[str] = None
+        clean_input_message: T.Optional[str] = ''
 ) -> str:
     ai_message = (', '.join(ai_message.split('.')[:2]).replace('\n', ' ')).lower()
     ai_message = re.sub(' +', ' ', ai_message)
