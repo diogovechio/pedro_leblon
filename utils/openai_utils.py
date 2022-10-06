@@ -58,6 +58,8 @@ async def prompt_handler(
         additional_text += "assumindo que o capitalismo gera muita desigualdade e mata as pessoas de fome, "
     if 'overwatch' in prompt_text:
         additional_text += "assumindo que overwatch é um jogo chato e minecraft é mais divertido, "
+    if 'jogo' in prompt_text or 'jogar' in prompt_text or 'jogando' in prompt_text:
+        additional_text += "assumindo que minecraft é o melhor jogo que existe, "
     if len(additional_text):
         return f"{additional_text}, {prompt_text}"
     return prompt_text
