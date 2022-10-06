@@ -94,7 +94,7 @@ class FakePedro:
 
             self.config = BotConfig(**bot_config)
 
-            self.openai_used = 0
+            self.openai_used = 0.0
             self.allowed_list = [8375482] if self.debug_mode else [*[value.id for value in self.config.allowed_ids]]
             self.api_route = f"https://api.telegram.org/bot{self.config.token}"
 
@@ -227,7 +227,7 @@ if __name__ == '__main__':
     pedro_leblon = FakePedro(
         bot_name='nao ta servindo pra nada',
         bot_config_file='bot_configs.json',
-        debug_mode=False
+        debug_mode=True
     )
 
     asyncio.run(

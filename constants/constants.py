@@ -24,7 +24,6 @@ openai_react_words = ['bolsonaro', 'segundo turno', 'stadia', 'playstation', 'nv
 
 openai_default_params = {
     'temperature': 0,
-    'max_tokens': 200,
     'top_p': 1,
     'frequency_penalty': 1.0,
     'presence_penalty': 2.0,

@@ -26,20 +26,20 @@ async def openai_reactions(
                     model=await model_selector(bot=bot, message=message, mock_message=True),
                     prompt=await prompt_handler(f"{openai_prompts['fale']}: {message.text.lower()}"),
                     api_key=bot.config.openai.api_key,
+                    max_tokens=bot.config.openai.max_tokens,
                     **openai_default_params
                 )
                 bot.loop.create_task(
                     bot.send_message(
                         message_text=await normalize_openai_text(
                             ai_message=response.choices[0].text,
-                            clean_prompts=openai_prompts,
-                            clean_input_message=message.text.lower()
+                            sentences=bot.config.openai.max_sentences,
+                            clean_prompts=openai_prompts
                         ),
                         chat_id=message.chat.id,
                         sleep_time=1 + (round(random.random()) * 5),
                         reply_to=message.message_id)
                 )
-                bot.openai_used += 1
                 break
 
     if not openai_block_word_detected and 'pedr' in message.text.lower()[0:4]:
@@ -51,6 +51,7 @@ async def openai_reactions(
                 (f"{openai_prompts['fale'] if not question else openai_prompts['responda']}: "
                  f"{normalized_message_text}")),
             api_key=bot.config.openai.api_key,
+            max_tokens=bot.config.openai.max_tokens,
             **openai_default_params
         )
         if len(response.choices[0].text):
@@ -58,30 +59,29 @@ async def openai_reactions(
                 bot.send_message(
                     message_text=await normalize_openai_text(
                         ai_message=response.choices[0].text,
-                        clean_prompts=openai_prompts,
-                        clean_input_message=normalized_message_text
+                        sentences=bot.config.openai.max_sentences,
+                        clean_prompts=openai_prompts
                     ),
                     chat_id=message.chat.id,
                     reply_to=message.message_id)
             )
-            bot.openai_used += 1
     elif not openai_block_word_detected:
         if random.random() < bot.config.random_params.random_mock_frequency:
             response = openai.Completion.create(
                 model=await model_selector(bot=bot, message=message, random_model=True),
                 prompt=await prompt_handler(f"{openai_prompts['comente']}: {message.text.lower()}"),
                 api_key=bot.config.openai.api_key,
+                max_tokens=bot.config.openai.max_tokens,
                 **openai_default_params
             )
             bot.loop.create_task(
                 bot.send_message(
                     message_text=await normalize_openai_text(
                         ai_message=response.choices[0].text,
-                        clean_prompts=openai_prompts,
-                        clean_input_message=message.text.lower()
+                        sentences=bot.config.openai.max_sentences,
+                        clean_prompts=openai_prompts
                     ),
                     chat_id=message.chat.id,
                     sleep_time=1 + (round(random.random()) * 5),
                     reply_to=message.message_id)
             )
-            bot.openai_used += 1
