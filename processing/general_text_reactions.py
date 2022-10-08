@@ -60,7 +60,7 @@ async def mock_users(
                 )
                 bot.config.mock_messages[message.from_.username].last_mock_hour = bot.datetime_now.hour
 
-    if message.from_.username in ['nands93', 'theyuush'] or from_samuel or from_debug_chats:
+    if message.from_.username in ['nands93', 'theyuush'] or from_debug_chats:
         if bot.sent_news != bot.datetime_now.hour:
             if random.random() < bot.config.random_params.random_mock_frequency:
                 bot.loop.create_task(

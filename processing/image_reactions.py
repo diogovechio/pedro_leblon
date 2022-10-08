@@ -9,7 +9,8 @@ from utils.text_utils import greeter
 async def image_pipeline(
         bot: FakePedro,
         message: TelegramMessage,
-        method: str
+        method: str,
+        always_send_crop: bool = False
 ) -> None:
     loop = bot.loop
 
@@ -24,15 +25,16 @@ async def image_pipeline(
                         faces_names=bot.faces_names,
                         face_tolerance=bot.config.face_classifier.face_tolerance
                     )
-                    await bot.send_photo(
-                        image=crop_bytes,
-                        chat_id=message.chat.id,
-                        caption=await greeter(
-                            recognized_face[0],
-                            recognized_face[1],
-                            bot.config.face_classifier.face_min_accepted_matches
-                        ) if recognized_face is not None else None
-                    )
+                    if recognized_face or always_send_crop:
+                        await bot.send_photo(
+                            image=crop_bytes,
+                            chat_id=message.chat.id,
+                            caption=await greeter(
+                                recognized_face[0],
+                                recognized_face[1],
+                                bot.config.face_classifier.face_min_accepted_matches
+                            ) if recognized_face is not None else None
+                        )
 
                 for img_coord in face_coords:
                     loop.create_task(_crop_and_send(image_bytes, img_coord))

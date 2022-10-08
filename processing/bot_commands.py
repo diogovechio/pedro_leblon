@@ -1,4 +1,5 @@
 import random
+from dataclasses import asdict
 
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
@@ -37,6 +38,10 @@ async def bot_commands(
             ,
             chat_id=message.chat.id)
         )
+    # elif '/status' in message.text[0:7]:
+    #     for key, value in filter(lambda x: x != 'secrets', asdict(bot.config).items()):
+    #         print(key, value)
+    #     print(message.text)
     elif message.text[0] == '/':
         if bot.reacted_random_command != round(bot.datetime_now.hour / 8):
             bot.loop.create_task(bot.send_message(
@@ -45,3 +50,7 @@ async def bot_commands(
                 reply_to=message.message_id)
             )
             bot.reacted_random_command = round(bot.datetime_now.hour / 8)
+
+
+async def format_status():
+    pass

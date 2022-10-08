@@ -59,7 +59,7 @@ class FakePedro:
         self.sent_news = 0
         self.reacted_random_command = 0
 
-        self.openai_used = 0
+        self.openai_use = 0
 
         self.loop: T.Optional[AbstractEventLoop] = None
 
@@ -94,9 +94,9 @@ class FakePedro:
 
             self.config = BotConfig(**bot_config)
 
-            self.openai_used = 0.0
+            self.openai_use = 0.0
             self.allowed_list = [8375482] if self.debug_mode else [*[value.id for value in self.config.allowed_ids]]
-            self.api_route = f"https://api.telegram.org/bot{self.config.token}"
+            self.api_route = f"https://api.telegram.org/bot{self.config.secrets.bot_token}"
 
             self.faces_files = []
             self.faces_names = []
@@ -106,16 +106,17 @@ class FakePedro:
                 self.faces_files.extend(filenames)
                 break
 
-            for file in self.faces_files:
-                embeddings = face_recognition.face_encodings(
-                    face_recognition.load_image_file(f"{self.face_images_path}/{file}")
-                )
-                if len(embeddings):
-                    self.faces_names.append(file[:-7])
-                    self.face_embeddings.append(embeddings[0])
-                    logging.info(f"Loaded embeddings for {file}")
-                else:
-                    logging.critical(f'NO EMBEDDINGS FOR {file}')
+            if not self.debug_mode:
+                for file in self.faces_files:
+                    embeddings = face_recognition.face_encodings(
+                        face_recognition.load_image_file(f"{self.face_images_path}/{file}")
+                    )
+                    if len(embeddings):
+                        self.faces_names.append(file[:-7])
+                        self.face_embeddings.append(embeddings[0])
+                        logging.info(f"Loaded embeddings for {file}")
+                    else:
+                        logging.critical(f'NO EMBEDDINGS FOR {file}')
 
         logging.info('Loading finished')
 
@@ -144,8 +145,8 @@ class FakePedro:
             try:
                 logging.info(f'Message controller task running - {len(self.interacted_messages)}')
                 if hasattr(self.messages, 'result'):
-                    for message in [asdict(entry) for entry in self.messages.result
-                                    if entry.update_id not in self.interacted_messages]:
+                    for message in (asdict(entry) for entry in self.messages.result
+                                    if entry.update_id not in self.interacted_messages):
                         self.interacted_messages.append(message['update_id'])
                         logging.info(message)
 
@@ -155,7 +156,7 @@ class FakePedro:
                             )
 
                 if self.datetime_now.hour == 1:
-                    self.openai_used = 0
+                    self.openai_use = 0
 
                 await asyncio.sleep(self.polling_rate)
             except Exception as exc:

@@ -22,13 +22,6 @@ openai_react_words = ['bolsonaro', 'segundo turno', 'stadia', 'playstation', 'nv
                       'gamepass', 'game pass', 'eleição', 'machismo', 'machista', 'homofobia', 'homofôbico', 'racismo',
                       'temer', 'ryzen', 'rio', 'overwatch', 'ps5', 'ps4', 'pc']
 
-openai_default_params = {
-    'temperature': 0,
-    'top_p': 1,
-    'frequency_penalty': 1.0,
-    'presence_penalty': 2.0,
-}
-
 openai_prompts = {
     'fale': 'fale sobre esse tema:',
     'responda': 'responda essa pergunta:',

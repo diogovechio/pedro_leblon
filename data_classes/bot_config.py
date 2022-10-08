@@ -36,18 +36,23 @@ class MockMessage:
 
 @dataclass
 class OpenAI:
-    api_key: str
     davinci_daily_limit: int
     curie_daily_limit: int
     max_sentences: int
     max_tokens: int
-    only_ada_users: T.List[str]
+    ada_only_users: T.List[str]
     force_model: T.Optional[str] = None
 
 
 @dataclass
+class BotSecret:
+    bot_token: str
+    openai_key: str
+
+
+@dataclass
 class BotConfig:
-    token: str
+    secrets: BotSecret
     openai: OpenAI
     face_classifier: FaceClassifier
     random_params: RandomParams
