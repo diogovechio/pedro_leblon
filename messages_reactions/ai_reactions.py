@@ -64,12 +64,14 @@ async def openai_reactions(
             if random.random() < bot.config.random_params.random_mock_frequency:
                 bot.loop.create_task(
                     bot.send_message(
-                        message_text=await openai_generate_message(
+                        message_text=(await openai_generate_message(
                             bot=bot,
                             message=message,
                             prompt_inject=openai_prompts['comente'],
-                            random_model=True
-                        ),
+                            sentences=1,
+                            temperature=0.9,
+                            tokens=150
+                        )).replace('\n', ' '),
                         chat_id=message.chat.id,
                         sleep_time=1 + (round(random.random()) * 5),
                         reply_to=message.message_id)

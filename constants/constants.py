@@ -20,7 +20,7 @@ openai_block_words = ['viado', 'porra', 'fuck', 'cock', 'shit', 'transar', 'buce
                       'cú', 'chupa meu', 'chupa um', 'pau', 'penis', 'pênis', 'chupa o', 'o saco do']
 openai_react_words = ['bolsonaro', 'segundo turno', 'stadia', 'playstation', 'nvidia', 'amd', 'eleições', 'xbox',
                       'gamepass', 'game pass', 'eleição', 'machismo', 'machista', 'homofobia', 'homofôbico', 'racismo',
-                      'temer', 'ryzen', 'rio', 'overwatch', 'ps5', 'ps4', 'pc']
+                      'temer', 'ryzen', 'rio', 'overwatch', 'ps5', 'ps4']
 
 openai_prompts = {
     'fale': 'fale sobre esse tema:',

@@ -2,10 +2,10 @@ import asyncio
 
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
-from processing.ai_reactions import openai_reactions
-from processing.bot_commands import bot_commands
-from processing.general_text_reactions import words_reactions, mock_users
-from processing.image_reactions import image_pipeline
+from messages_reactions.ai_reactions import openai_reactions
+from messages_reactions.bot_commands import bot_commands
+from messages_reactions.general_text_reactions import words_reactions, mock_users
+from messages_reactions.image_reactions import image_pipeline
 
 
 async def messages_coordinator(

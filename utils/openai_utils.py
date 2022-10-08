@@ -21,8 +21,10 @@ usage_mapping = {
 async def openai_generate_message(
         message: TelegramMessage,
         bot: FakePedro,
-        prompt_inject: T.Optional[str] = None,
+        sentences: T.Optional[int] = None,
+        tokens: T.Optional[int] = None,
         temperature=0,
+        prompt_inject: T.Optional[str] = None,
         top_p=1,
         random_model: bool = False,
         mock_message: bool = False,
@@ -41,7 +43,7 @@ async def openai_generate_message(
         ),
         prompt=await prompt_handler(f"{prompt_inject}: {message_text}") if prompt_inject else message_text,
         api_key=bot.config.secrets.openai_key,
-        max_tokens=bot.config.openai.max_tokens,
+        max_tokens=bot.config.openai.max_tokens if tokens is None else tokens,
         temperature=temperature,
         top_p=top_p,
         frequency_penalty=1.0,
@@ -50,7 +52,7 @@ async def openai_generate_message(
 
     return await normalize_openai_text(
         ai_message=response.choices[0].text,
-        sentences=bot.config.openai.max_sentences,
+        sentences=bot.config.openai.max_sentences if sentences is None else sentences,
         clean_prompts=openai_prompts
     )
 
@@ -105,7 +107,9 @@ async def prompt_handler(
     if 'nando' in prompt_text or 'nands93' in prompt_text:
         additional_text += "assumindo que o nando devia arrumar um emprego, "
     if 'decaptor' in prompt_text:
-        additional_text += "assumindo que o andré é um macho orgulhoso, "
+        additional_text += "assumindo que o decaptor é um macho orgulhoso, "
+    if 'cocão' in prompt_text:
+        additional_text += "assumindo que o cocão gosta muito de glamour, "
     if len(additional_text):
         return f"{additional_text}, {prompt_text}"
     return prompt_text
@@ -117,7 +121,6 @@ async def normalize_openai_text(
         clean_prompts: T.Optional[dict] = None
 ) -> str:
     ai_message = ('. '.join(ai_message.split('.')[:sentences])).lower()
-    ai_message = ai_message.replace('pedro', '')
     if clean_prompts:
         for _, msg in clean_prompts.items():
             ai_message = ai_message.replace(msg, '')
@@ -130,7 +133,8 @@ async def normalize_openai_text(
     ai_message = re.sub('\\. +\\.', ' ', ai_message)
     ai_message = re.sub(', +,', ' ', ai_message)
     ai_message = re.sub(': +,', ' ', ai_message)
-    ai_message = ai_message.split(":")[-1]
+    ai_message = re.sub(': +:', ' ', ai_message)
+    ai_message = ai_message.split("::")[-1]
     if random.random() < 0.03:
         ai_message = ai_message.upper()
     return re.sub(' +', ' ', ai_message)

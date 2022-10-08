@@ -20,7 +20,7 @@ from aiohttp import ClientSession
 from data_classes.bot_config import BotConfig
 from data_classes.received_message import MessagesResults, TelegramMessage
 from data_structures.max_size_list import MaxSizeList
-from processing import messages_coordinator
+from messages_reactions import messages_coordinator
 
 logging.basicConfig(level=logging.INFO)
 
