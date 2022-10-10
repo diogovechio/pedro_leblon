@@ -14,7 +14,7 @@ async def words_reactions(
 ) -> None:
     if message.text.lower() in ['oi', 'bom dia', 'boa noite', 'adeus', 'rs', 'kk'] or (
             len(set(list(message.text.lower()))) <= 2 and len(
-            message.text) > 2 and random.random() < bot.config.random_params.words_react_frequency):
+            message.text) > 2 and random.random() < bot.config.random_params.random_mock_frequency):
         bot.loop.create_task(
             bot.send_message(
                 message_text=message.text,

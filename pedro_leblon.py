@@ -8,7 +8,6 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 import aiohttp
-import requests
 import json
 
 import face_recognition
@@ -182,32 +181,34 @@ class FakePedro:
 
     async def send_photo(self, image: bytes, chat_id: int, caption=None, reply_to=None, sleep_time=0):
         await asyncio.sleep(sleep_time)
-        # ToDo: replace for aiohttp
-        req = requests.post(
-            f"{self.api_route}/sendPhoto".replace('\n', ''),
-            {
-                'chat_id': f"{chat_id}",
-                'reply_to_message_id': reply_to,
-                'allow_sending_without_reply': True,
-                'caption': caption
-            },
-            files={'photo': image}
-        )
-        logging.info(req.status_code)
+        async with self.session.post(
+                url=f"{self.api_route}/sendPhoto".replace('\n', ''),
+                data=aiohttp.FormData(
+                    (
+                        ("chat_id", str(chat_id)),
+                        ("photo", image),
+                        ("reply_to_message_id", str(reply_to) if reply_to else ''),
+                        ('allow_sending_without_reply', 'true'),
+                        ("caption", caption if caption else '')
+                    )
+                )
+        ) as resp:
+            logging.info(resp.status)
 
     async def send_video(self, video: bytes, chat_id: int, reply_to=None, sleep_time=0):
         await asyncio.sleep(sleep_time)
-        # ToDo: replace for aiohttp
-        req = requests.post(
-            f"{self.api_route}/sendVideo".replace('\n', ''),
-            {
-                 'chat_id': f"{chat_id}",
-                 'reply_to_message_id': reply_to,
-                 'allow_sending_without_reply': True
-             },
-            files={'video': video}
-        )
-        logging.info(req.status_code)
+        async with self.session.post(
+                url=f"{self.api_route}/sendVideo".replace('\n', ''),
+                data=aiohttp.FormData(
+                    (
+                        ("chat_id", str(chat_id)),
+                        ("video", video),
+                        ("reply_to_message_id", str(reply_to) if reply_to else ''),
+                        ('allow_sending_without_reply', 'true')
+                    )
+                )
+        ) as resp:
+            logging.info(resp.status)
 
     async def send_message(self, message_text: str, chat_id: int, reply_to=None, sleep_time=0):
         await asyncio.sleep(sleep_time)
