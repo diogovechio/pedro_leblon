@@ -13,14 +13,13 @@ drunk_decaptor_taunt_list = [
     'já vai arrumar problema com a polícia de novo?',
 ]
 
-ask_photos = ['melhorar', 'fotos', 'foto', 'melhorou', 'ia']
+ask_photos = ['melhorar', 'fotos', 'foto', 'melhorou']
 
-openai_block_words = ['viado', 'porra', 'fuck', 'cock', 'shit', 'transar', 'buceta', 'boceta',
+openai_block_words = ['viado', 'porra', 'fuck', 'cock', 'transar', 'buceta', 'boceta',
                       'piroca', 'pornô', 'porno', 'sexo', 'cu?', ' cu ', 'caralho', 'foder', 'matar', 'pinto',
                       'cú', 'chupa meu', 'chupa um', 'pau', 'penis', 'pênis', 'chupa o', 'o saco do']
-openai_react_words = ['bolsonaro', 'segundo turno', 'stadia', 'playstation', 'nvidia', 'amd', 'eleições', 'xbox',
-                      'gamepass', 'game pass', 'eleição', 'machismo', 'machista', 'homofobia', 'homofôbico', 'racismo',
-                      'temer', 'ryzen', 'rio', 'overwatch', 'ps5', 'ps4']
+openai_react_words = ['bolsonaro', 'segundo turno', 'macho', 'lula', 'dilma', 'homem', 'homens', 'ets', 'votação',
+                      'eleição', 'eleições']
 
 openai_prompts = {
     'fale': 'fale sobre esse tema:',

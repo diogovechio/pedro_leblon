@@ -196,8 +196,8 @@ class FakePedro:
         logging.info(req.status_code)
 
     async def send_video(self, video: bytes, chat_id: int, reply_to=None, sleep_time=0):
-        # ToDo: replace for aiohttp
         await asyncio.sleep(sleep_time)
+        # ToDo: replace for aiohttp
         req = requests.post(
             f"{self.api_route}/sendVideo".replace('\n', ''),
             {

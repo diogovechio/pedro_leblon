@@ -32,7 +32,7 @@ async def image_cropper(image: bytes, coords: tuple) -> bytes:
         image_bytes = file.read()
     del img
     os.remove(temp_load)
-    return image_bytes
+    yield image_bytes
 
 
 async def face_classifier(
@@ -73,4 +73,4 @@ async def face_classifier(
     del input_image_embeddings
     os.remove(temp_filename)
 
-    return data
+    yield data
