@@ -14,7 +14,7 @@ async def words_reactions(
 ) -> None:
     if message.text.lower() in ['oi', 'bom dia', 'boa noite', 'adeus', 'rs', 'kk'] or (
             len(set(list(message.text.lower()))) <= 2 and len(
-            message.text) > 2 and random.random() < bot.config.random_params.words_react_frequency):
+        message.text) > 2 and random.random() < bot.config.random_params.words_react_frequency):
         bot.loop.create_task(
             bot.send_message(
                 message_text=message.text,
@@ -66,7 +66,15 @@ async def mock_users(
                 bot.loop.create_task(
                     bot.send_message(
                         message_text=random.choice(
-                            [url.link for url in feedparser.parse(bot.config.rss_feed.url).entries]
+                            list(
+                                filter(
+                                    lambda url: (
+                                            'lula' in url or 'bolsonaro' in url or 'moro' in url or 'turno' in url or
+                                            'dilma' in url or 'pt' in url
+                                    ),
+                                    [url.link for url in feedparser.parse(bot.config.rss_feed.url).entries]
+                                )
+                            )
                         ),
                         chat_id=message.chat.id,
                         reply_to=message.message_id
