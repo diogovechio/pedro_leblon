@@ -44,6 +44,8 @@ async def openai_reactions(
                             bot=bot,
                             message=message,
                             prompt_inject=openai_prompts['fale'],
+                            sentences=1,
+                            tokens=150,
                             mock_message=True
                         ),
                         chat_id=message.chat.id,
