@@ -25,6 +25,8 @@ async def openai_generate_message(
         tokens: T.Optional[int] = None,
         temperature=0,
         prompt_inject: T.Optional[str] = None,
+        message_text_replace: T.Optional[str] = None,
+        force_model: T.Optional[str] = None,
         top_p=1,
         random_model: bool = False,
         mock_message: bool = False,
@@ -34,13 +36,15 @@ async def openai_generate_message(
     if remove_words_list:
         for word in remove_words_list:
             message_text = message_text.replace(word, '')
+    if message_text_replace:
+        message_text = message_text_replace
     response = openai.Completion.create(
         model=await model_selector(
             bot=bot,
             message=message,
             mock_message=mock_message,
             random_model=random_model
-        ),
+        ) if not force_model else force_model,
         prompt=await prompt_handler(f"{prompt_inject}: {message_text}") if prompt_inject else message_text,
         api_key=bot.config.secrets.openai_key,
         max_tokens=bot.config.openai.max_tokens if tokens is None else tokens,
@@ -131,6 +135,7 @@ async def normalize_openai_text(
     ai_message = re.sub(': +:', ' ', ai_message)
     ai_message = ai_message.split("::")[-1]
     ai_message = ai_message.strip()
+    logging.info(ai_message)
     while '.' in ai_message[0] or ' ' in ai_message[0] or '?' in ai_message[0] or ',' in ai_message[0]:
         ai_message = ai_message[1:]
     while '.' in ai_message[-1] or ' ' in ai_message[0] or ',' in ai_message[-1]:

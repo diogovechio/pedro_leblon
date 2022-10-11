@@ -2,7 +2,7 @@ import random
 
 import feedparser
 
-from constants.constants import ask_photos, openai_block_words, drunk_decaptor_taunt_list
+from constants.constants import ask_photos, openai_block_words, drunk_decaptor_taunt_list, NEWS_WORD_LIST
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
 from utils.text_utils import message_miguxer
@@ -68,10 +68,7 @@ async def mock_users(
                         message_text=random.choice(
                             list(
                                 filter(
-                                    lambda url: (
-                                            'lula' in url or 'bolsonaro' in url or 'moro' in url or 'turno' in url or
-                                            'dilma' in url or 'pt' in url
-                                    ),
+                                    lambda url: any(news_word in url for news_word in NEWS_WORD_LIST),
                                     [url.link for url in feedparser.parse(bot.config.rss_feed.url).entries]
                                 )
                             )
@@ -81,7 +78,6 @@ async def mock_users(
                     )
                 )
                 bot.sent_news = bot.datetime_now.hour
-
     if message.from_.username == f"{'decaptor' if not bot.debug_mode else 'diogovechio'}":
         if random.random() < bot.config.random_params.random_mock_frequency:
             bot.loop.create_task(

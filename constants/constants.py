@@ -24,5 +24,10 @@ openai_react_words = ['bolsonaro', 'segundo turno', 'macho', 'lula', 'dilma', 'h
 openai_prompts = {
     'fale': 'fale sobre esse tema:',
     'responda': 'responda essa pergunta:',
-    'comente': 'comente sobre isso:'
+    'comente': 'comente sobre isso:',
+    'critique': 'critique o linguajar dessa mensagem:',
+    'critique_reformule': 'critique o linguagem dessa mensagem e reformule para uma forma apropriada:'
 }
+
+
+NEWS_WORD_LIST = ['pt', 'lula', 'eleicao', 'eleicoes', 'voto', 'dilma', 'bolsonaro', 'moro']
