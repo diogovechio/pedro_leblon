@@ -124,17 +124,17 @@ async def normalize_openai_text(
     if clean_prompts:
         for _, msg in clean_prompts.items():
             ai_message = ai_message.replace(msg, '')
-    ai_message = ai_message.strip()
-    while '.' in ai_message[0] or ' ' in ai_message[0] or '?' in ai_message[0] or ',' in ai_message[0]:
-        ai_message = ai_message[1:]
-    while '.' in ai_message[-1] or ' ' in ai_message[0] or ',' in ai_message[-1]:
-        ai_message = ai_message[:-1]
     ai_message = re.sub(', +,', ' ', ai_message)
     ai_message = re.sub('\\. +\\.', ' ', ai_message)
     ai_message = re.sub(', +,', ' ', ai_message)
     ai_message = re.sub(': +,', ' ', ai_message)
     ai_message = re.sub(': +:', ' ', ai_message)
     ai_message = ai_message.split("::")[-1]
+    ai_message = ai_message.strip()
+    while '.' in ai_message[0] or ' ' in ai_message[0] or '?' in ai_message[0] or ',' in ai_message[0]:
+        ai_message = ai_message[1:]
+    while '.' in ai_message[-1] or ' ' in ai_message[0] or ',' in ai_message[-1]:
+        ai_message = ai_message[:-1]
     if random.random() < 0.03:
         ai_message = ai_message.upper()
     return re.sub(' +', ' ', ai_message)
