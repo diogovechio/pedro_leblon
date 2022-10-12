@@ -2,7 +2,7 @@ import random
 
 import feedparser
 
-from constants.constants import NEWS_WORD_LIST, DRUNK_DECAPTOR_LIST, SWEAR_WORDS
+from constants.constants import NEWS_WORD_LIST, DRUNK_DECAPTOR_LIST, DECAPTOR_DISAPPOINTS
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
 from utils.text_utils import message_miguxer
@@ -48,6 +48,7 @@ async def mock_users(
         bot.sent_news = bot.datetime_now.hour
 
     if message.from_.username == f"{'decaptor' if not bot.debug_mode else 'diogovechio'}":
+
         if random.random() < bot.config.random_params.random_mock_frequency:
             bot.loop.create_task(
                 bot.send_video(
@@ -74,21 +75,11 @@ async def mock_users(
                     reply_to=None)
             )
 
-        if random.random() < bot.config.random_params.words_react_frequency:
-            if any(word in message.text.lower() for word in SWEAR_WORDS):
-                bot.loop.create_task(
-                    bot.send_video(
-                        video=open(f'gifs/nossa.mp4', 'rb').read(),
-                        chat_id=message.chat.id,
-                        reply_to=None)
-                )
-                bot.config.mock_messages[message.from_.username].last_mock_hour = bot.datetime_now.hour
-
-            elif 'lula' in message.text.lower():
-                bot.loop.create_task(
-                    bot.send_video(
-                        video=open(f'gifs/kardashian_disappointed.mp4', 'rb').read(),
-                        chat_id=message.chat.id,
-                        reply_to=message.message_id),
-                )
-                bot.config.mock_messages[message.from_.username].last_mock_hour = bot.datetime_now.hour
+        if any(word in message.text.lower() for word in DECAPTOR_DISAPPOINTS):
+            bot.loop.create_task(
+                bot.send_video(
+                    video=open(f'gifs/kardashian_disappointed.mp4', 'rb').read(),
+                    chat_id=message.chat.id,
+                    reply_to=message.message_id),
+            )
+            bot.config.mock_messages[message.from_.username].last_mock_hour = bot.datetime_now.hour

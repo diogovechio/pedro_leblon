@@ -15,11 +15,13 @@ DRUNK_DECAPTOR_LIST = [
 
 ASK_PHOTOS = ['melhorar', 'fotos', 'foto', 'melhorou']
 
-SWEAR_WORDS = ['merda', 'porra', 'caralho', 'viado', 'buceta', 'fode']
+DECAPTOR_DISAPPOINTS = ['lula', 'esquerdista', 'fato', 'venezuela', 'hipócrita', 'hipocrisia', 'hipocrita', 'dilma',
+                        'imparcial']
 
 OPENAI_BLOCK_WORDS = ['viado', 'porra', 'fuck', 'cock', 'transar', 'buceta', 'boceta',
                       'piroca', 'pornô', 'porno', 'sexo', 'cu?', ' cu ', 'caralho', 'foder', 'matar', 'pinto',
                       'cú', 'chupa meu', 'chupa um', 'pau', 'penis', 'pênis', 'chupa o', 'o saco do']
+
 OPENAI_REACT_WORDS = ['bolsonaro', 'segundo turno', 'macho', 'lula', 'dilma', 'homem', 'homens', 'ets', 'votação',
                       'eleição', 'eleições']
 
