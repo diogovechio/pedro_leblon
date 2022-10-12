@@ -1,4 +1,5 @@
 import asyncio
+import typing as T
 
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
@@ -6,7 +7,7 @@ from utils.face_utils import faces_detector, image_cropper, face_classifier
 from utils.text_utils import greeter
 
 
-async def image_pipeline(
+async def image_reactions(
         bot: FakePedro,
         message: TelegramMessage,
         method: str,

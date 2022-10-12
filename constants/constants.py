@@ -1,4 +1,4 @@
-drunk_decaptor_taunt_list = [
+DRUNK_DECAPTOR_LIST = [
     'vai dormir merda',
     'senhor dono da verdade',
     'culpa dos webdevs',
@@ -13,15 +13,17 @@ drunk_decaptor_taunt_list = [
     'já vai arrumar problema com a polícia de novo?',
 ]
 
-ask_photos = ['melhorar', 'fotos', 'foto', 'melhorou']
+ASK_PHOTOS = ['melhorar', 'fotos', 'foto', 'melhorou']
 
-openai_block_words = ['viado', 'porra', 'fuck', 'cock', 'transar', 'buceta', 'boceta',
+SWEAR_WORDS = ['merda', 'porra', 'caralho', 'viado', 'buceta', 'fode']
+
+OPENAI_BLOCK_WORDS = ['viado', 'porra', 'fuck', 'cock', 'transar', 'buceta', 'boceta',
                       'piroca', 'pornô', 'porno', 'sexo', 'cu?', ' cu ', 'caralho', 'foder', 'matar', 'pinto',
                       'cú', 'chupa meu', 'chupa um', 'pau', 'penis', 'pênis', 'chupa o', 'o saco do']
-openai_react_words = ['bolsonaro', 'segundo turno', 'macho', 'lula', 'dilma', 'homem', 'homens', 'ets', 'votação',
+OPENAI_REACT_WORDS = ['bolsonaro', 'segundo turno', 'macho', 'lula', 'dilma', 'homem', 'homens', 'ets', 'votação',
                       'eleição', 'eleições']
 
-openai_prompts = {
+OPENAI_PROMPTS = {
     'fale': 'fale sobre esse tema:',
     'responda': 'responda essa pergunta:',
     'comente': 'comente sobre isso:',

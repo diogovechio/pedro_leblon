@@ -54,6 +54,8 @@ class BotSecret:
 class BotConfig:
     secrets: BotSecret
     openai: OpenAI
+    ask_photos: bool
+    telegram_api_semaphore: int
     face_classifier: FaceClassifier
     random_params: RandomParams
     rss_feed: RSSFeed

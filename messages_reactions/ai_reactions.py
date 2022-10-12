@@ -1,6 +1,6 @@
 import random
 
-from constants.constants import openai_block_words, openai_react_words, openai_prompts
+from constants.constants import OPENAI_BLOCK_WORDS, OPENAI_REACT_WORDS, OPENAI_PROMPTS
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
 from utils.openai_utils import openai_generate_message
@@ -12,7 +12,7 @@ async def openai_reactions(
 ) -> None:
     openai_block_word_detected = False
 
-    for block_word in openai_block_words:
+    for block_word in OPENAI_BLOCK_WORDS:
         if openai_block_word_detected := block_word in message.text.lower():
             if random.random() < bot.config.random_params.words_react_frequency:
                 bot.loop.create_task(
@@ -20,8 +20,8 @@ async def openai_reactions(
                         message_text=await openai_generate_message(
                             bot=bot,
                             message=message,
-                            prompt_inject=openai_prompts['critique'] if round(
-                                random.random()) else openai_prompts['critique_reformule'],
+                            prompt_inject=OPENAI_PROMPTS['critique'] if round(
+                                random.random()) else OPENAI_PROMPTS['critique_reformule'],
                             sentences=2,
                             temperature=1.0,
                             tokens=165,
@@ -34,7 +34,7 @@ async def openai_reactions(
             break
 
     if not openai_block_word_detected:
-        for react_word in openai_react_words:
+        for react_word in OPENAI_REACT_WORDS:
             if '?' not in message.text.lower() and react_word in message.text.lower(
 
             ) and random.random() < bot.config.random_params.words_react_frequency:
@@ -43,7 +43,7 @@ async def openai_reactions(
                         message_text=await openai_generate_message(
                             bot=bot,
                             message=message,
-                            prompt_inject=openai_prompts['fale'],
+                            prompt_inject=OPENAI_PROMPTS['fale'],
                             sentences=1,
                             tokens=150,
                             mock_message=True
@@ -59,8 +59,8 @@ async def openai_reactions(
                     message_text=await openai_generate_message(
                             bot=bot,
                             message=message,
-                            prompt_inject=openai_prompts[
-                                'responda'] if '?' in message.text.lower() else openai_prompts['fale'],
+                            prompt_inject=OPENAI_PROMPTS[
+                                'responda'] if '?' in message.text.lower() else OPENAI_PROMPTS['fale'],
                             remove_words_list=['pedro']
                         ),
                     chat_id=message.chat.id,
@@ -85,7 +85,7 @@ async def openai_reactions(
                         message_text=(await openai_generate_message(
                             bot=bot,
                             message=message,
-                            prompt_inject=openai_prompts['comente'],
+                            prompt_inject=OPENAI_PROMPTS['comente'],
                             sentences=1,
                             temperature=0.9,
                             tokens=150

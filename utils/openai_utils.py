@@ -5,7 +5,7 @@ import typing as T
 
 import openai
 
-from constants.constants import openai_prompts
+from constants.constants import OPENAI_PROMPTS
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
 
@@ -57,7 +57,7 @@ async def openai_generate_message(
     return await normalize_openai_text(
         ai_message=response.choices[0].text,
         sentences=bot.config.openai.max_sentences if sentences is None else sentences,
-        clean_prompts=openai_prompts
+        clean_prompts=OPENAI_PROMPTS
     )
 
 

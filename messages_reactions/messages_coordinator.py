@@ -1,11 +1,12 @@
 import asyncio
 
 from data_classes.received_message import TelegramMessage
+from messages_reactions.mock_users import mock_users
 from pedro_leblon import FakePedro
 from messages_reactions.ai_reactions import openai_reactions
 from messages_reactions.bot_commands import bot_commands
-from messages_reactions.general_text_reactions import words_reactions, mock_users
-from messages_reactions.image_reactions import image_pipeline
+from messages_reactions.general_text_reactions import words_reactions
+from messages_reactions.image_reactions import image_reactions
 
 
 async def messages_coordinator(
@@ -18,7 +19,7 @@ async def messages_coordinator(
 
         if message.photo:
             bot.loop.create_task(
-                image_pipeline(
+                image_reactions(
                     bot=bot,
                     message=message,
                     method='cropper' if from_samuel or from_debug_chats else 'face_classifier',

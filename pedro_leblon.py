@@ -27,13 +27,11 @@ logging.basicConfig(level=logging.INFO)
 class FakePedro:
     def __init__(
             self,
-            bot_name: str,
             bot_config_file: str,
             polling_rate: int = 1,
             debug_mode=False
     ):
         self.allowed_list = []
-        self.bot_name = bot_name
         self.debug_mode = debug_mode
 
         self.config: T.Optional[BotConfig] = None
@@ -42,7 +40,7 @@ class FakePedro:
         self.last_id = 0
         self.polling_rate = polling_rate
         self.messages: T.List[T.Any] = []
-        self.interacted_messages = MaxSizeList(1000)
+        self.interacted_messages = MaxSizeList(400)
 
         self.datetime_now = datetime.now() - timedelta(hours=3)
 
@@ -62,19 +60,21 @@ class FakePedro:
 
         self.loop: T.Optional[AbstractEventLoop] = None
 
-    async def run(self):
+    async def run(self) -> None:
         try:
             Path('tmp').mkdir(exist_ok=True)
             Path('face_lake').mkdir(exist_ok=True)
 
-            self.loop = asyncio.get_running_loop()
-
             await self.load_config_params()
 
+            self.loop = asyncio.get_running_loop()
             self.session = aiohttp.ClientSession()
-            self.loop.create_task(self._message_controller())
 
-            await self._message_polling()
+            await asyncio.gather(
+                self._message_controller(),
+                self._message_polling()
+            )
+
         except Exception as exc:
             if isinstance(self.session, ClientSession):
                 await self.session.close()
@@ -82,10 +82,11 @@ class FakePedro:
 
             logging.exception(exc)
 
-            await asyncio.sleep(90)
+            await asyncio.sleep(60)
+
             await self.run()
 
-    async def load_config_params(self):
+    async def load_config_params(self) -> None:
         logging.info('Loading params')
 
         with open(self.config_file) as f:
@@ -119,7 +120,7 @@ class FakePedro:
 
         logging.info('Loading finished')
 
-    async def _message_polling(self):
+    async def _message_polling(self) -> None:
         while True:
             try:
                 await asyncio.sleep(self.polling_rate)
@@ -139,7 +140,7 @@ class FakePedro:
                 logging.exception(exc)
                 await asyncio.sleep(15)
 
-    async def _message_controller(self):
+    async def _message_controller(self) -> None:
         while True:
             try:
                 logging.info(f'Message controller task running - {len(self.interacted_messages)}')
@@ -154,6 +155,7 @@ class FakePedro:
                                 messages_coordinator(self, TelegramMessage(**message['message']))
                             )
 
+                # ToDo: implementa direito:
                 if self.datetime_now.hour == 1:
                     self.openai_use = 0
 
@@ -179,57 +181,62 @@ class FakePedro:
                         else:
                             logging.critical(f"Image download failed: {download_request.status}")
 
-    async def send_photo(self, image: bytes, chat_id: int, caption=None, reply_to=None, sleep_time=0):
+    async def send_photo(self, image: bytes, chat_id: int, caption=None, reply_to=None, sleep_time=0) -> None:
         await asyncio.sleep(sleep_time)
-        async with self.session.post(
-                url=f"{self.api_route}/sendPhoto".replace('\n', ''),
-                data=aiohttp.FormData(
-                    (
-                        ("chat_id", str(chat_id)),
-                        ("photo", image),
-                        ("reply_to_message_id", str(reply_to) if reply_to else ''),
-                        ('allow_sending_without_reply', 'true'),
-                        ("caption", caption if caption else '')
-                    )
-                )
-        ) as resp:
-            logging.info(resp.status)
 
-    async def send_video(self, video: bytes, chat_id: int, reply_to=None, sleep_time=0):
-        await asyncio.sleep(sleep_time)
-        async with self.session.post(
-                url=f"{self.api_route}/sendVideo".replace('\n', ''),
-                data=aiohttp.FormData(
-                    (
-                        ("chat_id", str(chat_id)),
-                        ("video", video),
-                        ("reply_to_message_id", str(reply_to) if reply_to else ''),
-                        ('allow_sending_without_reply', 'true')
+        async with asyncio.Semaphore(self.config.telegram_api_semaphore):
+            async with self.session.post(
+                    url=f"{self.api_route}/sendPhoto".replace('\n', ''),
+                    data=aiohttp.FormData(
+                        (
+                            ("chat_id", str(chat_id)),
+                            ("photo", image),
+                            ("reply_to_message_id", str(reply_to) if reply_to else ''),
+                            ('allow_sending_without_reply', 'true'),
+                            ("caption", caption if caption else '')
+                        )
                     )
-                )
-        ) as resp:
-            logging.info(resp.status)
+            ) as resp:
+                logging.info(resp.status)
 
-    async def send_message(self, message_text: str, chat_id: int, reply_to=None, sleep_time=0):
+    async def send_video(self, video: bytes, chat_id: int, reply_to=None, sleep_time=0) -> None:
         await asyncio.sleep(sleep_time)
-        async with self.session.post(
-                f"{self.api_route}/sendMessage".replace('\n', ''),
-                json={
-                    "chat_id": chat_id,
-                    'reply_to_message_id': reply_to,
-                    'allow_sending_without_reply': True,
-                    "text": message_text,
-                    "parse_mode": "HTML"
-                }
-        ) as resp:
-            logging.info(resp.status)
+
+        async with asyncio.Semaphore(self.config.telegram_api_semaphore):
+            async with self.session.post(
+                    url=f"{self.api_route}/sendVideo".replace('\n', ''),
+                    data=aiohttp.FormData(
+                        (
+                            ("chat_id", str(chat_id)),
+                            ("video", video),
+                            ("reply_to_message_id", str(reply_to) if reply_to else ''),
+                            ('allow_sending_without_reply', 'true')
+                        )
+                    )
+            ) as resp:
+                logging.info(resp.status)
+
+    async def send_message(self, message_text: str, chat_id: int, reply_to=None, sleep_time=0) -> None:
+        await asyncio.sleep(sleep_time)
+
+        async with asyncio.Semaphore(self.config.telegram_api_semaphore):
+            async with self.session.post(
+                    f"{self.api_route}/sendMessage".replace('\n', ''),
+                    json={
+                        "chat_id": chat_id,
+                        'reply_to_message_id': reply_to,
+                        'allow_sending_without_reply': True,
+                        "text": message_text,
+                        "parse_mode": "HTML"
+                    }
+            ) as resp:
+                logging.info(resp.status)
 
 
 if __name__ == '__main__':
     pedro_leblon = FakePedro(
-        bot_name='nao ta servindo pra nada',
         bot_config_file='bot_configs.json',
-        debug_mode=False
+        debug_mode=True
     )
 
     asyncio.run(
