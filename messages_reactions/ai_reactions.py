@@ -7,8 +7,8 @@ from utils.openai_utils import openai_generate_message
 
 
 async def openai_reactions(
-        bot: FakePedro, message:
-        TelegramMessage
+        bot: FakePedro,
+        message: TelegramMessage
 ) -> None:
     openai_block_word_detected = False
 

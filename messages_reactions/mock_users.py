@@ -75,7 +75,8 @@ async def mock_users(
                     reply_to=None)
             )
 
-        if any(word in message.text.lower() for word in DECAPTOR_DISAPPOINTS):
+        if any(word in message.text.lower() for word in DECAPTOR_DISAPPOINTS
+               ) and bot.config.mock_messages[message.from_.username].last_mock_hour != bot.datetime_now.hour:
             bot.loop.create_task(
                 bot.send_video(
                     video=open(f'gifs/kardashian_disappointed.mp4', 'rb').read(),
