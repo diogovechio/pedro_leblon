@@ -125,41 +125,44 @@ async def normalize_openai_text(
         clean_prompts: T.Optional[dict] = None
 ) -> str:
     try:
-        logging.info(f"original message: {ai_message}")
-        ai_message = ('. '.join(ai_message.split('.')[:sentences])).lower()
-        logging.info(f"joined message: {ai_message}")
+        ai_message = (
+            '. '.join(
+                list(
+                    filter(
+                        lambda entry: re.sub(" +", '', entry) != '', ai_message.split('.')
+                    )
+                )[:sentences]
+            )
+        ).lower()
+
         if clean_prompts:
             for _, msg in clean_prompts.items():
                 ai_message = ai_message.replace(msg, '')
-        logging.info(f"cleaning prompts: {ai_message}")
+
         ai_message = re.sub(', +,', ' ', ai_message)
-        logging.info(f"removing , ,: {ai_message}")
         ai_message = re.sub('\\. +\\.', ' ', ai_message)
-        logging.info(f"removing ,   ,: {ai_message}")
         ai_message = re.sub(', +,', ' ', ai_message)
-        logging.info(f"removing : ,: {ai_message}")
         ai_message = re.sub(': +,', ' ', ai_message)
-        logging.info(f"removing : : : {ai_message}")
         ai_message = re.sub(': +:', ' ', ai_message)
-        logging.info(f"spliting with :: : {ai_message}")
         ai_message = ai_message.split("::")[-1]
-        logging.info(f"strip: {ai_message}")
         ai_message = ai_message.strip()
-        logging.info(ai_message)
-        while '.' in ai_message[0] or ' ' in ai_message[0] or '?' in ai_message[0] or ',' in ai_message[0]:
-            ai_message = ai_message[1:]
 
-        logging.info(f"cleaning first characters: {ai_message}")
-        while '.' in ai_message[-1] or ' ' in ai_message[0] or ',' in ai_message[-1]:
-            ai_message = ai_message[:-1]
+        if ai_message:
+            logging.info(ai_message)
 
-        logging.info(f"removing last characters: {ai_message}")
+            while '.' in ai_message[0] or ' ' in ai_message[0] or '?' in ai_message[0] or ',' in ai_message[0]:
+                ai_message = ai_message[1:]
 
-        if random.random() < 0.03:
-            ai_message = ai_message.upper()
-            logging.info(f"messaing upper: {ai_message}")
+            while '.' in ai_message[-1] or ' ' in ai_message[0] or ',' in ai_message[-1]:
+                ai_message = ai_message[:-1]
 
-        return re.sub(' +', ' ', ai_message)
+            if random.random() < 0.03:
+                ai_message = ai_message.upper()
+
+            return re.sub(' +', ' ', ai_message)
+        else:
+            return 'estou sem palavras' if round(random.random()) else 'tenho nada a dizer'
     except Exception as exc:
         logging.exception(exc)
-        return 'dei pau vai ver o log'
+
+        return '@diogovechio dei pau vai ver o log'
