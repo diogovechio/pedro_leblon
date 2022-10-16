@@ -10,9 +10,12 @@ async def words_reactions(
         message: TelegramMessage
 ) -> None:
     if message.text.lower() in ['oi', 'bom dia', 'boa noite', 'adeus', 'rs', 'kk'] or (
-            len(set(list(message.text.lower()))) <= 2 and len(message.text) > 2 and random.random(
-
-    ) < bot.config.random_params.random_mock_frequency):
+            len(
+                set(
+                    list(message.text.lower())
+                    )
+                ) <= 2 and len(message.text) > 2 and random.random() < bot.config.random_params.random_mock_frequency
+    ):
         bot.loop.create_task(
             bot.send_message(
                 message_text=message.text,
@@ -24,11 +27,15 @@ async def words_reactions(
 
         ) < bot.config.random_params.words_react_frequency:
             if bot.asked_for_photo != round(bot.datetime_now.hour / 8):
+
                 embeddings_count = {key: bot.faces_names.count(key) for key in bot.faces_names}
+
                 low_photo_count = [key for key, value in embeddings_count.items() if
                                    value == embeddings_count[min(embeddings_count, key=embeddings_count.get)]]
+
                 high_photo_count = [key for key, value in embeddings_count.items() if
                                     value == embeddings_count[max(embeddings_count, key=embeddings_count.get)]]
+
                 bot.loop.create_task(
                     bot.send_message(
                         f"{message.from_.first_name.lower()} manda uma foto do "
@@ -38,4 +45,5 @@ async def words_reactions(
                         sleep_time=2 + round(random.random() * 5),
                         reply_to=message.message_id)
                 )
+
                 bot.asked_for_photo = round(bot.datetime_now.hour / 8)

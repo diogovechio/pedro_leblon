@@ -24,6 +24,7 @@ async def mock_users(
                         sleep_time=2 + round(random.random() * 5),
                         reply_to=None),
                 )
+
                 bot.config.mock_messages[message.from_.username].last_mock_hour = bot.datetime_now.hour
 
     if (
@@ -45,6 +46,7 @@ async def mock_users(
                 reply_to=message.message_id
             )
         )
+
         bot.sent_news = bot.datetime_now.hour
 
     if message.from_.username == f"{'decaptor' if not bot.debug_mode else 'diogovechio'}":
@@ -83,4 +85,5 @@ async def mock_users(
                     chat_id=message.chat.id,
                     reply_to=message.message_id),
             )
+
             bot.config.mock_messages[message.from_.username].last_mock_hour = bot.datetime_now.hour

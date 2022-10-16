@@ -17,6 +17,7 @@ async def image_reactions(
 
     if image_bytes := await bot.image_downloader(message):
         if face_coords := await faces_detector(image_bytes, bot.config.face_classifier.box_min_size):
+
             if method == 'cropper':
                 async def _crop_and_send(img_bytes: bytes, coord: tuple):
                     crop_bytes = await image_cropper(img_bytes, coord)
@@ -26,6 +27,7 @@ async def image_reactions(
                         faces_names=bot.faces_names,
                         face_tolerance=bot.config.face_classifier.face_tolerance
                     )
+
                     if recognized_face or always_send_crop:
                         await bot.send_photo(
                             image=crop_bytes,
@@ -39,11 +41,14 @@ async def image_reactions(
 
                 for img_coord in face_coords:
                     loop.create_task(_crop_and_send(image_bytes, img_coord))
+
                 return
+
             elif method == 'face_classifier':
                 if face_recognized := await face_classifier(
                         image_bytes, bot.face_embeddings, bot.faces_names,
                         bot.config.face_classifier.face_tolerance):
+
                     loop.create_task(
                         bot.send_message(
                             message_text=await greeter(
