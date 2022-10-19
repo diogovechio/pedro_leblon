@@ -10,7 +10,7 @@ async def openai_reactions(
         bot: FakePedro,
         message: TelegramMessage
 ) -> None:
-    
+
     if openai_block_word_detected := any(
             block_word in message.text.lower() for block_word in OPENAI_BLOCK_WORDS
     ):
@@ -22,6 +22,7 @@ async def openai_reactions(
                         message=message,
                         prompt_inject=OPENAI_PROMPTS['critique'] if round(
                             random.random()) else OPENAI_PROMPTS['critique_reformule'],
+                        remove_words_list=['pedro'],
                         sentences=2,
                         temperature=1.0,
                         tokens=165,
@@ -33,7 +34,7 @@ async def openai_reactions(
             )
 
     if not openai_block_word_detected:
-        
+
         if any(
                 react_word in message.text.lower() for react_word in OPENAI_REACT_WORDS
         ) and random.random() < bot.config.random_params.words_react_frequency:
@@ -51,7 +52,7 @@ async def openai_reactions(
                     sleep_time=1 + (round(random.random()) * 5),
                     reply_to=message.message_id)
             )
-    
+
         elif 'pedr' in message.text.lower()[0:4]:
             bot.loop.create_task(
                 bot.send_message(
@@ -65,7 +66,7 @@ async def openai_reactions(
                     chat_id=message.chat.id,
                     reply_to=message.message_id)
             )
-    
+
         elif "/pedro" in message.text.lower()[0:6]:
             bot.loop.create_task(
                 bot.send_message(
@@ -78,4 +79,3 @@ async def openai_reactions(
                     chat_id=message.chat.id,
                     reply_to=message.message_id)
             )
-    
