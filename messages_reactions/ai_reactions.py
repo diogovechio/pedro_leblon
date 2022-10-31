@@ -12,6 +12,8 @@ async def openai_reactions(
 ) -> None:
     openai_block_word_detected = False
 
+    message.chat.
+
     for block_word in OPENAI_BLOCK_WORDS:
         if openai_block_word_detected := block_word in message.text.lower():
             if random.random() < bot.config.random_params.words_react_frequency:
