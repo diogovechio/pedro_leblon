@@ -33,14 +33,15 @@ async def mock_users(
             (message.from_.username in ['nands93', 'theyuush', 'decaptor'] or from_debug_chats or from_samuel)
             and bot.sent_news != bot.datetime_now.hour
             and random.random() < bot.config.random_params.words_react_frequency
+            and bot.config.rss_feed.news != ""
     ):
         bot.loop.create_task(
             bot.send_message(
-                message_text=random.choice(
+                message_text=random.choice(\
                     list(
                         filter(
                             lambda url: any(news_word in url for news_word in NEWS_WORD_LIST),
-                            [url.link for url in feedparser.parse(bot.config.rss_feed.url).entries]
+                            [url.link for url in feedparser.parse(bot.config.rss_feed.news).entries]
                         )
                     )
                 ),

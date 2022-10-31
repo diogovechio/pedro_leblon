@@ -19,7 +19,8 @@ class RandomParams:
 
 @dataclass
 class RSSFeed:
-    url: str
+    news: str
+    games: str
 
 
 @dataclass

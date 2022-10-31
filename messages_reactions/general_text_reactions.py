@@ -1,5 +1,7 @@
 import random
 
+import feedparser
+
 from constants.constants import ASK_PHOTOS
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
@@ -22,28 +24,41 @@ async def words_reactions(
                 chat_id=message.chat.id)
         )
 
-    if bot.config.ask_photos:
-        if any(word in message.text.lower() for word in ASK_PHOTOS) and random.random(
+    if bot.config.ask_photos and any(
+            word in message.text.lower() for word in ASK_PHOTOS
+    ) and random.random() < bot.config.random_params.words_react_frequency:
 
-        ) < bot.config.random_params.words_react_frequency:
-            if bot.asked_for_photo != round(bot.datetime_now.hour / 8):
+        if bot.asked_for_photo != round(bot.datetime_now.hour / 8):
 
-                embeddings_count = {key: bot.faces_names.count(key) for key in bot.faces_names}
+            embeddings_count = {key: bot.faces_names.count(key) for key in bot.faces_names}
 
-                low_photo_count = [key for key, value in embeddings_count.items() if
-                                   value == embeddings_count[min(embeddings_count, key=embeddings_count.get)]]
+            low_photo_count = [key for key, value in embeddings_count.items() if
+                               value == embeddings_count[min(embeddings_count, key=embeddings_count.get)]]
 
-                high_photo_count = [key for key, value in embeddings_count.items() if
-                                    value == embeddings_count[max(embeddings_count, key=embeddings_count.get)]]
+            high_photo_count = [key for key, value in embeddings_count.items() if
+                                value == embeddings_count[max(embeddings_count, key=embeddings_count.get)]]
 
-                bot.loop.create_task(
-                    bot.send_message(
-                        f"{message.from_.first_name.lower()} manda uma foto do "
-                        f"{random.choice(low_photo_count)} {'aí rapidão' if round(random.random()) else 'aí'}, "
-                        f"eu ainda nao coheço ele tanto quanto o {random.choice(high_photo_count)}",
-                        chat_id=message.chat.id,
-                        sleep_time=2 + round(random.random() * 5),
-                        reply_to=message.message_id)
-                )
+            bot.loop.create_task(
+                bot.send_message(
+                    f"{message.from_.first_name.lower()} manda uma foto do "
+                    f"{random.choice(low_photo_count)} {'aí rapidão' if round(random.random()) else 'aí'}, "
+                    f"eu ainda nao coheço ele tanto quanto o {random.choice(high_photo_count)}",
+                    chat_id=message.chat.id,
+                    sleep_time=2 + round(random.random() * 5),
+                    reply_to=message.message_id)
+            )
 
-                bot.asked_for_photo = round(bot.datetime_now.hour / 8)
+            bot.asked_for_photo = round(bot.datetime_now.hour / 8)
+
+    if (
+            random.random() < bot.config.random_params.random_mock_frequency
+            and bot.config.rss_feed.games != ""
+    ):
+        bot.loop.create_task(
+            bot.send_message(
+                message_text=random.choice(
+                    [url.link for url in feedparser.parse(bot.config.rss_feed.games).entries]
+                ),
+                chat_id=message.chat.id
+            )
+        )
