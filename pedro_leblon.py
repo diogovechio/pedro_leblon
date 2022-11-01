@@ -12,6 +12,8 @@ import json
 
 import face_recognition
 
+import schedule
+
 import typing as T
 
 from aiohttp import ClientSession
@@ -44,6 +46,8 @@ class FakePedro:
 
         self.datetime_now = datetime.now() - timedelta(hours=3)
 
+        self.schedule = schedule
+
         self.api_route = ""
         self.session: T.Optional[ClientSession] = None
 
@@ -62,6 +66,8 @@ class FakePedro:
 
     async def run(self) -> None:
         try:
+            from scheduling import scheduler
+
             Path('tmp').mkdir(exist_ok=True)
             Path('face_lake').mkdir(exist_ok=True)
 
@@ -70,9 +76,12 @@ class FakePedro:
             self.loop = asyncio.get_running_loop()
             self.session = aiohttp.ClientSession()
 
+            self.loop.create_task(scheduler(self))
+
             await asyncio.gather(
                 self._message_controller(),
-                self._message_polling()
+                self._message_polling(),
+                self._run_scheduler()
             )
 
         except Exception as exc:
@@ -119,6 +128,16 @@ class FakePedro:
                         logging.critical(f'NO EMBEDDINGS FOR {file}')
 
         logging.info('Loading finished')
+
+    async def _run_scheduler(self) -> None:
+        while True:
+            try:
+                self.schedule.run_pending()
+                await asyncio.sleep(self.polling_rate)
+                logging.info(f'Scheduler is running. Total jobs: {len(self.schedule.get_jobs())}')
+            except Exception as exc:
+                logging.exception(exc)
+                await asyncio.sleep(15)
 
     async def _message_polling(self) -> None:
         while True:
@@ -226,8 +245,7 @@ class FakePedro:
                         "chat_id": chat_id,
                         'reply_to_message_id': reply_to,
                         'allow_sending_without_reply': True,
-                        "text": message_text,
-                        "parse_mode": "HTML"
+                        "text": message_text
                     }
             ) as resp:
                 logging.info(resp.status)
@@ -236,7 +254,7 @@ class FakePedro:
 if __name__ == '__main__':
     pedro_leblon = FakePedro(
         bot_config_file='bot_configs.json',
-        debug_mode=True
+        debug_mode=False
     )
 
     asyncio.run(
