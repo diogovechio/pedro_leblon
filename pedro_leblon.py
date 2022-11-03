@@ -54,6 +54,7 @@ class FakePedro:
 
         self.asked_for_photo = 0
         self.sent_news = 0
+        self.sent_games_news = 0
         self.reacted_random_command = 0
 
         self.openai_use = 0

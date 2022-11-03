@@ -51,8 +51,9 @@ async def words_reactions(
             bot.asked_for_photo = round(bot.datetime_now.hour / 8)
 
     if (
-            random.random() < bot.config.random_params.random_mock_frequency
+            random.random() < bot.config.random_params.words_react_frequency
             and bot.config.rss_feed.games != ""
+            and bot.sent_games_news != round(bot.datetime_now.hour / 4)
     ):
         bot.loop.create_task(
             bot.send_message(
@@ -62,3 +63,5 @@ async def words_reactions(
                 chat_id=message.chat.id
             )
         )
+
+        bot.sent_games_news = round(bot.datetime_now.hour / 4)
