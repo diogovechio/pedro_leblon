@@ -18,24 +18,24 @@ def bosta_counter(bot: FakePedro) -> None:
     remaining = bolso_expires_at - datetime.now()
 
     if remaining.days >= 0:
-        for chat in list(filter(lambda chat_id: chat_id < 0, bot.allowed_list)):
+        for _id in filter(lambda chat_id: chat_id < 0, bot.allowed_list):
             bot.loop.create_task(
                 bot.send_message(
                     message_text=f"faltam {remaining.days} dias {random.choice(bolsoff_list)}",
-                    chat_id=chat
+                    chat_id=_id
                 )
             )
 
             bot.loop.create_task(
                 bot.send_message(
                     message_text=f"GRANDE DIA! 👍👍👍",
-                    chat_id=chat,
+                    chat_id=_id,
                     sleep_time=3
                 )
             ) if remaining.days == 0 else bot.loop.create_task(
                 bot.send_message(
                     message_text=f"bom dia" if remaining.days % 2 == 0 else "grande dia! 👍",
-                    chat_id=chat,
+                    chat_id=_id,
                     sleep_time=3
                 )
             )
