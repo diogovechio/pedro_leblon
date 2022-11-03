@@ -9,6 +9,7 @@ bolsoff_list = [
     'pro jair já ir embora',
     'pro brasil voltar a ser comunista',
     'pra fora bolsonaro',
+    'pra completar os 100 anos de sigilo do bolstonaro'
 ]
 
 
@@ -17,7 +18,7 @@ def bosta_counter(bot: FakePedro) -> None:
     remaining = bolso_expires_at - datetime.now()
 
     if remaining.days >= 0:
-        for chat in list(filter(lambda x: x < 0, bot.allowed_list)):
+        for chat in list(filter(lambda chat_id: chat_id < 0, bot.allowed_list)):
             bot.loop.create_task(
                 bot.send_message(
                     message_text=f"faltam {remaining.days} dias {random.choice(bolsoff_list)}",
