@@ -30,14 +30,14 @@ async def mock_users(
         bot.config.mock_messages[message.from_.username].last_mock_hour = bot.datetime_now.hour
 
     if (
-            (message.from_.username in ['nands93', 'theyuush', 'decaptor'] or from_debug_chats or from_samuel)
+            (message.from_.username in ['nands93'])
             and bot.sent_news != bot.datetime_now.hour
             and random.random() < bot.config.random_params.words_react_frequency
             and bot.config.rss_feed.news != ""
     ):
         bot.loop.create_task(
             bot.send_message(
-                message_text=random.choice(\
+                message_text=random.choice(
                     list(
                         filter(
                             lambda url: any(news_word in url for news_word in NEWS_WORD_LIST),

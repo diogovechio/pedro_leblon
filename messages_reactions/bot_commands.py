@@ -1,3 +1,7 @@
+from datetime import datetime
+import random
+
+from constants.constants import BOLSOFF_LIST
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
 
@@ -35,6 +39,20 @@ async def bot_commands(
             ,
             chat_id=message.chat.id)
         )
+    elif '/bolso' in message.text.lower()[0:6]:
+        bolso_expires_at = datetime.strptime('1/1/2023', "%m/%d/%Y")
+        remaining = bolso_expires_at - datetime.now()
+
+        hours = round(remaining.total_seconds() / 60 / 60)
+
+        if remaining.days >= 0:
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=f"faltam {hours} horas {random.choice(BOLSOFF_LIST)}",
+                    chat_id=message.chat.id,
+                    reply_to=message.message_id
+                )
+            )
     elif message.text[0] == '/':
         if bot.reacted_random_command != round(bot.datetime_now.hour / 12):
             bot.loop.create_task(bot.send_message(

@@ -1,19 +1,11 @@
 import random
 
+from constants.constants import BOLSOFF_LIST
 from pedro_leblon import FakePedro
-
-from datetime import datetime
-
-bolsoff_list = [
-    'pro bolsonaro ir pro caralho',
-    'pro jair já ir embora',
-    'pro brasil voltar a ser comunista',
-    'pra fora bolsonaro',
-    'pra completar os 100 anos de sigilo do bolstonaro'
-]
+from datetime import datetime, timedelta
 
 
-def bosta_counter(bot: FakePedro) -> None:
+def bosta_daily_counter(bot: FakePedro) -> None:
     bolso_expires_at = datetime.strptime('1/1/2023', "%m/%d/%Y")
     remaining = bolso_expires_at - datetime.now()
 
@@ -21,7 +13,7 @@ def bosta_counter(bot: FakePedro) -> None:
         for _id in filter(lambda chat_id: chat_id < 0, bot.allowed_list):
             bot.loop.create_task(
                 bot.send_message(
-                    message_text=f"faltam {remaining.days} dias {random.choice(bolsoff_list)}",
+                    message_text=f"faltam {remaining.days} dias {random.choice(BOLSOFF_LIST)}",
                     chat_id=_id
                 )
             )

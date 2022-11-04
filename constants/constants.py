@@ -33,5 +33,12 @@ OPENAI_PROMPTS = {
     'critique_reformule': 'critique o linguagem dessa mensagem e reformule para uma forma apropriada:'
 }
 
+BOLSOFF_LIST = [
+    'pro bolsonaro ir pro caralho',
+    'pro jair já ir embora',
+    'pro brasil voltar a ser comunista',
+    'pra fora bolsonaro',
+    'pra completar os 100 anos de sigilo do bolstonaro'
+]
 
 NEWS_WORD_LIST = ['pt', 'lula', 'eleicao', 'eleicoes', 'voto', 'dilma', 'bolsonaro', 'moro']
