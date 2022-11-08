@@ -255,7 +255,7 @@ class FakePedro:
 if __name__ == '__main__':
     pedro_leblon = FakePedro(
         bot_config_file='bot_configs.json',
-        debug_mode=False
+        debug_mode=True
     )
 
     asyncio.run(

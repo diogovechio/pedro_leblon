@@ -37,8 +37,7 @@ BOLSOFF_LIST = [
     'pro bolsonaro ir pro caralho',
     'pro jair já ir embora',
     'pro brasil voltar a ser comunista',
-    'pra fora bolsonaro',
-    'pra completar os 100 anos de sigilo do bolstonaro'
+    'pra completar os 100 anos de sigilo do bolsonaro'
 ]
 
 NEWS_WORD_LIST = ['pt', 'lula', 'eleicao', 'eleicoes', 'voto', 'dilma', 'bolsonaro', 'moro']

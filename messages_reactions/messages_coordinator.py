@@ -17,7 +17,7 @@ async def messages_coordinator(
         from_samuel = message.from_.is_premium
         from_debug_chats = message.chat.id in (-20341310, 8375482)
 
-        if message.photo:
+        if message.photo and message.chat.id not in bot.config.not_internal_chats:
             bot.loop.create_task(
                 image_reactions(
                     bot=bot,

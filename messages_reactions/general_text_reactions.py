@@ -54,6 +54,7 @@ async def words_reactions(
             random.random() < bot.config.random_params.words_react_frequency
             and bot.config.rss_feed.games != ""
             and bot.sent_games_news != round(bot.datetime_now.hour / 4)
+            and message.chat.id not in bot.config.not_internal_chats
     ):
         bot.loop.create_task(
             bot.send_message(
