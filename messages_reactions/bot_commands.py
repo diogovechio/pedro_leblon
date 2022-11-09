@@ -18,12 +18,14 @@ async def bot_commands(
             message_text='Modo André Bêbado ativado',
             chat_id=message.from_.id)
         )
+
     elif message.text == '/andresobrio' and message.from_.username != 'decaptor' and not from_samuel:
         bot.config.random_params.mock_drunk_decaptor_frequency = 0.0
         bot.loop.create_task(bot.send_message(
             message_text='Modo André Sóbrio ativado',
             chat_id=message.from_.id)
         )
+
     elif message.text == '/reload' and message.from_.username == 'diogovechio':
         await bot.send_message(
             message_text='Recarregando parâmetros',
@@ -40,6 +42,7 @@ async def bot_commands(
             ,
             chat_id=message.chat.id)
         )
+
     elif '/bolso' in message.text.lower()[0:6]:
         bolso_expires_at = datetime.strptime('1/1/2023', "%m/%d/%Y")
         remaining = bolso_expires_at - bot.datetime_now
@@ -55,6 +58,7 @@ async def bot_commands(
                     reply_to=message.message_id
                 )
             )
+
             if 'embora' in bolsoff_message:
                 bot.loop.create_task(
                     bot.send_video(

@@ -61,7 +61,8 @@ async def words_reactions(
                 message_text=random.choice(
                     [url.link for url in feedparser.parse(bot.config.rss_feed.games).entries]
                 ),
-                chat_id=message.chat.id
+                chat_id=message.chat.id,
+                sleep_time=10 + round(random.random() * 5),
             )
         )
 
