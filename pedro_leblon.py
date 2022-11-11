@@ -101,12 +101,12 @@ class FakePedro:
     async def load_config_params(self) -> None:
         logging.info('Loading params')
 
-        with open(self.config_file) as f:
-            with open(self.secrets_file) as secret:
-                bot_config = json.loads(f.read())
+        with open(self.config_file) as config_file:
+            with open(self.secrets_file) as secret_file:
+                bot_config = json.loads(config_file.read())
 
                 bot_config.update(
-                    json.loads(secret.read())
+                    json.loads(secret_file.read())
                 )
 
                 self.config = BotConfig(**bot_config)
@@ -263,7 +263,7 @@ if __name__ == '__main__':
     pedro_leblon = FakePedro(
         bot_config_file='bot_configs.json',
         secrets_file='secrets.json',
-        debug_mode=True
+        debug_mode=False
     )
 
     asyncio.run(
