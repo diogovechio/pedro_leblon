@@ -12,8 +12,8 @@ async def scheduler(bot: FakePedro) -> None:
         lambda: logging.info('Scheduling health check')
     )
 
-    # schedule do not work with async functions, if you need to call an async function,
-    # call it from the bot event loop (bot.loop.create_task), like in the example bellow
+    # schedule cannot direct call async functions, if you need to call an async function,
+    # call it from the bot event loop (bot.loop.create_task), like in the 'bosta_daily_counter' function below
     schedule.every().day.at("08:30").do(
         bosta_daily_counter, bot
     )

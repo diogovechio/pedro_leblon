@@ -34,11 +34,14 @@ async def openai_generate_message(
         remove_words_list=None
 ) -> str:
     message_text = message_text.lower()
+
     if remove_words_list:
         for word in remove_words_list:
             message_text = message_text.replace(word, '')
+
     if message_text_replace:
         message_text = message_text_replace
+
     response = openai.Completion.create(
         model=await model_selector(
             bot=bot,
