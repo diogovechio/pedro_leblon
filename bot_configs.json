@@ -1,0 +1,104 @@
+{
+  "face_classifier": {
+    "face_tolerance": 0.6,
+    "face_min_accepted_matches": 0.7,
+    "box_min_size": 64
+  },
+  "random_params": {
+    "random_mock_frequency": 0.02,
+    "words_react_frequency": 0.7,
+    "mock_drunk_decaptor_frequency": 0.1
+  },
+  "openai": {
+    "force_model": null,
+    "max_tokens": 200,
+    "max_sentences": 4,
+    "ada_only_users": [],
+    "davinci_daily_limit": 75,
+    "curie_daily_limit": 200
+  },
+  "rss_feed": {
+    "news": "",
+    "games": "http://feeds.feedburner.com/ign/games-all"
+  },
+  "ask_photos": false,
+  "telegram_api_semaphore": 5,
+  "not_internal_chats": [-632911267, 8375482],
+  "allowed_ids": [
+    {
+      "name": "Diogo",
+      "id": 8375482
+    },
+    {
+      "name": "Davi",
+      "id": 690716068
+    },
+    {
+      "name": "Serra do Cantareira",
+      "id": -796941887
+    },
+    {
+      "name": "Blalabs",
+      "id": -20341310
+    },
+    {
+      "name": "ASD EUROPEU",
+      "id": -423330801
+    },
+    {
+      "name": "BLA principal",
+      "id": -1001369599178
+    },
+    {
+      "name": "ASD Esgoto",
+      "id": -31252096
+    },
+    {
+        "name": "inovaidevs",
+        "id": -632911267
+    }
+  ],
+  "mock_messages": {
+    "cocao": {
+      "last_mock_hour": 0,
+      "messages": [
+        "eu podia ta soldando",
+        "eu adoro um falo",
+        "a gente nao tem casa",
+        "glamour zero",
+        "só esperando o cartao virar"
+      ]
+    },
+    "kkeyo": {
+      "last_mock_hour": 0,
+      "messages": [
+        "PC é casa da mãe Joana",
+        "só tem gentalha",
+        "vou fazer hambúrguer pq tenho que economizar"
+      ]
+    },
+    "diogovechio": {
+      "last_mock_hour": 0,
+      "messages": [
+        "asd"
+      ]
+    },
+    "decaptor": {
+      "last_mock_hour": 0,
+      "messages": [
+        "culpa dos webdevs",
+        "mimimi webdevs python nojo",
+        "abstraçao em cima de abstração em cima de abstração em cima hardware",
+        "fala com o hardware",
+        "faz em c",
+        "o que tem no mercado é um monte de nego chato reclamando da vida programando em oop criando abstração pro cu",
+        "mimimi",
+        "tenho 99% de certeza que a ia tá errada",
+        "minha indiferença é maior que meu desgosto",
+        "eu pelo menos sou imparcial o suficiente pra enxergar essas coisas",
+        "eu uso win 7 sem antivirus mais de uma década",
+        "eu to ficando com raiva com todo mundo que manda merda pros meus comentários"
+      ]
+    }
+  }
+}

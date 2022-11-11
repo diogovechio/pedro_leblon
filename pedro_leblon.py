@@ -30,6 +30,7 @@ class FakePedro:
     def __init__(
             self,
             bot_config_file: str,
+            secrets_file: str,
             polling_rate: int = 1,
             debug_mode=False
     ):
@@ -38,6 +39,7 @@ class FakePedro:
 
         self.config: T.Optional[BotConfig] = None
         self.config_file = bot_config_file
+        self.secrets_file = secrets_file
 
         self.last_id = 0
         self.polling_rate = polling_rate
@@ -100,33 +102,38 @@ class FakePedro:
         logging.info('Loading params')
 
         with open(self.config_file) as f:
-            bot_config = json.loads(f.read())
+            with open(self.secrets_file) as secret:
+                bot_config = json.loads(f.read())
 
-            self.config = BotConfig(**bot_config)
+                bot_config.update(
+                    json.loads(secret.read())
+                )
 
-            self.openai_use = 0.0
-            self.allowed_list = [8375482] if self.debug_mode else [*[value.id for value in self.config.allowed_ids]]
-            self.api_route = f"https://api.telegram.org/bot{self.config.secrets.bot_token}"
+                self.config = BotConfig(**bot_config)
 
-            self.faces_files = []
-            self.faces_names = []
-            self.face_embeddings = []
+                self.openai_use = 0.0
+                self.allowed_list = [8375482] if self.debug_mode else [*[value.id for value in self.config.allowed_ids]]
+                self.api_route = f"https://api.telegram.org/bot{self.config.secrets.bot_token}"
 
-            for (_, _, filenames) in os.walk(self.face_images_path):
-                self.faces_files.extend(filenames)
-                break
+                self.faces_files = []
+                self.faces_names = []
+                self.face_embeddings = []
 
-            if not self.debug_mode:
-                for file in self.faces_files:
-                    embeddings = face_recognition.face_encodings(
-                        face_recognition.load_image_file(f"{self.face_images_path}/{file}")
-                    )
-                    if len(embeddings):
-                        self.faces_names.append(file[:-7])
-                        self.face_embeddings.append(embeddings[0])
-                        logging.info(f"Loaded embeddings for {file}")
-                    else:
-                        logging.critical(f'NO EMBEDDINGS FOR {file}')
+                for (_, _, filenames) in os.walk(self.face_images_path):
+                    self.faces_files.extend(filenames)
+                    break
+
+                if not self.debug_mode:
+                    for file in self.faces_files:
+                        embeddings = face_recognition.face_encodings(
+                            face_recognition.load_image_file(f"{self.face_images_path}/{file}")
+                        )
+                        if len(embeddings):
+                            self.faces_names.append(file[:-7])
+                            self.face_embeddings.append(embeddings[0])
+                            logging.info(f"Loaded embeddings for {file}")
+                        else:
+                            logging.critical(f'NO EMBEDDINGS FOR {file}')
 
         logging.info('Loading finished')
 
@@ -255,6 +262,7 @@ class FakePedro:
 if __name__ == '__main__':
     pedro_leblon = FakePedro(
         bot_config_file='bot_configs.json',
+        secrets_file='secrets.json',
         debug_mode=True
     )
 
