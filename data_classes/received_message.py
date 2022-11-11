@@ -34,12 +34,22 @@ class From:
 
 
 @dataclass
+class ReplyToMessage:
+    message_id: T.Optional[int] = None
+    from_: T.Optional[From] = None
+    chat: T.Optional[Chat] = None
+    date: T.Optional[int] = None
+    text: T.Optional[str] = None
+
+
+@dataclass
 class TelegramMessage:
     from_: From
     message_id: T.Optional[int] = None
     chat: T.Optional[Chat] = None
-    data: T.Optional[int] = None
+    date: T.Optional[int] = None
     text: T.Optional[str] = None
+    reply_to_message: T.Optional[ReplyToMessage] = None
     photo: T.Optional[T.List[Photo]] = None
     caption: T.Optional[str] = None
 

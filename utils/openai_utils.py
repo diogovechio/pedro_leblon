@@ -19,7 +19,8 @@ usage_mapping = {
 
 
 async def openai_generate_message(
-        message: TelegramMessage,
+        message_data: TelegramMessage,
+        message_text: str,
         bot: FakePedro,
         sentences: T.Optional[int] = None,
         tokens: T.Optional[int] = None,
@@ -32,7 +33,7 @@ async def openai_generate_message(
         mock_message: bool = False,
         remove_words_list=None
 ) -> str:
-    message_text = message.text.lower()
+    message_text = message_text.lower()
     if remove_words_list:
         for word in remove_words_list:
             message_text = message_text.replace(word, '')
@@ -41,7 +42,7 @@ async def openai_generate_message(
     response = openai.Completion.create(
         model=await model_selector(
             bot=bot,
-            message=message,
+            message=message_data,
             mock_message=mock_message,
             random_model=random_model
         ) if not force_model else force_model,

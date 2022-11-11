@@ -1,3 +1,4 @@
+
 DRUNK_DECAPTOR_LIST = [
     'vai dormir merda',
     'senhor dono da verdade',
@@ -41,3 +42,4 @@ BOLSOFF_LIST = [
 ]
 
 NEWS_WORD_LIST = ['pt', 'lula', 'eleicao', 'eleicoes', 'voto', 'dilma', 'bolsonaro', 'moro']
+

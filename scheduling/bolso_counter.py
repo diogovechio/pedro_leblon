@@ -8,10 +8,11 @@ from datetime import datetime
 def bosta_daily_counter(bot: FakePedro) -> None:
     bolso_expires_at = datetime.strptime('1/1/2023', "%m/%d/%Y")
     remaining = bolso_expires_at - bot.datetime_now
-    bolsoff_message = random.choice(BOLSOFF_LIST)
 
     if remaining.days >= 0:
         for _id in filter(lambda chat_id: chat_id < 0, bot.allowed_list):
+            bolsoff_message = random.choice(BOLSOFF_LIST)
+
             bot.loop.create_task(
                 bot.send_message(
                     message_text=f"faltam {remaining.days} dias {bolsoff_message}",
