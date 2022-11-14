@@ -24,10 +24,11 @@ async def words_reactions(
                 chat_id=message.chat.id)
         )
 
-    if bot.config.ask_photos and any(
-            word in message.text.lower() for word in ASK_PHOTOS
-    ) and random.random() < bot.config.random_params.words_react_frequency:
-
+    if (
+            bot.config.ask_photos and any(word in message.text.lower() for word in ASK_PHOTOS)
+            and random.random() < bot.config.random_params.words_react_frequency
+            and message.chat.id not in bot.config.not_internal_chats
+    ):
         if bot.asked_for_photo != round(bot.datetime_now.hour / 8):
 
             embeddings_count = {key: bot.faces_names.count(key) for key in bot.faces_names}
@@ -53,7 +54,7 @@ async def words_reactions(
     if (
             random.random() < bot.config.random_params.words_react_frequency
             and bot.config.rss_feed.games != ""
-            and bot.sent_games_news != round(bot.datetime_now.hour / 4)
+            and bot.sent_games_news != round(bot.datetime_now.hour / 12)
             and message.chat.id not in bot.config.not_internal_chats
     ):
         bot.loop.create_task(
@@ -66,4 +67,4 @@ async def words_reactions(
             )
         )
 
-        bot.sent_games_news = round(bot.datetime_now.hour / 4)
+        bot.sent_games_news = round(bot.datetime_now.hour / 12)

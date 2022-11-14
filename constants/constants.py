@@ -23,7 +23,7 @@ OPENAI_BLOCK_WORDS = ['viado', 'porra', 'fuck', 'cock', 'transar', 'buceta', 'bo
                       'piroca', 'pornô', 'porno', 'sexo', 'cu?', ' cu ', 'caralho', 'foder', 'matar', 'pinto',
                       'cú', 'chupa meu', 'chupa um', 'penis', 'pênis', 'chupa o', 'o saco do']
 
-OPENAI_REACT_WORDS = ['bolsonaro', 'segundo turno', 'macho', 'lula', 'dilma', 'homem', 'homens', 'ovni', 'votação',
+OPENAI_REACT_WORDS = ['bolsonaro', 'segundo turno', 'macho', ' lula', 'lula ', 'dilma', 'homem', 'homens', 'ovni', 'votação',
                       'eleição', 'eleições', 'bosta', 'aliens', 'temer', ' et ', ' ets ', ' pt' ' et']
 
 OPENAI_PROMPTS = {
