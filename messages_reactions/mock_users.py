@@ -63,7 +63,7 @@ async def mock_users(
             )
 
         if (
-                bot.datetime_now.hour > 22 or (0 <= bot.datetime_now.hour < 6)
+                (bot.datetime_now.hour > 22 or (0 <= bot.datetime_now.hour < 6))
                 and random.random() < bot.config.random_params.mock_drunk_decaptor_frequency
         ):
             bot.loop.create_task(
