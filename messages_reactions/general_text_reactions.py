@@ -11,12 +11,16 @@ async def words_reactions(
         bot: FakePedro,
         message: TelegramMessage
 ) -> None:
-    if message.text.lower() in ['oi', 'bom dia', 'boa noite', 'adeus', 'rs', 'kk'] or (
-            len(
-                set(
-                    list(message.text.lower())
-                    )
-                ) <= 2 and len(message.text) > 2 and random.random() < bot.config.random_params.random_mock_frequency
+    if (
+            (
+            message.text.lower() in ['oi', 'bom dia', 'boa noite', 'adeus', 'kk'] or (
+                len(
+                    set(
+                        list(message.text.lower())
+                        )
+                    ) <= 2 and len(message.text) > 2 and random.random() < bot.config.random_params.random_mock_frequency
+            )
+            ) and message.chat.id not in bot.config.not_internal_chats
     ):
         bot.loop.create_task(
             bot.send_message(
