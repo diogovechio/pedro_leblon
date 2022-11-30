@@ -14,7 +14,7 @@ usage_mapping = {
     "text-ada-001": 0.02,
     "text-babbage-001": 0.03,
     "text-curie-001": 0.1,
-    "text-davinci-002": 1.0
+    "text-davinci-003": 1.0
 }
 
 
@@ -74,11 +74,11 @@ async def model_selector(
     if bot.config.openai.force_model is not None:
         model = bot.config.openai.force_model
     elif random_model:
-        model = random.choice(["ada", "text-ada-001", "text-curie-001", "text-davinci-002", "text-babbage-001"])
+        model = random.choice(["ada", "text-ada-001", "text-curie-001", "text-davinci-003", "text-babbage-001"])
     elif message.from_.username in bot.config.openai.ada_only_users and not mock_message:
         model = "ada"
     elif bot.openai_use < bot.config.openai.davinci_daily_limit:
-        model = "text-davinci-002"
+        model = "text-davinci-003"
     elif bot.openai_use < bot.config.openai.curie_daily_limit:
         model = "text-curie-001"
     else:
