@@ -53,14 +53,14 @@ async def mock_users(
         bot.sent_news = bot.datetime_now.hour
 
     if message.from_.username == f"{'decaptor' if not bot.debug_mode else 'diogovechio'}":
-
-        if random.random() < bot.config.random_params.random_mock_frequency:
+        if random.random() < bot.config.random_params.random_mock_frequency and not bot.mocked_today:
             bot.loop.create_task(
                 bot.send_video(
                     video=open(f'gifs/kardashian{round(random.random())}.mp4', 'rb').read(),
                     chat_id=message.chat.id,
                     reply_to=message.message_id),
             )
+        bot.mocked_today = True
 
         if (
                 (bot.datetime_now.hour > 22 or (0 <= bot.datetime_now.hour < 6))
@@ -74,21 +74,22 @@ async def mock_users(
                     reply_to=message.message_id if round(random.random()) else None),
             )
 
-        if 'lol' in message.text.lower() and random.random() < bot.config.random_params.words_react_frequency:
+        if 'lol' in message.text.lower() and random.random(
+
+        ) < bot.config.random_params.words_react_frequency and not bot.mocked_today:
             bot.loop.create_task(
                 bot.send_video(
                     video=open(f'gifs/kardashian_lol.mp4', 'rb').read(),
                     chat_id=message.chat.id,
                     reply_to=None)
             )
+        bot.mocked_today = True
 
-        if any(word in message.text.lower() for word in DECAPTOR_DISAPPOINTS
-               ) and bot.config.mock_messages[message.from_.username].last_mock_hour != bot.datetime_now.hour:
+        if any(word in message.text.lower() for word in DECAPTOR_DISAPPOINTS) and not bot.mocked_today:
             bot.loop.create_task(
                 bot.send_video(
                     video=open(f'gifs/kardashian_disappointed.mp4', 'rb').read(),
                     chat_id=message.chat.id,
                     reply_to=message.message_id),
             )
-
-            bot.config.mock_messages[message.from_.username].last_mock_hour = bot.datetime_now.hour
+        bot.mocked_today = True

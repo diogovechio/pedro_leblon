@@ -63,6 +63,8 @@ class FakePedro:
         self.sent_games_news = 0
         self.reacted_random_command = 0
 
+        self.mocked_today = False
+
         self.openai_use = 0
 
         self.loop: T.Optional[AbstractEventLoop] = None
