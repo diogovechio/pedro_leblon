@@ -60,7 +60,7 @@ async def mock_users(
                     chat_id=message.chat.id,
                     reply_to=message.message_id),
             )
-        bot.mocked_today = True
+            bot.mocked_today = True
 
         if (
                 (bot.datetime_now.hour > 22 or (0 <= bot.datetime_now.hour < 6))
@@ -83,7 +83,7 @@ async def mock_users(
                     chat_id=message.chat.id,
                     reply_to=None)
             )
-        bot.mocked_today = True
+            bot.mocked_today = True
 
         if any(word in message.text.lower() for word in DECAPTOR_DISAPPOINTS) and not bot.mocked_today:
             bot.loop.create_task(
@@ -92,4 +92,4 @@ async def mock_users(
                     chat_id=message.chat.id,
                     reply_to=message.message_id),
             )
-        bot.mocked_today = True
+            bot.mocked_today = True
