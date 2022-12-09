@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import random
 import re
@@ -31,9 +32,23 @@ async def openai_generate_message(
         top_p=1,
         random_model: bool = False,
         mock_message: bool = False,
+        destroy_message: bool = False,
         remove_words_list=None
 ) -> str:
     message_text = message_text.lower()
+
+    if destroy_message:
+        message_text = message_text.replace('a', 'o')
+        message_text = message_text.replace('o', 'a')
+        message_text = message_text.replace('c', 'b')
+        message_text = message_text.replace('b', 't')
+        message_text = message_text.replace('l', 'a')
+        message_text = message_text.replace('h', '')
+        message_text = message_text.replace('m', 't')
+
+        force_model = "text-ada-001"
+
+        message_text = "Transforme essa mensagem em algo legível: " + message_text
 
     if remove_words_list:
         for word in remove_words_list:
@@ -42,7 +57,46 @@ async def openai_generate_message(
     if message_text_replace:
         message_text = message_text_replace
 
-    response = openai.Completion.create(
+    try:
+        response = await asyncio.wait_for(
+            openai_completion(
+                bot=bot,
+                message_data=message_data,
+                mock_message=mock_message,
+                random_model=random_model,
+                force_model=force_model,
+                prompt_inject=prompt_inject,
+                tokens=tokens,
+                message_text=message_text,
+                temperature=temperature,
+                top_p=top_p
+            ),
+            timeout=60
+        )
+    except Exception as exc:
+        logging.exception(exc)
+        response = "meu cérebro tá fora do ar"
+
+    return await normalize_openai_text(
+        ai_message=response.choices[0].text,
+        sentences=bot.config.openai.max_sentences if sentences is None else sentences,
+        clean_prompts=OPENAI_PROMPTS
+    )
+
+
+async def openai_completion(
+        bot: FakePedro,
+        message_data: TelegramMessage,
+        mock_message: bool,
+        random_model: bool,
+        force_model: T.Optional[str] = None,
+        prompt_inject: T.Optional[str] = None,
+        tokens: T.Optional[int] = None,
+        message_text: str = '',
+        temperature=0,
+        top_p=1
+):
+    return openai.Completion.create(
         model=await model_selector(
             bot=bot,
             message=message_data,
@@ -56,12 +110,6 @@ async def openai_generate_message(
         top_p=top_p,
         frequency_penalty=1.0,
         presence_penalty=2.0
-    )
-
-    return await normalize_openai_text(
-        ai_message=response.choices[0].text,
-        sentences=bot.config.openai.max_sentences if sentences is None else sentences,
-        clean_prompts=OPENAI_PROMPTS
     )
 
 

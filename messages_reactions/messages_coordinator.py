@@ -29,7 +29,7 @@ async def messages_coordinator(
 
         if message.text:
             await asyncio.gather(
-                openai_reactions(bot=bot, message=message),
+                openai_reactions(bot=bot, message=message, from_samuel=from_samuel),
                 words_reactions(bot=bot, message=message),
                 bot_commands(bot=bot, message=message, from_samuel=from_samuel),
                 mock_users(bot=bot, message=message, from_samuel=from_samuel, from_debug_chats=from_debug_chats),

@@ -62,4 +62,5 @@ class BotConfig:
     rss_feed: RSSFeed
     allowed_ids: T.List[UserID]
     mock_messages: T.Dict[str, MockMessage]
+    block_samuel: bool
     not_internal_chats: T.List[int] = Field(default_factory=list)

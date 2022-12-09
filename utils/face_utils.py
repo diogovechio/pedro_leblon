@@ -6,7 +6,7 @@ import face_recognition
 from PIL import Image
 
 
-async def faces_detector(image: bytes, min_size: int) -> T.Optional[iter]:
+async def faces_detector(image: bytes, min_size: int) -> T.Optional[T.List[T.Tuple]]:
     temp_filename = f'tmp/{uuid.uuid4()}.tmp'
     with open(temp_filename, 'wb') as file:
         file.write(image)
@@ -67,7 +67,7 @@ async def face_classifier(
         balanced_predict_result = {key: value / images_count[key] for key, value in faces_result.items()}
 
         if valid_result and len(balanced_predict_result):
-            result_name = max(balanced_predict_result, key=balanced_predict_result.get)
+            result_name: str = max(balanced_predict_result, key=balanced_predict_result.get)
             data = result_name, balanced_predict_result[result_name]
 
     del input_image_embeddings

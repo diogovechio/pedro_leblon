@@ -8,9 +8,12 @@ from utils.openai_utils import openai_generate_message
 
 async def openai_reactions(
         bot: FakePedro,
-        message: TelegramMessage
+        message: TelegramMessage,
+        from_samuel: bool
 ) -> None:
     input_text = message.text
+
+    destroy_message = True if bot.config.block_samuel and from_samuel else False
 
     if message.reply_to_message:
         input_text += ' : ' + message.reply_to_message.text
@@ -31,6 +34,7 @@ async def openai_reactions(
                         sentences=2,
                         temperature=1.0,
                         tokens=165,
+                        destroy_message=destroy_message,
                         mock_message=True
                     ),
                     chat_id=message.chat.id,
@@ -51,6 +55,7 @@ async def openai_reactions(
                         prompt_inject=OPENAI_PROMPTS['fale'],
                         sentences=1,
                         tokens=150,
+                        destroy_message=destroy_message,
                         mock_message=True
                     ),
                     chat_id=message.chat.id,
@@ -67,7 +72,8 @@ async def openai_reactions(
                         message_text=input_text,
                         prompt_inject=OPENAI_PROMPTS[
                             'responda'] if '?' in message.text.lower() else OPENAI_PROMPTS['fale'],
-                        remove_words_list=['pedro']
+                        remove_words_list=['pedro'],
+                        destroy_message=destroy_message
                     ),
                     chat_id=message.chat.id,
                     reply_to=message.message_id)
@@ -81,6 +87,7 @@ async def openai_reactions(
                         message_data=message,
                         message_text=input_text,
                         prompt_inject=None,
+                        destroy_message=destroy_message,
                         remove_words_list=['/pedro']
                     ),
                     chat_id=message.chat.id,
