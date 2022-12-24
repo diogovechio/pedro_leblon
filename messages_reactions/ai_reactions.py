@@ -63,7 +63,7 @@ async def openai_reactions(
                     reply_to=message.message_id)
             )
 
-        elif 'pedr' in message.text.lower()[0:4]:
+        elif 'pedr' in message.text.lower()[0:5]:
             bot.loop.create_task(
                 bot.send_message(
                     message_text=await openai_generate_message(
