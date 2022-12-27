@@ -25,6 +25,6 @@ async def scheduler(bot: FakePedro) -> None:
         bosta_daily_counter, bot
     )
 
-    schedule.every().day.at("21:01").do(
+    schedule.every().day.at("03:01").do(
         commemorations, bot
     )

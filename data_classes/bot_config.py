@@ -15,6 +15,7 @@ class RandomParams:
     random_mock_frequency: float
     words_react_frequency: float
     mock_drunk_decaptor_frequency: float
+    mock_samuel_frequency: float
 
 
 @dataclass

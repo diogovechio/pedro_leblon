@@ -7,7 +7,8 @@
   "random_params": {
     "random_mock_frequency": 0.02,
     "words_react_frequency": 0.7,
-    "mock_drunk_decaptor_frequency": 0.03
+    "mock_drunk_decaptor_frequency": 0.03,
+    "mock_samuel_frequency": 0.7
   },
   "openai": {
     "force_model": null,

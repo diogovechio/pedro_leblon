@@ -79,6 +79,20 @@ async def openai_reactions(
                     reply_to=message.message_id)
             )
 
+        elif from_samuel and random.random() < bot.config.random_params.mock_samuel_frequency:
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=await openai_generate_message(
+                        bot=bot,
+                        message_data=message,
+                        message_text=f"O samuel disse: {input_text}",
+                        prompt_inject=OPENAI_PROMPTS['critique_negativamente'],
+                        destroy_message=False
+                    ),
+                    chat_id=message.chat.id,
+                    reply_to=message.message_id)
+            )
+
         elif "/pedro" in message.text.lower()[0:6]:
             bot.loop.create_task(
                 bot.send_message(

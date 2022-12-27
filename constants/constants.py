@@ -31,7 +31,8 @@ OPENAI_PROMPTS = {
     'responda': 'responda essa pergunta:',
     'comente': 'comente sobre isso:',
     'critique': 'critique o linguajar dessa mensagem:',
-    'critique_reformule': 'critique o linguagem dessa mensagem e reformule para uma forma apropriada:'
+    'critique_reformule': 'critique o linguagem dessa mensagem e reformule para uma forma apropriada:',
+    'critique_negativamente': 'comente negativamente em relação a esse tema:'
 }
 
 BOLSOFF_LIST = [

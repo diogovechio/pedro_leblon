@@ -27,7 +27,9 @@ async def messages_coordinator(
                 )
             )
 
-        if message.text:
+        if message.text or message.caption:
+            message.text = message.caption if message.caption else message.text
+
             await asyncio.gather(
                 openai_reactions(bot=bot, message=message, from_samuel=from_samuel),
                 words_reactions(bot=bot, message=message),
