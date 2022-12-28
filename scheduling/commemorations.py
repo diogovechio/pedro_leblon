@@ -49,7 +49,12 @@ def commemorations(bot: FakePedro) -> None:
             string_date = str(entry.celebrate_at).split(' ')[0]
             date = datetime.strptime(string_date, "%Y-%m-%d")
 
-            if date.day == day and date.month == month and (entry.every_year and date.year == year):
+            if date.day == day and date.month == month and (
+                    (
+                        not entry.every_year and date.year == year
+                    )
+                    or entry.every_year
+            ):
                 if entry.anniversary:
                     bot.loop.create_task(
                         bot.send_message(

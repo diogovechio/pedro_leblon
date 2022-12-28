@@ -16,6 +16,11 @@ async def bot_commands(
         message: TelegramMessage,
         from_samuel: bool
 ) -> None:
+    message_split = message.text.lower().split(' ')
+
+    annual_date_pattern = r'^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])'
+    once_date_pattern = r'^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/([2-9][0-9][0-9][0-9])$'
+
     if message.text == '/andrebebado' and message.from_.username != 'decaptor' and not from_samuel:
         bot.config.random_params.mock_drunk_decaptor_frequency = 1.0
         bot.loop.create_task(bot.send_message(
@@ -71,25 +76,74 @@ async def bot_commands(
                     )
                 )
 
+    elif '/agendar' in message.text.lower()[0:8]:
+        frequency = None
+
+        if re.fullmatch(annual_date_pattern, message_split[-1]):
+            frequency = 'annual'
+        elif re.fullmatch(once_date_pattern, message_split[-1]):
+            frequency = 'once'
+
+        if len(message_split) < 3 or not frequency:
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=f"exemplo pra agendar:\n"
+                                 f"\n<b>Exemplo 1 (anual): </b>/agendar hoje é dia de asd caralho 29/12"
+                                 f"\n<b>Exemplo 2 (uma vez): </b>/agendar me lembra de sei la 29/12/2023"
+                    ,
+                    chat_id=message.chat.id,
+                    reply_to=message.message_id
+                )
+            )
+
+        else:
+            if frequency == "annual":
+                celebration = datetime.strptime(f"{message_split[-1]}/{bot.datetime_now.year}", "%d/%m/%Y")
+            else:
+                celebration = datetime.strptime(f"{message_split[-1]}", "%d/%m/%Y")
+
+            text = message.text.lower().replace(message_split[-1], '').replace(message_split[0], '').strip()
+
+            bot.commemorations.data.append(
+                Commemoration(
+                    id=str(uuid.uuid4()),
+                    every_year=frequency == 'annual',
+                    created_by=message.from_.id,
+                    created_at=str(bot.datetime_now),
+                    celebrate_at=str(celebration),
+                    for_chat=message.chat.id,
+                    message=text,
+                    anniversary=""
+                )
+            )
+
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=f"<b>{text}</b>\n{message_split[-1]}\nadicionado na agenda",
+                    chat_id=message.chat.id,
+                    reply_to=message.message_id
+                )
+            )
+
     elif '/agenda' in message.text.lower()[0:7]:
-        agenda = '\n\n'.join(
-                [
-                    f"<b>{entry.id}</b>\n"
+        agenda = [
+                    f"<b>{entry.id}</b>\n\n"
                     f"<b>Data:</b> {entry.celebrate_at.day}/{entry.celebrate_at.month}{'/' + str(entry.celebrate_at.year) if not entry.every_year else ''}\n"
-                    f"<b>Lembrete</b>: {entry.message if not entry.anniversary else 'Aniversário de ' + entry.anniversary}\n"
-                    f"<b>Autorizado a deletar:</b> {entry.created_by == message.from_.id}"
+                    f"<b>Lembrete:</b> {entry.message if not entry.anniversary else 'Aniversário de ' + entry.anniversary}\n"
+                    f"<b>Repete todo ano:</b> {entry.every_year}\n"
+                    f"<b>{message.from_.first_name} autorizado a deletar:</b> {entry.created_by == message.from_.id}"
                     for entry in bot.commemorations.data
                     if entry.for_chat == message.chat.id
             ]
-        )
 
-        bot.loop.create_task(
-            bot.send_message(
-                message_text=f"Agenda desse grupo:\n\n{agenda}",
-                chat_id=message.chat.id,
-                reply_to=message.message_id
+        for entry in agenda:
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=entry,
+                    chat_id=message.chat.id,
+                    reply_to=message.message_id
+                )
             )
-        )
 
     elif '/delete' in message.text.lower()[0:7]:
         msg_id = message.text.split(' ')
@@ -129,10 +183,7 @@ async def bot_commands(
                 )
 
     elif '/aniversario' in message.text.lower()[0:12]:
-        message_split = message.text.lower().split(' ')
-        date_pattern = r'^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])'
-
-        if len(message_split) < 3 or not re.fullmatch(date_pattern, message_split[-1]):
+        if len(message_split) < 3 or not re.fullmatch(annual_date_pattern, message_split[-1]):
             bot.loop.create_task(
                 bot.send_message(
                     message_text=f"exemplo pra agendar:\n\n/aniversario @thommazk 29/12",
@@ -160,7 +211,7 @@ async def bot_commands(
 
             bot.loop.create_task(
                 bot.send_message(
-                    message_text=f"aniversário de {message_split[1]} no dia {message_split[-1]} adicionado na agenda",
+                    message_text=f"aniversário de {anniversary} no dia {message_split[-1]} adicionado na agenda",
                     chat_id=message.chat.id,
                     reply_to=message.message_id
                 )
