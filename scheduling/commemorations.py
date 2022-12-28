@@ -53,10 +53,18 @@ def commemorations(bot: FakePedro) -> None:
                 if entry.anniversary:
                     bot.loop.create_task(
                         bot.send_message(
-                            message_text=f"feliz aniversário {entry.anniversary}\n{entry.message}",
+                            message_text=f"feliz aniversário {entry.anniversary}\n{entry.message}".upper(),
                             chat_id=entry.for_chat
                         )
                     )
+
+                    bot.loop.create_task(
+                        bot.send_video(
+                            video=open(f'gifs/birthday0.mp4', 'rb').read(),
+                            chat_id=entry.for_chat
+                        )
+                    )
+
                 else:
                     bot.loop.create_task(
                         bot.send_message(

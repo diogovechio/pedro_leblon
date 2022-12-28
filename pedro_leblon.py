@@ -246,7 +246,7 @@ class FakePedro:
                             ("chat_id", str(chat_id)),
                             ("video", video),
                             ("reply_to_message_id", str(reply_to) if reply_to else ''),
-                            ('allow_sending_without_reply', 'true')
+                            ('allow_sending_without_reply', 'true'),
                         )
                     )
             ) as resp:
