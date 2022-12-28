@@ -15,6 +15,7 @@ class Commemoration:
     for_chat: int
     message: str
     anniversary: str
+    last_celebration: T.Optional[datetime] = None
 
 
 @dataclass

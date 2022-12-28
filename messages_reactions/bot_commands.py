@@ -1,6 +1,6 @@
 import re
 from dataclasses import asdict
-from datetime import datetime
+from datetime import datetime, timedelta
 import random
 import uuid
 
@@ -129,7 +129,7 @@ async def bot_commands(
         agenda = [
                     f"<b>{entry.id}</b>\n\n"
                     f"<b>Data:</b> {entry.celebrate_at.day}/{entry.celebrate_at.month}{'/' + str(entry.celebrate_at.year) if not entry.every_year else ''}\n"
-                    f"<b>Lembrete:</b> {entry.message if not entry.anniversary else 'Aniversário de ' + entry.anniversary}\n"
+                    f"<b>Lembrete:</b> {entry.message if not entry.anniversary else 'Aniversário de ' + entry.anniversary.replace('@', '@ ')}\n"
                     f"<b>Repete todo ano:</b> {entry.every_year}\n"
                     f"<b>{message.from_.first_name} autorizado a deletar:</b> {entry.created_by == message.from_.id}"
                     for entry in bot.commemorations.data
@@ -140,8 +140,7 @@ async def bot_commands(
             bot.loop.create_task(
                 bot.send_message(
                     message_text=entry,
-                    chat_id=message.chat.id,
-                    reply_to=message.message_id
+                    chat_id=message.chat.id
                 )
             )
 
