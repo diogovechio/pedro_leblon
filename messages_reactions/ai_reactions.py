@@ -79,7 +79,12 @@ async def openai_reactions(
                     reply_to=message.message_id)
             )
 
-        elif from_samuel and random.random() < bot.config.random_params.mock_samuel_frequency:
+        elif from_samuel and (
+            random.random() < bot.config.random_params.mock_samuel_frequency or
+            any(
+                react_word in message.text.lower() for react_word in OPENAI_REACT_WORDS
+            )
+        ):
             bot.loop.create_task(
                 bot.send_message(
                     message_text=await openai_generate_message(

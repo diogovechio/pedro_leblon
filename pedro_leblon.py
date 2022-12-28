@@ -19,6 +19,7 @@ import typing as T
 from aiohttp import ClientSession
 
 from data_classes.bot_config import BotConfig
+from data_classes.commemorations import Commemoration, Commemorations
 from data_classes.received_message import MessagesResults, TelegramMessage
 from data_structures.max_size_list import MaxSizeList
 from messages_reactions import messages_coordinator
@@ -30,6 +31,7 @@ class FakePedro:
     def __init__(
             self,
             bot_config_file: str,
+            commemorations_file: str,
             secrets_file: str,
             polling_rate: int = 1,
             debug_mode=False
@@ -39,6 +41,8 @@ class FakePedro:
 
         self.config: T.Optional[BotConfig] = None
         self.config_file = bot_config_file
+        self.commemorations_file = commemorations_file
+        self.commemorations: T.Optional[Commemorations] = None
         self.secrets_file = secrets_file
 
         self.last_id = 0
@@ -106,6 +110,9 @@ class FakePedro:
         with open(self.config_file) as config_file:
             with open(self.secrets_file) as secret_file:
                 bot_config = json.loads(config_file.read())
+
+                with open(self.commemorations_file) as comm_file:
+                    self.commemorations = Commemorations(json.loads(comm_file.read()))
 
                 bot_config.update(
                     json.loads(secret_file.read())
@@ -255,7 +262,8 @@ class FakePedro:
                         "chat_id": chat_id,
                         'reply_to_message_id': reply_to,
                         'allow_sending_without_reply': True,
-                        "text": message_text
+                        'parse_mode': 'HTML',
+                        'text': message_text
                     }
             ) as resp:
                 logging.info(resp.status)
@@ -264,8 +272,9 @@ class FakePedro:
 if __name__ == '__main__':
     pedro_leblon = FakePedro(
         bot_config_file='bot_configs.json',
+        commemorations_file='commemorations.json',
         secrets_file='secrets.json',
-        debug_mode=True
+        debug_mode=False
     )
 
     asyncio.run(
