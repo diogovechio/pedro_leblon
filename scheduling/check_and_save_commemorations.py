@@ -25,4 +25,3 @@ def check_and_save(bot: FakePedro):
         os.rename("commemorations_tmp.json", "commemorations.json")
     except Exception as exc:
         logging.exception(exc)
-

@@ -112,3 +112,18 @@ async def openai_reactions(
                     chat_id=message.chat.id,
                     reply_to=message.message_id)
             )
+
+        elif "/tldr" in message.text.lower()[0:5]:
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=await openai_generate_message(
+                        bot=bot,
+                        message_data=message,
+                        message_text=f"faça um resumo do texto a seguir: {input_text}",
+                        prompt_inject=None,
+                        destroy_message=destroy_message,
+                        remove_words_list=None
+                    ),
+                    chat_id=message.chat.id,
+                    reply_to=message.message_id)
+            )

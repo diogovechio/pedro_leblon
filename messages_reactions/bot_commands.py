@@ -132,7 +132,7 @@ async def bot_commands(
         message_split = message.text.lower().split(' ')
         date_pattern = r'^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])'
 
-        if len(message_split) != 3 or not re.fullmatch(date_pattern, message_split[-1]):
+        if len(message_split) < 3 or not re.fullmatch(date_pattern, message_split[-1]):
             bot.loop.create_task(
                 bot.send_message(
                     message_text=f"exemplo pra agendar:\n\n/aniversario @thommazk 29/12",
@@ -143,6 +143,7 @@ async def bot_commands(
 
         else:
             celebration = datetime.strptime(f"{message_split[-1]}/{bot.datetime_now.year}", "%d/%m/%Y")
+            anniversary = message.text.lower().replace(message_split[-1], '').replace(message_split[0], '').strip()
 
             bot.commemorations.data.append(
                 Commemoration(
@@ -153,7 +154,7 @@ async def bot_commands(
                     celebrate_at=str(celebration),
                     for_chat=message.chat.id,
                     message="",
-                    anniversary=message_split[1]
+                    anniversary=anniversary
                 )
             )
 

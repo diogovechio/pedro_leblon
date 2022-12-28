@@ -19,7 +19,7 @@ import typing as T
 from aiohttp import ClientSession
 
 from data_classes.bot_config import BotConfig
-from data_classes.commemorations import Commemoration, Commemorations
+from data_classes.commemorations import Commemorations
 from data_classes.received_message import MessagesResults, TelegramMessage
 from data_structures.max_size_list import MaxSizeList
 from messages_reactions import messages_coordinator
@@ -274,7 +274,7 @@ if __name__ == '__main__':
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
         secrets_file='secrets.json',
-        debug_mode=False
+        debug_mode=True
     )
 
     asyncio.run(
