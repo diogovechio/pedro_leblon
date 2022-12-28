@@ -126,8 +126,10 @@ async def bot_commands(
             )
 
     elif '/agenda' in message.text.lower()[0:7]:
+        agendas = []
+
         agenda = [
-                    f"<b>{entry.id}</b>\n\n"
+                    f"<b>{entry.id}</b>\n"
                     f"<b>Data:</b> {entry.celebrate_at.day}/{entry.celebrate_at.month}{'/' + str(entry.celebrate_at.year) if not entry.every_year else ''}\n"
                     f"<b>Lembrete:</b> {entry.message if not entry.anniversary else 'Aniversário de ' + entry.anniversary.replace('@', '@ ')}\n"
                     f"<b>Repete todo ano:</b> {entry.every_year}\n"
@@ -136,10 +138,18 @@ async def bot_commands(
                     if entry.for_chat == message.chat.id
             ]
 
-        for entry in agenda:
+        message_len = 4
+        last_idx = 0
+        messages = int(len(agenda) / message_len)
+        for i in range(messages):
+            agendas.append('\n\n'.join(agenda[last_idx:message_len + last_idx]))
+
+            last_idx = message_len
+
+        for i, entry in enumerate(agendas):
             bot.loop.create_task(
                 bot.send_message(
-                    message_text=entry,
+                    message_text=f"<b>Agendamentos do chat {message.from_.username}</b> - {i + 1}/{len(agendas)}\n\n{entry}",
                     chat_id=message.chat.id
                 )
             )
