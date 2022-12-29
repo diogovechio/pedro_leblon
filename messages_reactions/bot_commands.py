@@ -139,18 +139,18 @@ async def bot_commands(
                     if entry.for_chat == message.chat.id
             ]
 
-        message_len = 4
+        message_len = 8
         last_idx = 0
         messages = math.ceil(len(agenda) / message_len)
         for i in range(messages):
             agendas.append('\n\n'.join(agenda[last_idx:message_len + last_idx]))
 
-            last_idx = message_len
+            last_idx += message_len
 
         for i, entry in enumerate(agendas):
             bot.loop.create_task(
                 bot.send_message(
-                    message_text=f"<b>Agendamentos do chat {message.chat.title}</b> - {i + 1}/{len(agendas)}\n\n{entry}",
+                    message_text=f"<b>Agendamentos do chat {message.chat.title if message.chat.title else message.chat.username}</b> - {i + 1}/{len(agendas)}\n\n{entry}",
                     chat_id=message.chat.id
                 )
             )
