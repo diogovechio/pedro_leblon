@@ -3,6 +3,7 @@ from dataclasses import asdict
 from datetime import datetime, timedelta
 import random
 import uuid
+import math
 
 from constants.constants import BOLSOFF_LIST
 from data_classes.commemorations import Commemoration
@@ -140,7 +141,7 @@ async def bot_commands(
 
         message_len = 4
         last_idx = 0
-        messages = int(len(agenda) / message_len)
+        messages = math.ceil(len(agenda) / message_len)
         for i in range(messages):
             agendas.append('\n\n'.join(agenda[last_idx:message_len + last_idx]))
 
@@ -149,7 +150,7 @@ async def bot_commands(
         for i, entry in enumerate(agendas):
             bot.loop.create_task(
                 bot.send_message(
-                    message_text=f"<b>Agendamentos do chat {message.from_.username}</b> - {i + 1}/{len(agendas)}\n\n{entry}",
+                    message_text=f"<b>Agendamentos do chat {message.chat.title}</b> - {i + 1}/{len(agendas)}\n\n{entry}",
                     chat_id=message.chat.id
                 )
             )
