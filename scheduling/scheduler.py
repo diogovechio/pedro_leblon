@@ -7,7 +7,7 @@ from pedro_leblon import FakePedro
 from scheduling.bolso_counter import bosta_daily_counter
 from scheduling.check_pending_and_save import check_agenda_and_save
 from scheduling.commemorations import fixed_commemorations
-from scheduling.daily_reset import daily_reset
+from scheduling.daily_reset import daily_routines
 
 
 async def scheduler(bot: FakePedro) -> None:
@@ -17,7 +17,7 @@ async def scheduler(bot: FakePedro) -> None:
     )
 
     schedule.every().day.do(
-        daily_reset, bot
+        daily_routines, bot
     )
 
     # schedule cannot direct call async functions, if you need to call an async function,

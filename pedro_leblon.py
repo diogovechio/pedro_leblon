@@ -20,7 +20,7 @@ from aiohttp import ClientSession
 
 from data_classes.bot_config import BotConfig
 from data_classes.commemorations import Commemorations
-from data_classes.received_message import MessagesResults, TelegramMessage
+from data_classes.received_message import MessagesResults, TelegramMessage, MessageReceived
 from data_structures.max_size_list import MaxSizeList
 from messages_reactions import messages_coordinator
 
@@ -88,7 +88,7 @@ class FakePedro:
             self.loop.create_task(scheduler(self))
 
             await asyncio.gather(
-                self._message_controller(),
+                self._message_handler(),
                 self._message_polling(),
                 self._run_scheduler()
             )
@@ -161,39 +161,36 @@ class FakePedro:
             try:
                 await asyncio.sleep(self.polling_rate)
 
-                self.datetime_now = datetime.now() - timedelta(hours=3)
+                self.datetime_now = datetime.utcnow() - timedelta(hours=3)
                 polling_url = f"{self.api_route}/getUpdates?offset={self.last_id}"
 
                 async with self.session.get(polling_url) as request:
                     if 200 <= request.status < 300:
                         response = json.loads((await request.text()).replace('"from":{"', '"from_":{"'))
                         if 'ok' in response and response['ok']:
-                            logging.info(f'Polling for new messages:'
-                                         f'{polling_url} last_id: {self.last_id} - {self.datetime_now}')
+                            logging.info(f'Message polling task running:'
+                                         f"{polling_url.replace(self.config.secrets.bot_token, '#TOKEN#')} last_id: {self.last_id} - {self.datetime_now}")
                             self.messages = MessagesResults(**response)
                             self.last_id = self.messages.result[-1].update_id
             except Exception as exc:
                 logging.exception(exc)
                 await asyncio.sleep(15)
 
-    async def _message_controller(self) -> None:
+    async def _message_handler(self) -> None:
         while True:
             try:
                 logging.info(f'Message controller task running - {len(self.interacted_messages)}')
                 if hasattr(self.messages, 'result'):
-                    for message in (asdict(entry) for entry in self.messages.result
+                    for incoming in (entry for entry in self.messages.result
                                     if entry.update_id not in self.interacted_messages):
-                        self.interacted_messages.append(message['update_id'])
-                        logging.info(message)
+                        incoming: MessageReceived
+                        self.interacted_messages.append(incoming.update_id)
+                        logging.info(incoming)
 
-                        if message['message'] is not None:
+                        if incoming.message is not None:
                             self.loop.create_task(
-                                messages_coordinator(self, TelegramMessage(**message['message']))
+                                messages_coordinator(self, incoming.message)
                             )
-
-                # ToDo: implementa direito:
-                if self.datetime_now.hour == 1:
-                    self.openai_use = 0
 
                 await asyncio.sleep(self.polling_rate)
             except Exception as exc:
@@ -245,6 +242,24 @@ class FakePedro:
                         (
                             ("chat_id", str(chat_id)),
                             ("video", video),
+                            ("reply_to_message_id", str(reply_to) if reply_to else ''),
+                            ('allow_sending_without_reply', 'true'),
+                        )
+                    )
+            ) as resp:
+                logging.info(resp.status)
+
+    async def send_document(self, document: bytes, chat_id: int, caption=None, reply_to=None, sleep_time=0) -> None:
+        await asyncio.sleep(sleep_time)
+
+        async with asyncio.Semaphore(self.config.telegram_api_semaphore):
+            async with self.session.post(
+                    url=f"{self.api_route}/sendDocument".replace('\n', ''),
+                    data=aiohttp.FormData(
+                        (
+                            ("chat_id", str(chat_id)),
+                            ("document", document),
+                            ("caption", caption if caption else ''),
                             ("reply_to_message_id", str(reply_to) if reply_to else ''),
                             ('allow_sending_without_reply', 'true'),
                         )
