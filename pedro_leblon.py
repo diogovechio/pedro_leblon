@@ -283,13 +283,22 @@ class FakePedro:
             ) as resp:
                 logging.info(resp.status)
 
+    async def leave_chat(self, chat_id: int, sleep_time=0) -> None:
+        await asyncio.sleep(sleep_time)
+
+        async with self.session.post(
+                f"{self.api_route}/leaveChat".replace('\n', ''),
+                json={"chat_id": chat_id}
+        ) as resp:
+            logging.info(resp.status)
+
 
 if __name__ == '__main__':
     pedro_leblon = FakePedro(
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
         secrets_file='secrets.json',
-        debug_mode=True
+        debug_mode=False
     )
 
     asyncio.run(

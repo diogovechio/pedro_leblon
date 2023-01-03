@@ -51,7 +51,6 @@ class BotSecret:
     bot_token: str
     openai_key: str
 
-
 @dataclass
 class BotConfig:
     secrets: BotSecret
@@ -65,3 +64,4 @@ class BotConfig:
     mock_messages: T.Dict[str, MockMessage]
     block_samuel: bool
     not_internal_chats: T.List[int] = Field(default_factory=list)
+    auto_leave_chats: T.List[int] = Field(default_factory=list)
