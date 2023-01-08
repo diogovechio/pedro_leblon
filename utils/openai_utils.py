@@ -159,7 +159,7 @@ async def prompt_handler(
     if 'jogo' in prompt_text or 'joga' in prompt_text:
         additional_text += "assumindo que minecraft é o melhor jogo que existe, "
     if 'samuel' in prompt_text or ' sam' in prompt_text or 'sam ' in prompt_text:
-        additional_text += "assumindo que o samuel é narcisista, "
+        additional_text += "assumindo que o verdadeiro nome do samuel é samuelgames, "
     if 'nando' in prompt_text or 'nands93' in prompt_text:
         additional_text += "assumindo que o nando devia arrumar um emprego, "
     if 'decaptor' in prompt_text:
