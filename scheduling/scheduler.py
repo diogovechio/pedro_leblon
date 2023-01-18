@@ -8,6 +8,7 @@ from scheduling.bolso_counter import bosta_daily_counter
 from scheduling.check_pending_and_save import check_agenda_and_save
 from scheduling.commemorations import fixed_commemorations
 from scheduling.daily_reset import daily_routines
+from scheduling.pedro_roleta import pedro_roleta
 
 
 async def scheduler(bot: FakePedro) -> None:
@@ -32,4 +33,8 @@ async def scheduler(bot: FakePedro) -> None:
 
     schedule.every(10).seconds.do(
         check_agenda_and_save, bot
+    )
+
+    schedule.every().day.at("13:30").do(
+        pedro_roleta, bot
     )

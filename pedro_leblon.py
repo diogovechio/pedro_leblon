@@ -282,6 +282,19 @@ class FakePedro:
                     }
             ) as resp:
                 logging.info(resp.status)
+                if resp.status == 400:
+                    logging.info(f"Retrying to send without HTML parse mode")
+
+                    async with self.session.post(
+                            f"{self.api_route}/sendMessage".replace('\n', ''),
+                            json={
+                                "chat_id": chat_id,
+                                'reply_to_message_id': reply_to,
+                                'allow_sending_without_reply': True,
+                                'text': message_text
+                            }
+                    ) as new_resp:
+                        logging.info(new_resp.status)
 
     async def leave_chat(self, chat_id: int, sleep_time=0) -> None:
         await asyncio.sleep(sleep_time)
@@ -298,7 +311,7 @@ if __name__ == '__main__':
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
         secrets_file='secrets.json',
-        debug_mode=False
+        debug_mode=True
     )
 
     asyncio.run(
