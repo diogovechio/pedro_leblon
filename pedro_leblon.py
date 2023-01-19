@@ -48,7 +48,8 @@ class FakePedro:
         self.last_id = 0
         self.polling_rate = polling_rate
         self.messages: T.List[T.Any] = []
-        self.interacted_messages = MaxSizeList(400)
+        self.interacted_updates = MaxSizeList(400)
+        self.interacted_messages_with_chat_id = MaxSizeList(400)
 
         self.datetime_now = datetime.now() - timedelta(hours=3)
 
@@ -179,12 +180,13 @@ class FakePedro:
     async def _message_handler(self) -> None:
         while True:
             try:
-                logging.info(f'Message controller task running - {len(self.interacted_messages)}')
+                logging.info(f'Message controller task running - {len(self.interacted_updates)}')
                 if hasattr(self.messages, 'result'):
                     for incoming in (entry for entry in self.messages.result
-                                    if entry.update_id not in self.interacted_messages):
+                                     if entry.update_id not in self.interacted_updates):
                         incoming: MessageReceived
-                        self.interacted_messages.append(incoming.update_id)
+                        self.interacted_updates.append(incoming.update_id)
+                        self.interacted_messages_with_chat_id.append(f"{incoming.message.chat.id}:{incoming.message.message_id}")
                         logging.info(incoming)
 
                         if incoming.message is not None:
@@ -311,7 +313,7 @@ if __name__ == '__main__':
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
         secrets_file='secrets.json',
-        debug_mode=True
+        debug_mode=False
     )
 
     asyncio.run(

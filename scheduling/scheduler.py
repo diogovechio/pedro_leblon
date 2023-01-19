@@ -35,6 +35,30 @@ async def scheduler(bot: FakePedro) -> None:
         check_agenda_and_save, bot
     )
 
-    schedule.every().day.at("13:30").do(
+    schedule.every().monday.at("08:30").do(
+        pedro_roleta, bot
+    )
+
+    schedule.every().tuesday.at("09:30").do(
+        pedro_roleta, bot
+    )
+
+    schedule.every().wednesday.at("10:30").do(
+        pedro_roleta, bot
+    )
+
+    schedule.every().thursday.at("11:30").do(
+        pedro_roleta, bot
+    )
+
+    schedule.every().friday.at("21:00").do(
+        pedro_roleta, bot
+    )
+
+    schedule.every().saturday.at("16:00").do(
+        pedro_roleta, bot
+    )
+
+    schedule.every().sunday.at("23:00").do(
         pedro_roleta, bot
     )

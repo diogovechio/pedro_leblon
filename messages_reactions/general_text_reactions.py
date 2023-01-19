@@ -6,6 +6,7 @@ from constants.constants import ASK_PHOTOS, OPENAI_BLOCK_WORDS
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
 from utils.roleta_utils import get_roletas_from_pavuna
+from utils.text_utils import message_miguxer
 
 
 async def words_reactions(
@@ -36,9 +37,11 @@ async def words_reactions(
                 random.random() < bot.config.random_params.words_react_frequency
                 and message.chat.id not in bot.config.not_internal_chats
         ):
+            text = (random.choice(await get_roletas_from_pavuna(bot))).lower()
+
             bot.loop.create_task(
                 bot.send_message(
-                    message_text=(random.choice(await get_roletas_from_pavuna(bot))).lower(),
+                    message_text=await message_miguxer(text) if round(random.random()) else text,
                     chat_id=message.chat.id,
                     sleep_time=2 + round(random.random() * 5)
                 )
