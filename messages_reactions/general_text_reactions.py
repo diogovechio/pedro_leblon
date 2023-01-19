@@ -2,9 +2,10 @@ import random
 
 import feedparser
 
-from constants.constants import ASK_PHOTOS
+from constants.constants import ASK_PHOTOS, OPENAI_BLOCK_WORDS
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
+from utils.roleta_utils import get_roletas_from_pavuna
 
 
 async def words_reactions(
@@ -27,6 +28,21 @@ async def words_reactions(
                 message_text=message.text,
                 chat_id=message.chat.id)
         )
+
+    if any(
+            block_word in message.text.lower() for block_word in OPENAI_BLOCK_WORDS
+    ):
+        if (
+                random.random() < bot.config.random_params.words_react_frequency
+                and message.chat.id not in bot.config.not_internal_chats
+        ):
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=(random.choice(await get_roletas_from_pavuna(bot))).lower(),
+                    chat_id=message.chat.id,
+                    sleep_time=2 + round(random.random() * 5)
+                )
+            )
 
     if (
             bot.config.ask_photos and any(word in message.text.lower() for word in ASK_PHOTOS)
