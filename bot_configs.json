@@ -25,7 +25,7 @@
   "ask_photos": false,
   "telegram_api_semaphore": 5,
   "not_internal_chats": [-632911267],
-  "auto_leave_chats": [-423330801],
+  "auto_leave_chats": [],
   "block_samuel": true,
   "allowed_ids": [
     {
