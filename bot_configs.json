@@ -29,6 +29,14 @@
   "block_samuel": true,
   "allowed_ids": [
     {
+      "name": "Pedro Debug",
+      "id": -704277411
+    },
+    {
+      "name": "Pedro Debug 2",
+      "id": -884201527
+    },
+    {
       "name": "Diogo",
       "id": 8375482
     },

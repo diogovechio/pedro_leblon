@@ -67,6 +67,7 @@ class FakePedro:
         self.sent_news = 0
         self.sent_games_news = 0
         self.reacted_random_command = 0
+        self.roleta_hour = 11
 
         self.mocked_today = False
 
@@ -122,7 +123,8 @@ class FakePedro:
                 self.config = BotConfig(**bot_config)
 
                 self.openai_use = 0.0
-                self.allowed_list = [8375482] if self.debug_mode else [*[value.id for value in self.config.allowed_ids]]
+                self.allowed_list = [8375482, -704277411, -884201527] if self.debug_mode else [
+                    *[value.id for value in self.config.allowed_ids]]
                 self.api_route = f"https://api.telegram.org/bot{self.config.secrets.bot_token}"
 
                 self.faces_files = []
@@ -180,13 +182,15 @@ class FakePedro:
     async def _message_handler(self) -> None:
         while True:
             try:
-                logging.info(f'Message controller task running - {len(self.interacted_updates)}')
+                logging.info(f'Message controller task running - {len(self.interacted_updates)} - '
+                             f'Next roleta: {self.roleta_hour}')
                 if hasattr(self.messages, 'result'):
                     for incoming in (entry for entry in self.messages.result
                                      if entry.update_id not in self.interacted_updates):
                         incoming: MessageReceived
                         self.interacted_updates.append(incoming.update_id)
-                        self.interacted_messages_with_chat_id.append(f"{incoming.message.chat.id}:{incoming.message.message_id}")
+                        self.interacted_messages_with_chat_id.append(f"{incoming.message.chat.id}:"
+                                                                     f"{incoming.message.message_id}")
                         logging.info(incoming)
 
                         if incoming.message is not None:

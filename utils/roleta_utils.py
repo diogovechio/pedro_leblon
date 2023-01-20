@@ -1,4 +1,5 @@
 import json
+import typing as T
 
 from pedro_leblon import FakePedro
 
@@ -6,7 +7,7 @@ from pedro_leblon import FakePedro
 async def get_roletas_from_pavuna(
         bot: FakePedro,
         min_chars=0
-) -> list[str]:
+) -> T.List[str]:
     async with bot.session.get("https://keyo.me/bot/roleta.json") as roleta:
         return [
             value['text'] for _, value in json.loads(
