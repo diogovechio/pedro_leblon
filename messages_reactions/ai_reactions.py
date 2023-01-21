@@ -1,9 +1,12 @@
 import random
 
+import openai
+
 from constants.constants import OPENAI_BLOCK_WORDS, OPENAI_REACT_WORDS, OPENAI_PROMPTS
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
-from utils.openai_utils import openai_generate_message
+from utils.openai_utils import openai_generate_message, normalize_openai_text
+from utils.roleta_utils import get_roletas_from_pavuna
 
 
 async def openai_reactions(
@@ -127,3 +130,30 @@ async def openai_reactions(
                     chat_id=message.chat.id,
                     reply_to=message.message_id)
             )
+        elif len(message.text) >= 25 and random.random() < bot.config.random_params.random_mock_frequency:
+            roleta_list = await get_roletas_from_pavuna(bot, 25)
+            username = message.from_.username if message.from_.username else message.from_.first_name
+            prompt = f"assumindo que alguém disse: '{random.choice(roleta_list)}' e o {username} disse: '{message.text}', {'continue o assunto' if round(random.random()) else 'puxe outro assunto com base no que está sendo conversado'}."
+
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=(
+                        await normalize_openai_text(
+                            ai_message=openai.Completion.create(
+                                model="text-davinci-003",
+                                prompt=prompt,
+                                api_key=bot.config.secrets.openai_key,
+                                max_tokens=bot.config.openai.max_tokens,
+                                frequency_penalty=1.0,
+                                presence_penalty=2.0,
+                                temperature=1.0
+                            ).choices[0].text,
+                            sentences=2
+                        )
+                    ),
+                    chat_id=message.chat.id,
+                    sleep_time=1 + (round(random.random()) * 5),
+                    reply_to=message.message_id
+                )
+            )
+
