@@ -15,6 +15,7 @@ async def openai_reactions(
         from_samuel: bool
 ) -> None:
     input_text = message.text
+    username = message.from_.username if message.from_.username else message.from_.first_name
 
     destroy_message = True if bot.config.block_samuel and from_samuel else False
 
@@ -130,12 +131,36 @@ async def openai_reactions(
                     chat_id=message.chat.id,
                     reply_to=message.message_id)
             )
+        elif "/asd" in message.text.lower()[0:5]:
+            roleta_list = await get_roletas_from_pavuna(bot, 25)
+            prompt = f"repita essa frase e em seguinte dê a sua conclusão: '{random.choice(roleta_list)} pois {random.choice(roleta_list)}'"
+
+            if round(random.random()):
+                prompt += f" - dê uma bronca no {username} por ter dito isso"
+
+            text = await openai_generate_message(
+                        bot=bot,
+                        message_data=message,
+                        message_text=prompt,
+                        prompt_inject=None,
+                        destroy_message=destroy_message,
+                        temperature=1.0,
+                        sentences=2,
+                        remove_words_list=['asd']
+                    )
+
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=text.split("\n")[-1],
+                    chat_id=message.chat.id,
+                    reply_to=message.message_id)
+            )
+
         elif (
                 len(message.text) >= 25 and random.random() < bot.config.random_params.random_mock_frequency
                 and message.chat.id not in bot.config.not_internal_chats
         ):
             roleta_list = await get_roletas_from_pavuna(bot, 25)
-            username = message.from_.username if message.from_.username else message.from_.first_name
             prompt = f"assumindo que alguém disse: '{random.choice(roleta_list)}' e o {username} disse: '{message.text}', {'continue o assunto' if round(random.random()) else 'puxe outro assunto com base no que está sendo conversado'}."
 
             bot.loop.create_task(

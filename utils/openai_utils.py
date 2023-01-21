@@ -75,7 +75,7 @@ async def openai_generate_message(
         )
     except Exception as exc:
         logging.exception(exc)
-        response = "meu cérebro tá fora do ar"
+        return "meu cérebro tá fora do ar"
 
     return await normalize_openai_text(
         ai_message=response.choices[0].text,
