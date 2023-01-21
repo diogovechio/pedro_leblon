@@ -130,7 +130,10 @@ async def openai_reactions(
                     chat_id=message.chat.id,
                     reply_to=message.message_id)
             )
-        elif len(message.text) >= 25 and random.random() < bot.config.random_params.random_mock_frequency:
+        elif (
+                len(message.text) >= 25 and random.random() < bot.config.random_params.random_mock_frequency
+                and message.chat.id not in bot.config.not_internal_chats
+        ):
             roleta_list = await get_roletas_from_pavuna(bot, 25)
             username = message.from_.username if message.from_.username else message.from_.first_name
             prompt = f"assumindo que alguém disse: '{random.choice(roleta_list)}' e o {username} disse: '{message.text}', {'continue o assunto' if round(random.random()) else 'puxe outro assunto com base no que está sendo conversado'}."
