@@ -41,7 +41,7 @@ async def send_roleta(bot: FakePedro) -> None:
                     await normalize_openai_text(
                         ai_message=openai.Completion.create(
                             model="text-davinci-003",
-                            prompt=f"repita essa frase e em seguinte dê a sua conclusão: '{random.choice(roleta_list)}'",
+                            prompt=f"repita essa frase e em seguinte dê a sua conclusão: '{random.choice(roleta_list)['text']}'",
                             api_key=bot.config.secrets.openai_key,
                             max_tokens=bot.config.openai.max_tokens,
                             frequency_penalty=1.0,

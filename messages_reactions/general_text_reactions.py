@@ -39,7 +39,7 @@ async def words_reactions(
         ):
             bot.loop.create_task(
                 bot.send_message(
-                    message_text=(random.choice(await get_roletas_from_pavuna(bot))).lower(),
+                    message_text=(random.choice(await get_roletas_from_pavuna(bot)))['text'].lower(),
                     chat_id=message.chat.id,
                     sleep_time=2 + round(random.random() * 5)
                 )
