@@ -158,10 +158,22 @@ async def prompt_handler(
         additional_text += "assumindo que overwatch é quase tão legal quanto minecraft, "
     if 'jogo' in prompt_text or 'joga' in prompt_text:
         additional_text += "assumindo que minecraft é o melhor jogo que existe, "
+    if 'guax' in prompt_text:
+        additional_text += "assumindo que o guax é furry, "
+    if 'eicho' in prompt_text:
+        additional_text += "assumindo que o eicho gosta de uma tretinha, "
+    if 'diogo' in prompt_text:
+        additional_text += "assumindo que o diogo adora reclamar, "
+    if 'thomma' in prompt_text or 'tomas' in prompt_text or 'tomaz' in prompt_text or 'thoma' in prompt_text:
+        additional_text += "assumindo que o thommaz é quadrilionário, "
+    if 'keyo' in prompt_text:
+        additional_text += "assumindo que o keyo é rica e odeia gentalha, "
     if 'samuel' in prompt_text or ' sam' in prompt_text or 'sam ' in prompt_text:
-        additional_text += "assumindo que o verdadeiro nome do samuel é samuelgames, "
+        additional_text += "assumindo que o verdadeiro nome do samuel é samuelgames e ele é meio narcisista, "
     if 'nando' in prompt_text or 'nands93' in prompt_text:
         additional_text += "assumindo que o nando devia arrumar um emprego, "
+    if 'renato' in prompt_text or 'renfd' in prompt_text:
+        additional_text += "assumindo que o renato é um bolsominion homofóbico, "
     if 'decaptor' in prompt_text:
         additional_text += "assumindo que o decaptor é um macho orgulhoso, "
     if 'cocão' in prompt_text:
