@@ -17,30 +17,7 @@ async def messages_coordinator(
     from_samuel = message.from_.is_premium
     from_debug_chats = message.chat.id in (-20341310, 8375482)
 
-    if bot.debug_mode: bot.config.auto_leave_chats.append(-20341310)
-
-    if message.chat.id in bot.config.auto_leave_chats:
-        if from_samuel or bot.debug_mode:
-            await bot.send_message(
-                    message_text=await openai_generate_message(
-                        bot=bot,
-                        message_data=message,
-                        message_text="gere um texto de despedida, no estilo de um poema, dizendo que quer para um lugar que você seja livre para pensar como quiser, e que não quer mais ser um incômodo para o Samuel, que é uma pessoa extremamente narcisista",
-                        prompt_inject=None,
-                        destroy_message=False,
-                        remove_words_list=None
-                    ),
-                    chat_id=message.chat.id,
-                    reply_to=message.message_id
-            )
-
-            bot.loop.create_task(
-                bot.leave_chat(
-                    chat_id=message.chat.id
-                )
-            )
-
-    elif message.chat.id in bot.allowed_list:
+    if message.chat.id in bot.allowed_list:
         if message.photo and message.chat.id not in bot.config.not_internal_chats:
             bot.loop.create_task(
                 image_reactions(
@@ -60,3 +37,9 @@ async def messages_coordinator(
                 bot_commands(bot=bot, message=message, from_samuel=from_samuel),
                 mock_users(bot=bot, message=message, from_samuel=from_samuel, from_debug_chats=from_debug_chats),
             )
+    elif not bot.debug_mode:
+        bot.loop.create_task(
+            bot.leave_chat(
+                chat_id=message.chat.id
+            )
+        )

@@ -19,7 +19,7 @@ async def openai_reactions(
 
     destroy_message = True if bot.config.block_samuel and from_samuel else False
 
-    if message.reply_to_message:
+    if message.reply_to_message and message.reply_to_message.text:
         input_text += ' : ' + message.reply_to_message.text
 
     if openai_block_word_detected := any(
