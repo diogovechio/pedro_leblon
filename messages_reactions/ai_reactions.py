@@ -6,7 +6,7 @@ from constants.constants import OPENAI_BLOCK_WORDS, OPENAI_REACT_WORDS, OPENAI_P
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
 from utils.openai_utils import openai_generate_message, normalize_openai_text
-from utils.roleta_utils import get_roletas_from_pavuna
+from utils.roleta_utils import get_roletas_from_pavuna, arrombado_classifier
 
 
 async def openai_reactions(
@@ -131,27 +131,31 @@ async def openai_reactions(
                     chat_id=message.chat.id,
                     reply_to=message.message_id)
             )
-        elif "/asd" in message.text.lower()[0:5]:
+        elif "/critique" in message.text.lower()[0:9]:
             roleta_list = await get_roletas_from_pavuna(bot, 25)
-            prompt = f"repita essa frase e em seguinte dê a sua conclusão: '{random.choice(roleta_list)} pois {random.choice(roleta_list)}'"
+            choiced_roleta = random.choice(roleta_list)
+            arrombado = arrombado_classifier(choiced_roleta)
 
-            if round(random.random()):
-                prompt += f" - dê uma bronca no {username} por ter dito isso"
+            prompt = f"{'dê uma bronca em' if round(random.random()) else 'xingue o'} {arrombado} por ter dito isso: " \
+                     f"'{choiced_roleta['text']}'"
 
             text = await openai_generate_message(
                         bot=bot,
                         message_data=message,
                         message_text=prompt,
-                        prompt_inject=None,
                         destroy_message=destroy_message,
+                        prompt_inject="O",
                         temperature=1.0,
                         sentences=2,
                         remove_words_list=['asd']
                     )
 
+            if arrombado.lower() not in text:
+                text = f"{arrombado}, {text}"
+
             bot.loop.create_task(
                 bot.send_message(
-                    message_text=text.split("\n")[-1],
+                    message_text=f"'{choiced_roleta['text']}'\n\n{text.upper()}",
                     chat_id=message.chat.id,
                     reply_to=message.message_id)
             )
