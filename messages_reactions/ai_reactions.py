@@ -1,3 +1,4 @@
+import json
 import random
 
 import openai
@@ -146,6 +147,14 @@ async def openai_reactions(
                 prompt = f"{'dê uma bronca em' if round(random.random()) else 'xingue o'} {arrombado} por ter dito isso: " \
                          f"'{choiced_roleta['text']}'"
 
+            if choiced_roleta:
+                _ = await bot.forward_message(
+                    target_chat_id=message.chat.id,
+                    from_chat_id=choiced_roleta['from_chat_id'],
+                    message_id=choiced_roleta['message_id'],
+                    replace_token=bot.config.secrets.alternate_bot_token
+                )
+
             text = await openai_generate_message(
                         bot=bot,
                         message_data=message,
@@ -156,25 +165,31 @@ async def openai_reactions(
                         sentences=2,
                         remove_words_list=['asd']
                     )
-
-            if choiced_roleta:
-                message_text = f"'{choiced_roleta['text']}'\n\n{text.upper()}"
-            else:
-                message_text = text.upper()
+            message_text = text.upper()
 
             if arrombado.lower() not in text:
                 message_text = f"{arrombado}, {text}"
 
-            bot.loop.create_task(
-                bot.send_message(
-                    message_text=message_text,
-                    chat_id=message.chat.id,
-                    reply_to=message.message_id)
-            )
+            if choiced_roleta:
+                bot.loop.create_task(
+                    bot.send_message(
+                        message_text=message_text,
+                        chat_id=message.chat.id,
+                        reply_to=message.message_id + 1
+                    )
+                )
+            else:
+                bot.loop.create_task(
+                    bot.send_message(
+                        message_text=message_text,
+                        chat_id=message.chat.id,
+                        reply_to=message.message_id)
+                )
 
         elif (
                 len(message.text) >= 25 and True
                 and message.chat.id not in bot.config.not_internal_chats
+                and not bot.mocked_today
         ):
             roleta_list = (await get_roletas_from_pavuna(bot, 25))
             prompt = f"assumindo que alguém disse: '{random.choice(roleta_list)['text']}' e o {username} disse: '{message.text}', {'continue o assunto' if round(random.random()) else 'puxe outro assunto com base no que está sendo conversado'}."
@@ -201,3 +216,4 @@ async def openai_reactions(
                 )
             )
 
+            bot.mocked_today = True

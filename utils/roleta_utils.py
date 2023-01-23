@@ -85,7 +85,7 @@ def arrombado_classifier(message: dict) -> str:
                 or
                 (message['sender_name'] is not None and 'marco' in message['sender_name'].lower())
         ):
-            return 'renato'
+            return 'keyo'
         if (
                 (message['username'] is not None and 'fabio' in message['username'].lower())
                 or

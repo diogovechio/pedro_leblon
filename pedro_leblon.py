@@ -123,7 +123,7 @@ class FakePedro:
                 self.config = BotConfig(**bot_config)
 
                 self.openai_use = 0.0
-                self.allowed_list = [8375482, -704277411, -884201527] if self.debug_mode else [
+                self.allowed_list = [8375482, -704277411, -884201527, -20341310] if self.debug_mode else [
                     *[value.id for value in self.config.allowed_ids]]
                 self.api_route = f"https://api.telegram.org/bot{self.config.secrets.bot_token}"
 
@@ -273,6 +273,35 @@ class FakePedro:
             ) as resp:
                 logging.info(resp.status)
 
+    async def forward_message(
+            self,
+            target_chat_id: int,
+            from_chat_id: int,
+            message_id: int,
+            sleep_time=0,
+            replace_token:T.Optional[str]=None
+    ):
+        await asyncio.sleep(sleep_time)
+        url = self.api_route
+        if replace_token:
+            url = f"https://api.telegram.org/bot{replace_token}"
+
+        async with asyncio.Semaphore(self.config.telegram_api_semaphore):
+            async with self.session.post(
+                    url=f"{url}/forwardMessage".replace('\n', ''),
+                    data=aiohttp.FormData(
+                        (
+                            ("chat_id", str(target_chat_id)),
+                            ("from_chat_id", str(from_chat_id)),
+                            ("message_id", str(message_id)),
+                        )
+                    )
+            ) as resp:
+                logging.info(resp.status)
+
+                return await resp.json()
+
+
     async def send_message(self, message_text: str, chat_id: int, reply_to=None, sleep_time=0) -> None:
         await asyncio.sleep(sleep_time)
 
@@ -317,7 +346,7 @@ if __name__ == '__main__':
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
         secrets_file='secrets.json',
-        debug_mode=True
+        debug_mode=False
     )
 
     asyncio.run(
