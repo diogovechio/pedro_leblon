@@ -19,7 +19,7 @@ async def openai_reactions(
 
     destroy_message = True if bot.config.block_samuel and from_samuel else False
 
-    if message.reply_to_message and message.reply_to_message.text:
+    if message.reply_to_message:
         input_text += ' : ' + message.reply_to_message.text
 
     if openai_block_word_detected := any(
@@ -84,10 +84,10 @@ async def openai_reactions(
             )
 
         elif from_samuel and (
-            random.random() < bot.config.random_params.mock_samuel_frequency or
-            any(
-                react_word in message.text.lower() for react_word in OPENAI_REACT_WORDS
-            )
+                random.random() < bot.config.random_params.mock_samuel_frequency or
+                any(
+                    react_word in message.text.lower() for react_word in OPENAI_REACT_WORDS
+                )
         ):
             bot.loop.create_task(
                 bot.send_message(
@@ -132,52 +132,41 @@ async def openai_reactions(
                     reply_to=message.message_id)
             )
         elif "/critique" in message.text.lower()[0:9]:
-            choiced_roleta = {}
+            roleta_list = await get_roletas_from_pavuna(bot, 25)
+            choiced_roleta = random.choice(roleta_list)
+            arrombado = arrombado_classifier(choiced_roleta)
 
-            if message.reply_to_message and message.reply_to_message.text:
-                arrombado = message.reply_to_message.from_.first_name
-                prompt = f"{'dê uma bronca em' if round(random.random()) else 'xingue o'} {arrombado} por ter dito isso: " \
-                         f"'{message.reply_to_message.text}'"
-            else:
-                roleta_list = await get_roletas_from_pavuna(bot, 25)
-                choiced_roleta = random.choice(roleta_list)
-                arrombado = arrombado_classifier(choiced_roleta)
-
-                prompt = f"{'dê uma bronca em' if round(random.random()) else 'xingue o'} {arrombado} por ter dito isso: " \
-                         f"'{choiced_roleta['text']}'"
+            prompt = f"{'dê uma bronca em' if round(random.random()) else 'xingue o'} {arrombado} por ter dito isso: " \
+                     f"'{choiced_roleta['text']}'"
 
             text = await openai_generate_message(
-                        bot=bot,
-                        message_data=message,
-                        message_text=prompt,
-                        destroy_message=destroy_message,
-                        prompt_inject="O",
-                        temperature=1.0,
-                        sentences=2,
-                        remove_words_list=['asd']
-                    )
-
-            if choiced_roleta:
-                message_text = f"'{choiced_roleta['text']}'\n\n{text.upper()}"
-            else:
-                message_text = text.upper()
+                bot=bot,
+                message_data=message,
+                message_text=prompt,
+                destroy_message=destroy_message,
+                prompt_inject="O",
+                temperature=1.0,
+                sentences=2,
+                remove_words_list=['asd']
+            )
 
             if arrombado.lower() not in text:
-                message_text = f"{arrombado}, {text}"
+                text = f"{arrombado}, {text}"
 
             bot.loop.create_task(
                 bot.send_message(
-                    message_text=message_text,
+                    message_text=f"'{choiced_roleta['text']}'\n\n{text.upper()}",
                     chat_id=message.chat.id,
                     reply_to=message.message_id)
             )
 
         elif (
-                len(message.text) >= 25 and True
+                len(message.text) >= 25 and random.random() < bot.config.random_params.random_mock_frequency
                 and message.chat.id not in bot.config.not_internal_chats
+                and not bot.mocked_today
         ):
-            roleta_list = (await get_roletas_from_pavuna(bot, 25))
-            prompt = f"assumindo que alguém disse: '{random.choice(roleta_list)['text']}' e o {username} disse: '{message.text}', {'continue o assunto' if round(random.random()) else 'puxe outro assunto com base no que está sendo conversado'}."
+            roleta_list = await get_roletas_from_pavuna(bot, 25)
+            prompt = f"assumindo que alguém disse: '{random.choice(roleta_list)}' e o {username} disse: '{message.text}', {'continue o assunto' if round(random.random()) else 'puxe outro assunto com base no que está sendo conversado'}."
 
             bot.loop.create_task(
                 bot.send_message(
@@ -201,3 +190,4 @@ async def openai_reactions(
                 )
             )
 
+            bot.mocked_today = True
