@@ -132,30 +132,31 @@ async def openai_reactions(
                     chat_id=message.chat.id,
                     reply_to=message.message_id)
             )
+
         elif "/critique" in message.text.lower()[0:9]:
-            choiced_roleta = {}
+            roleta_from_pavuna = None
 
             if message.reply_to_message and message.reply_to_message.text:
                 arrombado = message.reply_to_message.from_.first_name
                 prompt = f"{'dê uma bronca em' if round(random.random()) else 'xingue o'} {arrombado} por ter dito isso: " \
                          f"'{message.reply_to_message.text}'"
             else:
-                roleta_list = await get_roletas_from_pavuna(bot, 25)
-                choiced_roleta = random.choice(roleta_list)
-                arrombado = arrombado_classifier(choiced_roleta)
+                roleta_from_pavuna = random.choice(await get_roletas_from_pavuna(bot, 25))
+                arrombado = arrombado_classifier(roleta_from_pavuna)
 
                 prompt = f"{'dê uma bronca em' if round(random.random()) else 'xingue o'} {arrombado} por ter dito isso: " \
-                         f"'{choiced_roleta['text']}'"
+                         f"'{roleta_from_pavuna['text']}'"
 
-            if choiced_roleta:
-                _ = await bot.forward_message(
+            status_code_from_pavuna = 0
+            if roleta_from_pavuna:
+                status_code_from_pavuna = await bot.forward_message(
                     target_chat_id=message.chat.id,
-                    from_chat_id=choiced_roleta['from_chat_id'],
-                    message_id=choiced_roleta['message_id'],
+                    from_chat_id=roleta_from_pavuna['from_chat_id'],
+                    message_id=roleta_from_pavuna['message_id'],
                     replace_token=bot.config.secrets.alternate_bot_token
                 )
 
-            text = await openai_generate_message(
+            openai_text = await openai_generate_message(
                         bot=bot,
                         message_data=message,
                         message_text=prompt,
@@ -165,12 +166,15 @@ async def openai_reactions(
                         sentences=2,
                         remove_words_list=['asd']
                     )
-            message_text = text.upper()
+            message_text = openai_text.upper()
 
-            if arrombado.lower() not in text:
-                message_text = f"{arrombado}, {text}"
+            if arrombado.lower() not in openai_text:
+                message_text = f"{arrombado.upper()}, {openai_text.upper()}"
 
-            if choiced_roleta:
+            if roleta_from_pavuna:
+                if status_code_from_pavuna >= 300:
+                  message_text = f"'{roleta_from_pavuna['text']}'\n\n{message_text}"
+
                 bot.loop.create_task(
                     bot.send_message(
                         message_text=message_text,
@@ -181,9 +185,10 @@ async def openai_reactions(
             else:
                 bot.loop.create_task(
                     bot.send_message(
-                        message_text=message_text,
+                        message_text=message_text.upper(),
                         chat_id=message.chat.id,
-                        reply_to=message.message_id)
+                        reply_to=message.message_id
+                    )
                 )
 
         elif (

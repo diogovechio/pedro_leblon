@@ -280,7 +280,7 @@ class FakePedro:
             message_id: int,
             sleep_time=0,
             replace_token:T.Optional[str]=None
-    ):
+    ) -> int:
         await asyncio.sleep(sleep_time)
         url = self.api_route
         if replace_token:
@@ -299,7 +299,7 @@ class FakePedro:
             ) as resp:
                 logging.info(resp.status)
 
-                return await resp.json()
+                return resp.status
 
 
     async def send_message(self, message_text: str, chat_id: int, reply_to=None, sleep_time=0) -> None:
@@ -346,7 +346,7 @@ if __name__ == '__main__':
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
         secrets_file='secrets.json',
-        debug_mode=False
+        debug_mode=True
     )
 
     asyncio.run(
