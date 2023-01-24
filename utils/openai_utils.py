@@ -169,7 +169,7 @@ async def prompt_handler(
     if 'keyo' in prompt_text:
         additional_text += "assumindo que o keyo é rica e odeia gentalha, "
     if 'samuel' in prompt_text or ' sam' in prompt_text or 'sam ' in prompt_text:
-        additional_text += "assumindo que o verdadeiro nome do samuel é samuelgames e ele é meio narcisista, "
+        additional_text += "assumindo que o verdadeiro nome do samuel é samuelgames, "
     if 'nando' in prompt_text or 'nands93' in prompt_text:
         additional_text += "assumindo que o nando devia arrumar um emprego, "
     if 'renato' in prompt_text or 'renfd' in prompt_text:
