@@ -26,6 +26,8 @@ OPENAI_BLOCK_WORDS = [' viado', 'porra', 'fuck', 'cock', 'transar', 'buceta', 'b
 OPENAI_REACT_WORDS = ['bolsonaro', 'segundo turno', 'macho', ' lula ', 'dilma', 'homem', 'homens', 'ovni', 'votação',
                       'eleição', 'eleições', 'bosta', 'aliens', 'temer', ' et ', ' ets ', ' pt' ' et']
 
+OPENAI_TRASH_LIST = ['"', "r:", "o:", "a:", "q:"]
+
 OPENAI_PROMPTS = {
     'fale': 'fale sobre esse tema:',
     'responda': 'responda essa pergunta:',

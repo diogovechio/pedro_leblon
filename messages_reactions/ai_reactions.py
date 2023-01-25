@@ -3,7 +3,7 @@ import random
 
 import openai
 
-from constants.constants import OPENAI_BLOCK_WORDS, OPENAI_REACT_WORDS, OPENAI_PROMPTS
+from constants.constants import OPENAI_BLOCK_WORDS, OPENAI_REACT_WORDS, OPENAI_PROMPTS, OPENAI_TRASH_LIST
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
 from utils.openai_utils import openai_generate_message, normalize_openai_text
@@ -178,11 +178,14 @@ async def openai_reactions(
                     )
             message_text = openai_text.lower()
 
-            if arrombado.lower() not in openai_text:
-                message_text = f"{arrombado}, {openai_text}"
+            for x in OPENAI_TRASH_LIST:
+                message_text = message_text.replace(x, "")
+
+            if arrombado.lower() not in message_text:
+                message_text = f"{arrombado}, {message_text}"
 
             if random.random() < 0.25:
-                message_text = openai_text.upper()
+                message_text = message_text.upper()
 
             if roleta_from_pavuna:
                 if status_code_from_pavuna >= 300:
