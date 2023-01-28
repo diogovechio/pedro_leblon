@@ -1,6 +1,5 @@
 import re
-from dataclasses import asdict
-from datetime import datetime, timedelta
+from datetime import datetime
 import random
 import uuid
 import math
@@ -93,7 +92,8 @@ async def bot_commands(
                                  f"\n<b>Exemplo 2 (uma vez): </b>/agendar me lembra de sei la 29/12/2023"
                     ,
                     chat_id=message.chat.id,
-                    reply_to=message.message_id
+                    reply_to=message.message_id,
+                    parse_mode="HTML"
                 )
             )
 
@@ -122,7 +122,8 @@ async def bot_commands(
                 bot.send_message(
                     message_text=f"<b>{text}</b>\n{message_split[-1]}\nadicionado na agenda",
                     chat_id=message.chat.id,
-                    reply_to=message.message_id
+                    reply_to=message.message_id,
+                    parse_mode="HTML"
                 )
             )
 
@@ -151,7 +152,8 @@ async def bot_commands(
             bot.loop.create_task(
                 bot.send_message(
                     message_text=f"<b>Agendamentos do chat {message.chat.title if message.chat.title else message.chat.username}</b> - {i + 1}/{len(agendas)}\n\n{entry}",
-                    chat_id=message.chat.id
+                    chat_id=message.chat.id,
+                    parse_mode="HTML"
                 )
             )
 
@@ -163,7 +165,8 @@ async def bot_commands(
                 bot.send_message(
                     message_text=f"para deletar entrada da agenda:\n/delete id",
                     chat_id=message.chat.id,
-                    reply_to=message.message_id
+                    reply_to=message.message_id,
+                    parse_mode="HTML"
                 )
             )
         else:
@@ -175,7 +178,8 @@ async def bot_commands(
                         bot.send_message(
                             message_text=f"{msg_id[-1]} deletado da agenda",
                             chat_id=message.chat.id,
-                            reply_to=message.message_id
+                            reply_to=message.message_id,
+                            parse_mode="HTML"
                         )
                     )
                     bot.commemorations.data.pop(idx)
@@ -188,7 +192,8 @@ async def bot_commands(
                         message_text=f"nao achei {msg_id[-1]}... manda /agenda e copia o id direito "
                                      f"ou vê se você tem permissão pra deletar",
                         chat_id=message.chat.id,
-                        reply_to=message.message_id
+                        reply_to=message.message_id,
+                        parse_mode="HTML"
                     )
                 )
 
@@ -198,7 +203,8 @@ async def bot_commands(
                 bot.send_message(
                     message_text=f"exemplo pra agendar:\n\n/aniversario @thommazk 29/12",
                     chat_id=message.chat.id,
-                    reply_to=message.message_id
+                    reply_to=message.message_id,
+                    parse_mode="HTML"
                 )
             )
 
@@ -223,7 +229,8 @@ async def bot_commands(
                 bot.send_message(
                     message_text=f"aniversário de {anniversary} no dia {message_split[-1]} adicionado na agenda",
                     chat_id=message.chat.id,
-                    reply_to=message.message_id
+                    reply_to=message.message_id,
+                    parse_mode="HTML"
                 )
             )
 

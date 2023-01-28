@@ -6,7 +6,9 @@ from pedro_leblon import FakePedro
 def daily_routines(bot: FakePedro) -> None:
     try:
         bot.mocked_today = False
-        bot.openai_use = 0
+
+        if bot.openai is not None:
+            bot.openai.openai_use = 0
 
         bot.loop.create_task(
             bot.send_document(

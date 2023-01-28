@@ -39,17 +39,9 @@ async def send_roleta(bot: FakePedro) -> None:
             bot.loop.create_task(
                 bot.send_message(
                     message_text=(
-                        await normalize_openai_text(
-                            ai_message=openai.Completion.create(
-                                model="text-davinci-003",
-                                prompt=f"repita essa frase e em seguinte dê a sua conclusão: '{random.choice(roleta_list)['text']}'",
-                                api_key=bot.config.secrets.openai_key,
-                                max_tokens=bot.config.openai.max_tokens,
-                                frequency_penalty=1.0,
-                                presence_penalty=2.0,
-                                temperature=1.0
-                            ).choices[0].text,
-                            sentences=bot.config.openai.max_sentences
+                        await bot.openai.generate_message(
+                            message_text=f"repita essa frase e em seguinte dê a sua conclusão: "
+                                         f"'{random.choice(roleta_list)['text']}'",
                         )
                     ).upper(),
                     chat_id=chat_id,

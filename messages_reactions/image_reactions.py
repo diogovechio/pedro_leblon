@@ -1,5 +1,4 @@
 import asyncio
-import typing as T
 
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro

@@ -1,5 +1,3 @@
-from dataclasses import asdict
-from datetime import datetime
 import logging
 
 from pedro_leblon import FakePedro

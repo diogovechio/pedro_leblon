@@ -2,7 +2,6 @@ import asyncio
 import logging
 import os
 from asyncio import AbstractEventLoop
-from dataclasses import asdict
 
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -23,6 +22,8 @@ from data_classes.commemorations import Commemorations
 from data_classes.received_message import MessagesResults, TelegramMessage, MessageReceived
 from data_structures.max_size_list import MaxSizeList
 from messages_reactions import messages_coordinator
+from utils.openai_utils import OpenAiCompletion
+from utils.text_utils import normalize_openai_text
 
 logging.basicConfig(level=logging.INFO)
 
@@ -71,7 +72,7 @@ class FakePedro:
 
         self.mocked_today = False
 
-        self.openai_use = 0
+        self.openai: T.Optional[OpenAiCompletion] = None
 
         self.loop: T.Optional[AbstractEventLoop] = None
 
@@ -82,10 +83,10 @@ class FakePedro:
             Path('tmp').mkdir(exist_ok=True)
             Path('face_lake').mkdir(exist_ok=True)
 
-            await self.load_config_params()
-
             self.loop = asyncio.get_running_loop()
             self.session = aiohttp.ClientSession()
+
+            await self.load_config_params()
 
             self.loop.create_task(scheduler(self))
 
@@ -122,7 +123,18 @@ class FakePedro:
 
                 self.config = BotConfig(**bot_config)
 
-                self.openai_use = 0.0
+                self.openai = OpenAiCompletion(
+                    api_key=self.config.secrets.openai_key,
+                    max_tokens=self.config.openai.max_tokens,
+                    max_sentences=self.config.openai.max_sentences,
+                    session=self.session,
+                    semaphore=self.config.telegram_api_semaphore,
+                    davinci_daily_limit=self.config.openai.davinci_daily_limit,
+                    curie_daily_limit=self.config.openai.curie_daily_limit,
+                    only_ada_users=self.config.openai.ada_only_users,
+                    force_model=self.config.openai.force_model
+                )
+
                 self.allowed_list = [8375482, -704277411, -884201527, -20341310] if self.debug_mode else [
                     *[value.id for value in self.config.allowed_ids]]
                 self.api_route = f"https://api.telegram.org/bot{self.config.secrets.bot_token}"
@@ -228,11 +240,11 @@ class FakePedro:
                     url=f"{self.api_route}/sendPhoto".replace('\n', ''),
                     data=aiohttp.FormData(
                         (
-                            ("chat_id", str(chat_id)),
-                            ("photo", image),
-                            ("reply_to_message_id", str(reply_to) if reply_to else ''),
-                            ('allow_sending_without_reply', 'true'),
-                            ("caption", caption if caption else '')
+                                ("chat_id", str(chat_id)),
+                                ("photo", image),
+                                ("reply_to_message_id", str(reply_to) if reply_to else ''),
+                                ('allow_sending_without_reply', 'true'),
+                                ("caption", caption if caption else '')
                         )
                     )
             ) as resp:
@@ -246,10 +258,10 @@ class FakePedro:
                     url=f"{self.api_route}/sendVideo".replace('\n', ''),
                     data=aiohttp.FormData(
                         (
-                            ("chat_id", str(chat_id)),
-                            ("video", video),
-                            ("reply_to_message_id", str(reply_to) if reply_to else ''),
-                            ('allow_sending_without_reply', 'true'),
+                                ("chat_id", str(chat_id)),
+                                ("video", video),
+                                ("reply_to_message_id", str(reply_to) if reply_to else ''),
+                                ('allow_sending_without_reply', 'true'),
                         )
                     )
             ) as resp:
@@ -263,11 +275,11 @@ class FakePedro:
                     url=f"{self.api_route}/sendDocument".replace('\n', ''),
                     data=aiohttp.FormData(
                         (
-                            ("chat_id", str(chat_id)),
-                            ("document", document),
-                            ("caption", caption if caption else ''),
-                            ("reply_to_message_id", str(reply_to) if reply_to else ''),
-                            ('allow_sending_without_reply', 'true'),
+                                ("chat_id", str(chat_id)),
+                                ("document", document),
+                                ("caption", caption if caption else ''),
+                                ("reply_to_message_id", str(reply_to) if reply_to else ''),
+                                ('allow_sending_without_reply', 'true'),
                         )
                     )
             ) as resp:
@@ -279,7 +291,7 @@ class FakePedro:
             from_chat_id: int,
             message_id: int,
             sleep_time=0,
-            replace_token:T.Optional[str]=None
+            replace_token: T.Optional[str] = None
     ) -> int:
         await asyncio.sleep(sleep_time)
         url = self.api_route
@@ -291,9 +303,9 @@ class FakePedro:
                     url=f"{url}/forwardMessage".replace('\n', ''),
                     data=aiohttp.FormData(
                         (
-                            ("chat_id", str(target_chat_id)),
-                            ("from_chat_id", str(from_chat_id)),
-                            ("message_id", str(message_id)),
+                                ("chat_id", str(target_chat_id)),
+                                ("from_chat_id", str(from_chat_id)),
+                                ("message_id", str(message_id)),
                         )
                     )
             ) as resp:
@@ -301,35 +313,35 @@ class FakePedro:
 
                 return resp.status
 
+    async def send_message(
+            self,
+            message_text: str,
+            chat_id: int,
+            reply_to=None,
+            sleep_time=0,
+            parse_mode: str = "Markdown",
+            max_retries=5
+    ) -> None:
+        fallback_parse_modes = ["", "HTML", "MarkdownV2", "Markdown"]
 
-    async def send_message(self, message_text: str, chat_id: int, reply_to=None, sleep_time=0) -> None:
         await asyncio.sleep(sleep_time)
 
-        async with asyncio.Semaphore(self.config.telegram_api_semaphore):
-            async with self.session.post(
-                    f"{self.api_route}/sendMessage".replace('\n', ''),
-                    json={
-                        "chat_id": chat_id,
-                        'reply_to_message_id': reply_to,
-                        'allow_sending_without_reply': True,
-                        'parse_mode': 'HTML',
-                        'text': message_text
-                    }
-            ) as resp:
-                logging.info(resp.status)
-                if resp.status == 400:
-                    logging.info(f"Retrying to send without HTML parse mode")
-
-                    async with self.session.post(
-                            f"{self.api_route}/sendMessage".replace('\n', ''),
-                            json={
-                                "chat_id": chat_id,
-                                'reply_to_message_id': reply_to,
-                                'allow_sending_without_reply': True,
-                                'text': message_text
-                            }
-                    ) as new_resp:
-                        logging.info(new_resp.status)
+        for i in range(max_retries):
+            async with asyncio.Semaphore(self.config.telegram_api_semaphore):
+                async with self.session.post(
+                        f"{self.api_route}/sendMessage".replace('\n', ''),
+                        json={
+                            "chat_id": chat_id,
+                            'reply_to_message_id': reply_to,
+                            'allow_sending_without_reply': True,
+                            'text': message_text,
+                            'parse_mode': parse_mode
+                        }
+                ) as resp:
+                    logging.info(resp.status)
+                    if 200 <= resp.status < 300:
+                        break
+                    parse_mode = fallback_parse_modes.pop() if len(fallback_parse_modes) else ""
 
     async def leave_chat(self, chat_id: int, sleep_time=0) -> None:
         await asyncio.sleep(sleep_time)

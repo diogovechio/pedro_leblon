@@ -7,7 +7,6 @@ from messages_reactions.ai_reactions import openai_reactions
 from messages_reactions.bot_commands import bot_commands
 from messages_reactions.general_text_reactions import words_reactions
 from messages_reactions.image_reactions import image_reactions
-from utils.openai_utils import openai_generate_message
 
 
 async def messages_coordinator(

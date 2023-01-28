@@ -1,12 +1,8 @@
-import json
 import random
-
-import openai
 
 from constants.constants import OPENAI_BLOCK_WORDS, OPENAI_REACT_WORDS, OPENAI_PROMPTS, OPENAI_TRASH_LIST
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
-from utils.openai_utils import openai_generate_message, normalize_openai_text
 from utils.roleta_utils import get_roletas_from_pavuna, arrombado_classifier
 
 
@@ -29,16 +25,15 @@ async def openai_reactions(
         if random.random() < bot.config.random_params.words_react_frequency or 'pedr' in message.text.lower():
             bot.loop.create_task(
                 bot.send_message(
-                    message_text=await openai_generate_message(
-                        bot=bot,
-                        message_data=message,
+                    message_text=await bot.openai.generate_message(
+                        message_username=message.from_.username,
                         message_text=input_text,
                         prompt_inject=OPENAI_PROMPTS['critique'] if round(
                             random.random()) else OPENAI_PROMPTS['critique_reformule'],
                         remove_words_list=['pedro'],
                         sentences=2,
-                        temperature=1.0,
                         tokens=165,
+                        temperature=1.0,
                         destroy_message=destroy_message,
                         mock_message=True
                     ),
@@ -53,9 +48,8 @@ async def openai_reactions(
         ) and random.random() < bot.config.random_params.words_react_frequency:
             bot.loop.create_task(
                 bot.send_message(
-                    message_text=await openai_generate_message(
-                        bot=bot,
-                        message_data=message,
+                    message_text=await bot.openai.generate_message(
+                        message_username=message.from_.username,
                         message_text=input_text,
                         prompt_inject=OPENAI_PROMPTS['fale'],
                         sentences=1,
@@ -68,12 +62,11 @@ async def openai_reactions(
                     reply_to=message.message_id)
             )
 
-        elif 'pedr' in message.text.lower()[0:5] and not "/pedro" in message.text.lower()[0:6]:
+        elif 'pedr' in message.text.lower()[0:5] and "/pedro" not in message.text.lower()[0:6]:
             bot.loop.create_task(
                 bot.send_message(
-                    message_text=await openai_generate_message(
-                        bot=bot,
-                        message_data=message,
+                    message_text=await bot.openai.generate_message(
+                        message_username=message.from_.username,
                         message_text=input_text,
                         prompt_inject=OPENAI_PROMPTS[
                             'responda'] if '?' in message.text.lower() else OPENAI_PROMPTS['fale'],
@@ -85,16 +78,15 @@ async def openai_reactions(
             )
 
         elif from_samuel and (
-            random.random() < bot.config.random_params.mock_samuel_frequency or
-            any(
-                react_word in message.text.lower() for react_word in OPENAI_REACT_WORDS
-            )
+                random.random() < bot.config.random_params.mock_samuel_frequency or
+                any(
+                    react_word in message.text.lower() for react_word in OPENAI_REACT_WORDS
+                )
         ):
             bot.loop.create_task(
                 bot.send_message(
-                    message_text=await openai_generate_message(
-                        bot=bot,
-                        message_data=message,
+                    message_text=await bot.openai.generate_message(
+                        message_username=message.from_.username,
                         message_text=f"O samuel disse: {input_text}",
                         prompt_inject=OPENAI_PROMPTS['critique_negativamente'],
                         destroy_message=False
@@ -106,13 +98,14 @@ async def openai_reactions(
         elif "/pedro" in message.text.lower()[0:6]:
             bot.loop.create_task(
                 bot.send_message(
-                    message_text=await openai_generate_message(
-                        bot=bot,
-                        message_data=message,
+                    message_text=await bot.openai.generate_message(
+                        message_username=message.from_.username,
                         message_text=input_text,
                         prompt_inject=None,
+                        biased=False,
                         destroy_message=destroy_message,
-                        remove_words_list=['/pedro']
+                        remove_words_list=['/pedro'],
+                        return_raw_text=True
                     ),
                     chat_id=message.chat.id,
                     reply_to=message.message_id)
@@ -121,9 +114,8 @@ async def openai_reactions(
         elif "/tldr" in message.text.lower()[0:5]:
             bot.loop.create_task(
                 bot.send_message(
-                    message_text=await openai_generate_message(
-                        bot=bot,
-                        message_data=message,
+                    message_text=await bot.openai.generate_message(
+                        message_username=message.from_.username,
                         message_text=f"faça um resumo do texto a seguir: {input_text}",
                         prompt_inject=None,
                         destroy_message=destroy_message,
@@ -166,16 +158,15 @@ async def openai_reactions(
                     replace_token=bot.config.secrets.alternate_bot_token
                 )
 
-            openai_text = await openai_generate_message(
-                        bot=bot,
-                        message_data=message,
-                        message_text=prompt,
-                        destroy_message=destroy_message,
-                        prompt_inject="O",
-                        temperature=1.0,
-                        sentences=2,
-                        remove_words_list=['asd']
-                    )
+            openai_text = await bot.openai.generate_message(
+                message_username=message.from_.username,
+                message_text=prompt,
+                destroy_message=destroy_message,
+                prompt_inject="O",
+                temperature=1.0,
+                sentences=2,
+                remove_words_list=['asd']
+            )
             message_text = openai_text.lower()
 
             for x in OPENAI_TRASH_LIST:
@@ -189,7 +180,7 @@ async def openai_reactions(
 
             if roleta_from_pavuna:
                 if status_code_from_pavuna >= 300:
-                  message_text = f"'{roleta_from_pavuna['text']}'\n\n{message_text}"
+                    message_text = f"'{roleta_from_pavuna['text']}'\n\n{message_text}"
 
                 bot.loop.create_task(
                     bot.send_message(
@@ -218,16 +209,9 @@ async def openai_reactions(
             bot.loop.create_task(
                 bot.send_message(
                     message_text=(
-                        await normalize_openai_text(
-                            ai_message=openai.Completion.create(
-                                model="text-davinci-003",
-                                prompt=prompt,
-                                api_key=bot.config.secrets.openai_key,
-                                max_tokens=bot.config.openai.max_tokens,
-                                frequency_penalty=1.0,
-                                presence_penalty=2.0,
-                                temperature=1.0
-                            ).choices[0].text,
+                        await bot.openai.generate_message(
+                            message_text=prompt,
+                            temperature=1.0,
                             sentences=2
                         )
                     ),
