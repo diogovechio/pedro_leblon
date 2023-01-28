@@ -4,7 +4,7 @@ import random
 import re
 import typing as T
 
-import openai
+import json
 
 from constants.constants import OPENAI_PROMPTS
 from data_classes.received_message import TelegramMessage
@@ -71,14 +71,14 @@ async def openai_generate_message(
                 temperature=temperature,
                 top_p=top_p
             ),
-            timeout=60
+            timeout=120
         )
     except Exception as exc:
         logging.exception(exc)
         return "meu cérebro tá fora do ar"
 
     return await normalize_openai_text(
-        ai_message=response.choices[0].text,
+        ai_message=response,
         sentences=bot.config.openai.max_sentences if sentences is None else sentences,
         clean_prompts=OPENAI_PROMPTS
     )
@@ -96,22 +96,29 @@ async def openai_completion(
         temperature=0,
         top_p=1
 ):
-    return openai.Completion.create(
-        model=await model_selector(
-            bot=bot,
-            message=message_data,
-            mock_message=mock_message,
-            random_model=random_model
-        ) if not force_model else force_model,
-        prompt=await prompt_handler(f"{prompt_inject}: {message_text}") if prompt_inject else message_text,
-        api_key=bot.config.secrets.openai_key,
-        max_tokens=bot.config.openai.max_tokens if tokens is None else tokens,
-        temperature=temperature,
-        top_p=top_p,
-        frequency_penalty=1.0,
-        presence_penalty=2.0
-    )
-
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {bot.config.secrets.openai_key}"
+    }
+    async with bot.session.post(
+            "https://api.openai.com/v1/completions",
+             headers=headers,
+             json={
+                "model": await model_selector(
+             bot=bot,
+             message=message_data,
+             mock_message=mock_message,
+             random_model=random_model
+             ) if force_model is None else force_model,
+                'prompt': await prompt_handler(f"{prompt_inject}: {message_text}") if prompt_inject else message_text,
+                'max_tokens': bot.config.openai.max_tokens if tokens is None else tokens,
+                'temperature': temperature,
+                'top_p':top_p,
+                'frequency_penalty': 1.0,
+                'presence_penalty': 2.0,
+            }
+    ) as openai_request:
+        return json.loads(await openai_request.text())['choices'][0]['text']
 
 async def model_selector(
         bot: FakePedro,
