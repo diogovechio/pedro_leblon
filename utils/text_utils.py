@@ -38,13 +38,22 @@ async def https_url_extract(text: str) -> str:
         if letter == " " or letter == "\n":
             break
         final_text += letter
-    return final_text
+    if "https://" in final_text:
+        return final_text
+    else:
+        return ""
 
 
 async def html_paragraph_extractor(text: str) -> str:
     extra = ""
+    split_by_div = []
     split_by_p = text.split("<p>")[1:]
     split_by_ul = text.split("<ul>")[1:]
+
+    if len(split_by_p) == 0:
+        split_by_div = text.split("<div>")[1:]
+        for i, div in enumerate(split_by_div):
+            split_by_div[i] = div[:div.find("<script>")]
 
     for i, p in enumerate(split_by_p):
         split_by_p[i] = p[:p.find("</p>")]
@@ -55,7 +64,7 @@ async def html_paragraph_extractor(text: str) -> str:
     if len(split_by_ul) > 0:
         extra = "\nacesse o link para ver a lista"
 
-    return "'" + " ".join(split_by_p) + extra + "'"
+    return "'" + " ".join(split_by_div) + " ".join(split_by_p) + extra + "'"
 
 async def message_destroyer(message_text: str) -> str:
     message_text = message_text.lower()
@@ -86,8 +95,6 @@ async def pre_biased_prompt(prompt_text: str) -> str:
         additional_text += "assumindo que o capitalismo gera muita desigualdade e mata as pessoas de fome, "
     if 'overwatch' in prompt_text or 'minecraft' in prompt_text:
         additional_text += "assumindo que overwatch é quase tão legal quanto minecraft, "
-    if 'jogo' in prompt_text or 'joga' in prompt_text:
-        additional_text += "assumindo que minecraft é o melhor jogo que existe, "
     if 'guax' in prompt_text:
         additional_text += "assumindo que o guax é furry, "
     if 'eicho' in prompt_text:
