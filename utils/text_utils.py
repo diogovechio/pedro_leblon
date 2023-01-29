@@ -45,26 +45,15 @@ async def https_url_extract(text: str) -> str:
 
 
 async def html_paragraph_extractor(text: str) -> str:
-    extra = ""
-    split_by_div = []
-    split_by_p = text.split("<p")[1:]
-    split_by_ul = text.split("<ul")[1:]
+    cleaned_html = re.sub("<[^>]*>", "olololo", text)
+    split_cleaned_html = cleaned_html.split("olololo")
 
-    if len(split_by_p) == 0:
-        split_by_div = text.split("<div")[1:]
-        for i, div in enumerate(split_by_div):
-            split_by_div[i] = div[:div.find("<script>")]
+    split_cleaned_html = [
+        x for x in split_cleaned_html if len(x) >= 4 and "function" not in x
+                                         and "{" not in x and "style" not in x]
 
-    for i, p in enumerate(split_by_p):
-        split_by_p[i] = p[:p.find("</p>")]
+    return "\n".join(split_cleaned_html)
 
-    for i, ul in enumerate(split_by_ul):
-        split_by_ul[i] = ul[:ul.find("</ul>")]
-
-    if len(split_by_ul) > 0:
-        extra = split_by_ul[-1]
-
-    return "'" + " ".join(split_by_div) + " ".join(split_by_p) + extra + "'"
 
 async def message_destroyer(message_text: str) -> str:
     message_text = message_text.lower()
