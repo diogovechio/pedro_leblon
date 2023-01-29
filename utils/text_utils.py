@@ -31,6 +31,32 @@ async def message_miguxer(message: str) -> str:
     )
 
 
+async def https_url_extract(text: str) -> str:
+    final_text = ""
+    text = text[text.find('https://'):]
+    for letter in text:
+        if letter == " " or letter == "\n":
+            break
+        final_text += letter
+    return final_text
+
+
+async def html_paragraph_extractor(text: str) -> str:
+    extra = ""
+    split_by_p = text.split("<p>")[1:]
+    split_by_ul = text.split("<ul>")[1:]
+
+    for i, p in enumerate(split_by_p):
+        split_by_p[i] = p[:p.find("</p>")]
+
+    for i, ul in enumerate(split_by_ul):
+        split_by_ul[i] = ul[:ul.find("</ul>")]
+
+    if len(split_by_ul) > 0:
+        extra = "\nacesse o link para ver a lista"
+
+    return "'" + " ".join(split_by_p) + extra + "'"
+
 async def message_destroyer(message_text: str) -> str:
     message_text = message_text.lower()
     message_text = message_text.replace('a', 'o')

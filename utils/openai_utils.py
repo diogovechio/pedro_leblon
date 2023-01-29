@@ -8,7 +8,7 @@ import json
 import aiohttp
 
 from constants.constants import OPENAI_PROMPTS
-from utils.text_utils import pre_biased_prompt, message_destroyer, normalize_openai_text
+from utils.text_utils import pre_biased_prompt, message_destroyer, normalize_openai_text, html_paragraph_extractor
 
 usage_mapping = {
     "ada": 0.02,
@@ -158,3 +158,15 @@ class OpenAiCompletion:
             sentences=self.max_sentences if sentences is None else sentences,
             clean_prompts=OPENAI_PROMPTS
         )
+
+
+async def extract_website_paragraph_content(
+        url: str,
+        session: aiohttp.ClientSession
+) -> str:
+    try:
+        async with session.get(url) as site:
+            return (await html_paragraph_extractor(await site.text()))[:2500]
+    except Exception as exc:
+        logging.exception(exc)
+        return f"talvez eu mesmo deva abrir e ler esse site: {url}"

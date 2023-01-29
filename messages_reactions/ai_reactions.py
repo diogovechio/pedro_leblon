@@ -3,7 +3,9 @@ import random
 from constants.constants import OPENAI_BLOCK_WORDS, OPENAI_REACT_WORDS, OPENAI_PROMPTS, OPENAI_TRASH_LIST
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
+from utils.openai_utils import extract_website_paragraph_content
 from utils.roleta_utils import get_roletas_from_pavuna, arrombado_classifier
+from utils.text_utils import https_url_extract
 
 
 async def openai_reactions(
@@ -18,6 +20,10 @@ async def openai_reactions(
 
     if message.reply_to_message and message.reply_to_message.text:
         input_text += ' : ' + message.reply_to_message.text
+
+    if url_detector := await https_url_extract(input_text):
+        url_content = await extract_website_paragraph_content(url_detector, bot.session)
+        input_text = input_text.replace(url_detector, url_content)
 
     if openai_block_word_detected := any(
             block_word in message.text.lower() for block_word in OPENAI_BLOCK_WORDS

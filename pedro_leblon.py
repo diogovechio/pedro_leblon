@@ -23,7 +23,6 @@ from data_classes.received_message import MessagesResults, TelegramMessage, Mess
 from data_structures.max_size_list import MaxSizeList
 from messages_reactions import messages_coordinator
 from utils.openai_utils import OpenAiCompletion
-from utils.text_utils import normalize_openai_text
 
 logging.basicConfig(level=logging.INFO)
 
@@ -358,7 +357,7 @@ if __name__ == '__main__':
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
         secrets_file='secrets.json',
-        debug_mode=True
+        debug_mode=False
     )
 
     asyncio.run(
