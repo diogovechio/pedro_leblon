@@ -47,11 +47,11 @@ async def https_url_extract(text: str) -> str:
 async def html_paragraph_extractor(text: str) -> str:
     extra = ""
     split_by_div = []
-    split_by_p = text.split("<p>")[1:]
-    split_by_ul = text.split("<ul>")[1:]
+    split_by_p = text.split("<p")[1:]
+    split_by_ul = text.split("<ul")[1:]
 
     if len(split_by_p) == 0:
-        split_by_div = text.split("<div>")[1:]
+        split_by_div = text.split("<div")[1:]
         for i, div in enumerate(split_by_div):
             split_by_div[i] = div[:div.find("<script>")]
 
@@ -62,7 +62,7 @@ async def html_paragraph_extractor(text: str) -> str:
         split_by_ul[i] = ul[:ul.find("</ul>")]
 
     if len(split_by_ul) > 0:
-        extra = "\nacesse o link para ver a lista"
+        extra = split_by_ul[-1]
 
     return "'" + " ".join(split_by_div) + " ".join(split_by_p) + extra + "'"
 

@@ -166,7 +166,10 @@ async def extract_website_paragraph_content(
 ) -> str:
     try:
         async with session.get(url) as site:
-            return (await html_paragraph_extractor(await site.text()))[:2500]
+            text = (await html_paragraph_extractor(await site.text()))[:2500]
+            if len(text) >= 250:
+                return text
     except Exception as exc:
         logging.exception(exc)
-        return f"talvez eu mesmo deva abrir e ler esse site: {url}"
+
+    return f"esse site parece inacessível: {url} - o que você acha que o artigo fala? deixe claro que é sua opinião"
