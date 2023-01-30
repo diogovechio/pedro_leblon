@@ -165,7 +165,8 @@ async def extract_website_paragraph_content(
         session: aiohttp.ClientSession
 ) -> str:
     try:
-        async with session.get(url) as site:
+        headers = {"User-Agent": "Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"}
+        async with session.get(url, headers=headers) as site:
             text = (await html_paragraph_extractor(await site.text()))[:3500]
             if len(text) >= 800 and (200 <= site.status < 300):
                 return text

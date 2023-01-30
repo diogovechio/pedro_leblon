@@ -49,10 +49,19 @@ async def html_paragraph_extractor(text: str) -> str:
     split_cleaned_html = cleaned_html.split("olololo")
 
     split_cleaned_html = [
-        x for x in split_cleaned_html if len(x) >= 4 and "function" not in x
+        x.strip().replace("\n", "") for x in split_cleaned_html if len(x) >= 4 and "function" not in x
                                          and "{" not in x and "style" not in x]
 
-    return "\n".join(split_cleaned_html)
+    new_split = [""]
+
+    short_len_sequence_block = 15
+    for i, text in enumerate(split_cleaned_html):
+        if len(text) < short_len_sequence_block and len(new_split[-1]) < short_len_sequence_block:
+            continue
+        else:
+            new_split.append(text)
+
+    return "\n".join(new_split)
 
 
 async def message_destroyer(message_text: str) -> str:
