@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+import re
 from asyncio import AbstractEventLoop
 
 from datetime import datetime, timedelta
@@ -320,13 +321,15 @@ class FakePedro:
             reply_to=None,
             sleep_time=0,
             parse_mode: str = "Markdown",
-            max_retries=5
+            max_retries=7
     ) -> None:
         fallback_parse_modes = ["", "HTML", "MarkdownV2", "Markdown"]
 
         await asyncio.sleep(sleep_time)
 
         for i in range(max_retries):
+            if i == max_retries - 1:
+                message_text = re.sub("[^A-Za-z0-9,.!àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕ]+", " ", message_text)
             async with asyncio.Semaphore(self.config.telegram_api_semaphore):
                 async with self.session.post(
                         f"{self.api_route}/sendMessage".replace('\n', ''),

@@ -30,7 +30,6 @@ async def message_miguxer(message: str) -> str:
         ]
     )
 
-
 async def https_url_extract(text: str) -> str:
     final_text = ""
     text = text[text.find('https://'):]

@@ -78,6 +78,8 @@ async def openai_reactions(
                     message_text=await bot.openai.generate_message(
                         message_username=message.from_.username,
                         message_text=input_text,
+                        prompt_inject=OPENAI_PROMPTS[
+                            'responda'] if '?' in message.text.lower() else OPENAI_PROMPTS['fale'],
                         remove_words_list=['pedro'],
                         destroy_message=destroy_message
                     ),
