@@ -76,7 +76,7 @@ class OpenAiCompletion:
             temperature: int = 0,
             message_text: str = "",
             message_username: str = "",
-            tokens: T.Optional[int] = None,
+            tokens_force: T.Optional[int] = None,
             prompt_inject: T.Optional[str] = None,
             force_model: T.Optional[str] = None
     ) -> str:
@@ -87,6 +87,10 @@ class OpenAiCompletion:
                         ) if force_model is None else force_model
 
         prompt = (await pre_biased_prompt(message_text) if biased else message_text)
+
+        tokens = self.max_tokens if tokens_force is None else tokens_force
+        if not tokens_force and self.openai_use >= self.davinci_daily_limit / 4 and not self.openai_use > self.davinci_daily_limit:
+            tokens = round(self.max_tokens / 4)
 
         if model == "text-davinci-003":
             prompt = prompt[:3500]
@@ -104,7 +108,7 @@ class OpenAiCompletion:
                     json={
                         "model": model,
                         'prompt': f"{prompt_inject}: {prompt}" if prompt_inject else prompt,
-                        'max_tokens': self.max_tokens if tokens is None else tokens,
+                        'max_tokens': tokens,
                         'temperature': temperature,
                         'top_p': 1,
                         'frequency_penalty': 1.0,
@@ -146,7 +150,7 @@ class OpenAiCompletion:
                     mock_message=mock_message,
                     random_model=random_model,
                     force_model=force_model,
-                    tokens=tokens,
+                    tokens_force=tokens,
                     prompt_inject=prompt_inject,
                     message_text=message_text,
                     temperature=temperature,
