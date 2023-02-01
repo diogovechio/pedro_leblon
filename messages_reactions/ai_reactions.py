@@ -21,9 +21,13 @@ async def openai_reactions(
     if message.reply_to_message and message.reply_to_message.text:
         input_text += ' : ' + message.reply_to_message.text
 
-    if url_detector := await https_url_extract(input_text):
-        url_content = await extract_website_paragraph_content(url_detector, bot.session)
-        input_text = input_text.replace(url_detector, url_content)
+    if bot.openai.openai_use < bot.openai.davinci_daily_limit:
+        if url_detector := await https_url_extract(input_text):
+            url_content = await extract_website_paragraph_content(
+                url=url_detector,
+                session=bot.session
+            )
+            input_text = input_text.replace(url_detector, url_content)
 
     if openai_block_word_detected := any(
             block_word in message.text.lower() for block_word in OPENAI_BLOCK_WORDS
@@ -74,8 +78,6 @@ async def openai_reactions(
                     message_text=await bot.openai.generate_message(
                         message_username=message.from_.username,
                         message_text=input_text,
-                        prompt_inject=OPENAI_PROMPTS[
-                            'responda'] if '?' in message.text.lower() else OPENAI_PROMPTS['fale'],
                         remove_words_list=['pedro'],
                         destroy_message=destroy_message
                     ),

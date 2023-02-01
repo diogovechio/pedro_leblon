@@ -68,6 +68,7 @@ class FakePedro:
         self.sent_games_news = 0
         self.reacted_random_command = 0
         self.roleta_hour = 11
+        self.last_roleta_day = 0
 
         self.mocked_today = False
 
@@ -302,9 +303,9 @@ class FakePedro:
                     url=f"{url}/forwardMessage".replace('\n', ''),
                     data=aiohttp.FormData(
                         (
-                                ("chat_id", str(target_chat_id)),
-                                ("from_chat_id", str(from_chat_id)),
-                                ("message_id", str(message_id)),
+                            ("chat_id", str(target_chat_id)),
+                            ("from_chat_id", str(from_chat_id)),
+                            ("message_id", str(message_id)),
                         )
                     )
             ) as resp:
@@ -357,7 +358,7 @@ if __name__ == '__main__':
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
         secrets_file='secrets.json',
-        debug_mode=True
+        debug_mode=False
     )
 
     asyncio.run(

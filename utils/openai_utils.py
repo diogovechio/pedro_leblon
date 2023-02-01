@@ -80,7 +80,18 @@ class OpenAiCompletion:
             prompt_inject: T.Optional[str] = None,
             force_model: T.Optional[str] = None
     ) -> str:
+        model = await self._model_selector(
+                            message_username=message_username,
+                            mock_message=mock_message,
+                            random_model=random_model
+                        ) if force_model is None else force_model
+
         prompt = (await pre_biased_prompt(message_text) if biased else message_text)
+
+        if model == "text-davinci-003":
+            prompt = prompt[:3500]
+        else:
+            prompt = prompt[:1600]
 
         headers = {
             "Content-Type": "application/json",
@@ -91,11 +102,7 @@ class OpenAiCompletion:
                     "https://api.openai.com/v1/completions",
                     headers=headers,
                     json={
-                        "model": await self._model_selector(
-                            message_username=message_username,
-                            mock_message=mock_message,
-                            random_model=random_model
-                        ) if force_model is None else force_model,
+                        "model": model,
                         'prompt': f"{prompt_inject}: {prompt}" if prompt_inject else prompt,
                         'max_tokens': self.max_tokens if tokens is None else tokens,
                         'temperature': temperature,

@@ -15,8 +15,8 @@
     "max_tokens": 200,
     "max_sentences": 4,
     "ada_only_users": [],
-    "davinci_daily_limit": 75,
-    "curie_daily_limit": 200
+    "davinci_daily_limit": 1,
+    "curie_daily_limit": 50
   },
   "rss_feed": {
     "news": "",

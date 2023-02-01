@@ -2,21 +2,20 @@ import json
 import logging
 import random
 
-import openai
 
 from pedro_leblon import FakePedro
-from utils.openai_utils import normalize_openai_text
 from utils.roleta_utils import get_roletas_from_pavuna
 
 
 def pedro_roleta(bot: FakePedro) -> None:
     try:
-        if bot.datetime_now.hour == bot.roleta_hour:
+        if bot.datetime_now.hour == bot.roleta_hour and bot.last_roleta_day != bot.datetime_now.day:
             bot.loop.create_task(
                 send_roleta(bot)
             )
 
             bot.roleta_hour = round(random.random() * 23)
+            bot.last_roleta_day = bot.datetime_now.day
     except Exception as exc:
         logging.exception(exc)
 
