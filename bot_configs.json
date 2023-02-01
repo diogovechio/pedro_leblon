@@ -5,28 +5,28 @@
     "box_min_size": 64
   },
   "random_params": {
-    "random_mock_frequency": 0.02,
+    "random_mock_frequency": 0.03,
     "words_react_frequency": 0.7,
     "mock_drunk_decaptor_frequency": 0.03,
-    "mock_samuel_frequency": 0.7
+    "mock_samuel_frequency": 0.0
   },
   "openai": {
     "force_model": null,
     "max_tokens": 200,
-    "max_sentences": 4,
+    "max_sentences": 100,
     "ada_only_users": [],
-    "davinci_daily_limit": 1,
-    "curie_daily_limit": 50
+    "davinci_daily_limit": 15,
+    "curie_daily_limit": 30
   },
   "rss_feed": {
     "news": "",
-    "games": "http://feeds.feedburner.com/ign/games-all"
+    "games": ""
   },
   "ask_photos": false,
   "telegram_api_semaphore": 5,
   "not_internal_chats": [-632911267],
   "auto_leave_chats": [],
-  "block_samuel": true,
+  "block_samuel": false,
   "allowed_ids": [
     {
       "name": "Pedro Debug",
