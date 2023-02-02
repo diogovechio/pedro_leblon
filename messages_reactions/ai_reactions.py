@@ -38,6 +38,7 @@ async def openai_reactions(
                     message_text=await bot.openai.generate_message(
                         message_username=message.from_.username,
                         message_text=input_text,
+                        chat=message.chat.title,
                         prompt_inject=OPENAI_PROMPTS['critique'] if round(
                             random.random()) else OPENAI_PROMPTS['critique_reformule'],
                         remove_words_list=['pedro'],
@@ -61,6 +62,7 @@ async def openai_reactions(
                     message_text=await bot.openai.generate_message(
                         message_username=message.from_.username,
                         message_text=input_text,
+                        chat=message.chat.title,
                         prompt_inject=OPENAI_PROMPTS['fale'],
                         sentences=1,
                         tokens=150,
@@ -78,9 +80,9 @@ async def openai_reactions(
                     message_text=await bot.openai.generate_message(
                         message_username=message.from_.username,
                         message_text=input_text,
+                        chat=message.chat.title,
                         prompt_inject=OPENAI_PROMPTS[
                             'responda'] if '?' in message.text.lower() else OPENAI_PROMPTS['fale'],
-                        remove_words_list=['pedro'],
                         destroy_message=destroy_message
                     ),
                     chat_id=message.chat.id,
@@ -97,6 +99,7 @@ async def openai_reactions(
                 bot.send_message(
                     message_text=await bot.openai.generate_message(
                         message_username=message.from_.username,
+                        chat=message.chat.title,
                         message_text=f"O samuel disse: {input_text}",
                         prompt_inject=OPENAI_PROMPTS['critique_negativamente'],
                         destroy_message=False
@@ -111,6 +114,7 @@ async def openai_reactions(
                     message_text=await bot.openai.generate_message(
                         message_username=message.from_.username,
                         message_text=input_text,
+                        chat=message.chat.title,
                         prompt_inject=None,
                         biased=False,
                         destroy_message=destroy_message,
@@ -127,6 +131,7 @@ async def openai_reactions(
                     message_text=await bot.openai.generate_message(
                         message_username=message.from_.username,
                         message_text=f"faça um resumo do texto a seguir: {input_text}",
+                        chat=message.chat.title,
                         prompt_inject=None,
                         destroy_message=destroy_message,
                         remove_words_list=None
@@ -171,6 +176,7 @@ async def openai_reactions(
             openai_text = await bot.openai.generate_message(
                 message_username=message.from_.username,
                 message_text=prompt,
+                chat=message.chat.title,
                 destroy_message=destroy_message,
                 prompt_inject="O",
                 temperature=1.0,
@@ -221,6 +227,7 @@ async def openai_reactions(
                     message_text=(
                         await bot.openai.generate_message(
                             message_text=prompt,
+                            chat=message.chat.title,
                             temperature=1.0,
                             sentences=2
                         )

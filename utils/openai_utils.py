@@ -76,10 +76,14 @@ class OpenAiCompletion:
             temperature: int = 0,
             message_text: str = "",
             message_username: str = "",
+            chat="ASD",
             tokens_force: T.Optional[int] = None,
             prompt_inject: T.Optional[str] = None,
             force_model: T.Optional[str] = None
     ) -> str:
+        if not message_username:
+            message_username = "arrombado"
+
         model = await self._model_selector(
                             message_username=message_username,
                             mock_message=mock_message,
@@ -101,26 +105,43 @@ class OpenAiCompletion:
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self.api_key}"
         }
+
         async with asyncio.Semaphore(self.semaphore):
             async with self.session.post(
-                    "https://api.openai.com/v1/completions",
-                    headers=headers,
-                    json={
-                        "model": model,
-                        'prompt': f"{prompt_inject}: {prompt}" if prompt_inject else prompt,
-                        'max_tokens': tokens,
-                        'temperature': temperature,
-                        'top_p': 1,
-                        'frequency_penalty': 1.0,
-                        'presence_penalty': 2.0,
-                    }
-            ) as openai_request:
-                return json.loads(await openai_request.text())['choices'][0]['text']
+                "https://api.openai.com/v1/moderations",
+                headers=headers,
+                json={
+                    "input": prompt
+                }) as moderation:
+                mod = json.loads(await moderation.text())
+                flagged = mod['results'][0]['flagged']
+
+            if flagged:
+                prompt = f"do it in brazillian portuguese: complain with @{message_username} for sending a message with {' ,'.join([key for key, value in mod['results'][0]['categories'].items() if value])} content. tell him he may be banned from {chat}."
+            else:
+                prompt = f"{prompt_inject}: {prompt}" if prompt_inject else prompt
+
+            async with asyncio.Semaphore(self.semaphore):
+                async with self.session.post(
+                        "https://api.openai.com/v1/completions",
+                        headers=headers,
+                        json={
+                            "model": model,
+                            'prompt': prompt,
+                            'max_tokens': tokens,
+                            'temperature': temperature,
+                            'top_p': 1,
+                            'frequency_penalty': 1.0,
+                            'presence_penalty': 2.0,
+                        }
+                ) as openai_request:
+                    return json.loads(await openai_request.text())['choices'][0]['text']
 
     async def generate_message(
             self,
             message_text: str,
             message_username: T.Optional[str] = "",
+            chat="ASD",
             biased=True,
             sentences: T.Optional[int] = None,
             temperature=0,
@@ -138,6 +159,9 @@ class OpenAiCompletion:
         else:
             force_model = self.force_model
 
+        if not chat:
+            chat = "ASD"
+
         if remove_words_list:
             for word in remove_words_list:
                 message_text = message_text.replace(word, '')
@@ -146,6 +170,7 @@ class OpenAiCompletion:
             response = await asyncio.wait_for(
                 self._completion(
                     message_username=message_username,
+                    chat=chat,
                     biased=biased,
                     mock_message=mock_message,
                     random_model=random_model,
