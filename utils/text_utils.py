@@ -77,6 +77,7 @@ async def message_destroyer(message_text: str) -> str:
 
 
 async def pre_biased_prompt(prompt_text: str) -> str:
+    additional_text = ''
     if 'pedro' in prompt_text:
         additional_text = 'assumindo que o seu próprio nome é pedro, '
     if 'bolsonaro' in prompt_text:
