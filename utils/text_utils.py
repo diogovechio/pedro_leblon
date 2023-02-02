@@ -146,6 +146,7 @@ async def normalize_openai_text(
         ai_message = re.sub(': +:', ' ', ai_message)
         ai_message = ai_message.split("::")[-1]
         ai_message = ai_message.strip()
+        ai_message = ai_message.replace("pedro: ","rs, ")
 
         if ai_message:
             logging.info(ai_message)
