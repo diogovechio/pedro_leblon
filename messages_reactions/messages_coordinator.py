@@ -22,7 +22,7 @@ async def messages_coordinator(
                 image_reactions(
                     bot=bot,
                     message=message,
-                    method='cropper' if from_samuel or from_debug_chats else 'face_classifier',
+                    method='cropper', #'cropper' if from_samuel or from_debug_chats else 'face_classifier',
                     always_send_crop=from_debug_chats
                 )
             )

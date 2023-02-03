@@ -108,7 +108,7 @@ async def openai_reactions(
                     reply_to=message.message_id)
             )
 
-        elif "/img" in message.text.lower()[0:4]:
+        elif "/img" in message.text.lower()[0:4] and message.from_.username == 'diogovechio':
             bot.loop.create_task(
                 bot.send_photo(
                     image=await bot.openai.generate_image(

@@ -74,6 +74,18 @@ class OpenAiCompletion:
 
         return model
 
+    async def is_flagged(self, text: str) -> T.Tuple[bool, dict]:
+        async with asyncio.Semaphore(self.semaphore):
+            async with self.session.post(
+                "https://api.openai.com/v1/moderations",
+                headers=self.headers,
+                json={
+                    "input": text
+                }) as moderation:
+                mod = json.loads(await moderation.text())
+
+                return mod['results'][0]['flagged'], mod
+
     async def _completion(
             self,
             biased: bool,
@@ -107,36 +119,28 @@ class OpenAiCompletion:
         else:
             prompt = prompt[:1600]
 
+        flagged, mod = await self.is_flagged(prompt)
+
+        if flagged:
+            prompt = f"do it in brazillian portuguese: complain with @{message_username} for sending a message with {' ,'.join([key for key, value in mod['results'][0]['categories'].items() if value])} content. tell him he may be banned from {chat}."
+        else:
+            prompt = f"{prompt_inject}: {prompt}" if prompt_inject else prompt
+
         async with asyncio.Semaphore(self.semaphore):
             async with self.session.post(
-                "https://api.openai.com/v1/moderations",
-                headers=self.headers,
-                json={
-                    "input": prompt
-                }) as moderation:
-                mod = json.loads(await moderation.text())
-                flagged = mod['results'][0]['flagged']
-
-            if flagged:
-                prompt = f"do it in brazillian portuguese: complain with @{message_username} for sending a message with {' ,'.join([key for key, value in mod['results'][0]['categories'].items() if value])} content. tell him he may be banned from {chat}."
-            else:
-                prompt = f"{prompt_inject}: {prompt}" if prompt_inject else prompt
-
-            async with asyncio.Semaphore(self.semaphore):
-                async with self.session.post(
-                        "https://api.openai.com/v1/completions",
-                        headers=self.headers,
-                        json={
-                            "model": model,
-                            'prompt': prompt,
-                            'max_tokens': tokens,
-                            'temperature': temperature,
-                            'top_p': 1,
-                            'frequency_penalty': 1.0,
-                            'presence_penalty': 2.0,
-                        }
-                ) as openai_request:
-                    return json.loads(await openai_request.text())['choices'][0]['text']
+                    "https://api.openai.com/v1/completions",
+                    headers=self.headers,
+                    json={
+                        "model": model,
+                        'prompt': prompt,
+                        'max_tokens': tokens,
+                        'temperature': temperature,
+                        'top_p': 1,
+                        'frequency_penalty': 1.0,
+                        'presence_penalty': 2.0,
+                    }
+            ) as openai_request:
+                return json.loads(await openai_request.text())['choices'][0]['text']
 
     async def generate_image(
             self,
