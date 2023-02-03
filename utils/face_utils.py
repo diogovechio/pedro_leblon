@@ -1,9 +1,10 @@
 import os
+import random
 import uuid
 import typing as T
 
 import face_recognition
-from PIL import Image
+from PIL import Image, ImageOps
 
 
 async def faces_detector(image: bytes, min_size: int) -> T.Optional[T.List[T.Tuple]]:
@@ -20,7 +21,7 @@ async def faces_detector(image: bytes, min_size: int) -> T.Optional[T.List[T.Tup
         return filtered_by_size
 
 
-async def image_cropper(image: bytes, coords: tuple) -> bytes:
+async def image_cropper(image: bytes, coords: tuple) -> T.Tuple[bytes, bytes]:
     temp_load = f'tmp/{uuid.uuid4()}.tmp'
     with open(temp_load, 'wb') as file:
         file.write(image)
@@ -32,8 +33,32 @@ async def image_cropper(image: bytes, coords: tuple) -> bytes:
         image_bytes = file.read()
     del img
     os.remove(temp_load)
-    return image_bytes
+    background_img = await put_face_on_background(image_bytes)
+    return image_bytes, background_img
 
+async def put_face_on_background(image: bytes) -> bytes:
+    background = Image.open("static/background.png")
+    temp_load = f'tmp/{uuid.uuid4()}.tmp'
+    with open(temp_load, 'wb') as file:
+        file.write(image)
+    face = Image.open(temp_load)
+
+    random_size = round(100 + 100 * random.random())
+    random_posx = round(0 + 250 * random.random())
+    random_posy = round(0 + 250 * random.random())
+
+    face = ImageOps.contain(face, (random_size , random_size))
+
+    background = background.convert('RGBA')
+    face = face.convert('RGBA')
+
+    background.paste(face, (random_posx, random_posy), face)
+
+    temp_save = f'tmp/{uuid.uuid4()}.png'
+    background.save(temp_save)
+
+    with open(temp_save, 'rb') as file:
+        return file.read()
 
 async def face_classifier(
         image: bytes,

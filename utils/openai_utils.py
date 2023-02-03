@@ -4,6 +4,7 @@ import random
 import typing as T
 
 import json
+import openai
 
 import aiohttp
 
@@ -42,6 +43,11 @@ class OpenAiCompletion:
         self.davinci_daily_limit = davinci_daily_limit
         self.curie_daily_limit = curie_daily_limit
         self.ada_only_users = only_ada_users
+
+        self.headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.api_key}"
+        }
 
     async def _model_selector(
             self,
@@ -101,15 +107,10 @@ class OpenAiCompletion:
         else:
             prompt = prompt[:1600]
 
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {self.api_key}"
-        }
-
         async with asyncio.Semaphore(self.semaphore):
             async with self.session.post(
                 "https://api.openai.com/v1/moderations",
-                headers=headers,
+                headers=self.headers,
                 json={
                     "input": prompt
                 }) as moderation:
@@ -124,7 +125,7 @@ class OpenAiCompletion:
             async with asyncio.Semaphore(self.semaphore):
                 async with self.session.post(
                         "https://api.openai.com/v1/completions",
-                        headers=headers,
+                        headers=self.headers,
                         json={
                             "model": model,
                             'prompt': prompt,
@@ -136,6 +137,36 @@ class OpenAiCompletion:
                         }
                 ) as openai_request:
                     return json.loads(await openai_request.text())['choices'][0]['text']
+
+    async def generate_image(
+            self,
+            text: str
+    ) -> bytes:
+        async with asyncio.Semaphore(self.semaphore):
+            async with self.session.post(
+                    "https://api.openai.com/v1/images/generations",
+                    headers=self.headers,
+                    json={'prompt': text,'n': 1, 'size': "256x256"}
+            ) as openai_request:
+                async with self.session.get(
+                        json.loads(await openai_request.text())['data'][0]['url']
+                ) as image:
+                    return await image.content.read()
+
+    async def edit_image(
+            self,
+            text: str,
+            square_png: bytes
+    ) -> bytes:
+        resp = openai.Image.create_edit(
+            image=square_png,
+            prompt=text,
+            size="256x256",
+            n=1,
+            api_key=self.api_key,
+        )
+        async with self.session.get(resp['data'][0]['url']) as image:
+            return await image.content.read()
 
     async def generate_message(
             self,

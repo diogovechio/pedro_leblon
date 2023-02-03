@@ -21,22 +21,36 @@ async def image_reactions(
                 async def _crop_and_send(img_bytes: bytes, coord: tuple):
                     crop_bytes = await image_cropper(img_bytes, coord)
                     recognized_face = await face_classifier(
-                        image=crop_bytes,
+                        image=crop_bytes[0],
                         faces_embeddings=bot.face_embeddings,
                         faces_names=bot.faces_names,
                         face_tolerance=bot.config.face_classifier.face_tolerance
                     )
 
                     if recognized_face or always_send_crop:
-                        await bot.send_photo(
-                            image=crop_bytes,
-                            chat_id=message.chat.id,
-                            caption=await greeter(
-                                recognized_face[0],
-                                recognized_face[1],
-                                bot.config.face_classifier.face_min_accepted_matches
-                            ) if recognized_face is not None else None
-                        )
+                        if recognized_face is not None and recognized_face[0] == "samuel":
+                            await bot.send_photo(
+                                image=await bot.openai.edit_image(
+                                    text="manifestação do partido dos trabalhadores com MST em brasília, muita gente de vermelho segurando bandeiras",
+                                    square_png=crop_bytes[1]
+                                ),
+                                chat_id=message.chat.id,
+                                caption=await greeter(
+                                    recognized_face[0],
+                                    recognized_face[1],
+                                    bot.config.face_classifier.face_min_accepted_matches
+                                ) if recognized_face is not None else None
+                            )
+                        else:
+                            await bot.send_photo(
+                                image=crop_bytes[0],
+                                chat_id=message.chat.id,
+                                caption=await greeter(
+                                    recognized_face[0],
+                                    recognized_face[1],
+                                    bot.config.face_classifier.face_min_accepted_matches
+                                ) if recognized_face is not None else None
+                            )
 
                 for img_coord in faces_coordinates:
                     loop.create_task(_crop_and_send(image_bytes, img_coord))

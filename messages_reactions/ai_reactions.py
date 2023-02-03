@@ -108,6 +108,27 @@ async def openai_reactions(
                     reply_to=message.message_id)
             )
 
+        elif "/img" in message.text.lower()[0:4]:
+            bot.loop.create_task(
+                bot.send_photo(
+                    image=await bot.openai.generate_image(
+                        text=input_text[4:],
+                    ),
+                    chat_id=message.chat.id,
+                    reply_to=message.message_id)
+            )
+
+        elif "/edit" in message.text.lower()[0:5]:
+            bot.loop.create_task(
+                bot.send_photo(
+                    image=await bot.openai.edit_image(
+                        text=input_text[5:],
+                        square_png=b'',
+                    ),
+                    chat_id=message.chat.id,
+                    reply_to=message.message_id)
+            )
+
         elif "/pedro" in message.text.lower()[0:6]:
             bot.loop.create_task(
                 bot.send_message(
