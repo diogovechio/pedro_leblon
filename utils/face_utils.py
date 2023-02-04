@@ -1,3 +1,4 @@
+import logging
 import os
 import random
 import uuid
@@ -5,6 +6,8 @@ import typing as T
 
 import face_recognition
 from PIL import Image, ImageOps
+
+from pedro_leblon import FakePedro
 
 
 async def faces_detector(image: bytes, min_size: int) -> T.Optional[T.List[T.Tuple]]:
@@ -59,6 +62,59 @@ async def put_face_on_background(image: bytes) -> bytes:
 
     with open(temp_save, 'rb') as file:
         return file.read()
+
+
+async def put_list_of_faces_on_background(bot: FakePedro, names: T.List[str]) -> bytes:
+    background = Image.open("static/background.png")
+    background = background.convert('RGBA')
+
+    random_posx = round(0 + 10 * random.random())
+
+    for i, name in enumerate(names):
+        random_size = round(80 + 20 * random.random())
+        random_posy = round(5 + 130 * random.random())
+
+        if i == 2:
+            random_posx = 25
+            random_size += 20
+        if i >= 2:
+            random_posy = 250
+
+        random_file_choice = random.choice([file_name for file_name in bot.faces_files if name in file_name])
+        face_file = f"faces/{random_file_choice}"
+        for _ in range(5):
+            try:
+                with open(f"faces/{random_file_choice}", "rb") as face:
+                    face_bytes = face.read()
+                    face_detected = await faces_detector(face_bytes, 32)
+                    face_cropped = await image_cropper(face_bytes, face_detected[0])
+                    face_file = f'tmp/{uuid.uuid4()}.jpg'
+                    with open(face_file, 'wb') as file:
+                        file.write(face_cropped[0])
+                        break
+            except Exception as exc:
+                logging.exception(exc)
+                random_file_choice = random.choice([file_name for file_name in bot.faces_files if name in file_name])
+
+
+        if len(names) == 1:
+            with open(face_file, "rb") as single_face:
+                return await put_face_on_background(single_face.read())
+
+        face = Image.open(face_file)
+        face = ImageOps.contain(face, (random_size, random_size))
+        face = face.convert('RGBA')
+
+        background.paste(face, (random_posx, random_posy), face)
+
+        random_posx += round(350 + 25 * random.random())
+
+    temp_save = f'tmp/{uuid.uuid4()}.png'
+    background.save(temp_save)
+
+    with open(temp_save, 'rb') as file:
+        return file.read()
+
 
 async def face_classifier(
         image: bytes,

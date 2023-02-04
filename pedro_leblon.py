@@ -27,6 +27,7 @@ from utils.openai_utils import OpenAiCompletion
 
 logging.basicConfig(level=logging.INFO)
 
+session_timeout =   aiohttp.ClientTimeout(total=None,sock_connect=120,sock_read=120)
 
 class FakePedro:
     def __init__(
@@ -64,6 +65,7 @@ class FakePedro:
         self.faces_files = []
         self.face_embeddings = []
 
+        self.used_dall_e_today = []
         self.asked_for_photo = 0
         self.sent_news = 0
         self.sent_games_news = 0
@@ -85,7 +87,7 @@ class FakePedro:
             Path('face_lake').mkdir(exist_ok=True)
 
             self.loop = asyncio.get_running_loop()
-            self.session = aiohttp.ClientSession()
+            self.session = aiohttp.ClientSession(timeout=session_timeout)
 
             await self.load_config_params()
 
@@ -233,23 +235,30 @@ class FakePedro:
                         else:
                             logging.critical(f"Image download failed: {download_request.status}")
 
-    async def send_photo(self, image: bytes, chat_id: int, caption=None, reply_to=None, sleep_time=0) -> None:
+    async def send_photo(self, image: bytes, chat_id: int, caption=None, reply_to=None, sleep_time=0, max_retries=5) -> None:
         await asyncio.sleep(sleep_time)
 
-        async with asyncio.Semaphore(self.config.telegram_api_semaphore):
-            async with self.session.post(
-                    url=f"{self.api_route}/sendPhoto".replace('\n', ''),
-                    data=aiohttp.FormData(
-                        (
-                                ("chat_id", str(chat_id)),
-                                ("photo", image),
-                                ("reply_to_message_id", str(reply_to) if reply_to else ''),
-                                ('allow_sending_without_reply', 'true'),
-                                ("caption", caption if caption else '')
-                        )
-                    )
-            ) as resp:
-                logging.info(resp.status)
+        for _ in range(max_retries):
+            try:
+                async with asyncio.Semaphore(self.config.telegram_api_semaphore):
+                    async with self.session.post(
+                            url=f"{self.api_route}/sendPhoto".replace('\n', ''),
+                            data=aiohttp.FormData(
+                                (
+                                        ("chat_id", str(chat_id)),
+                                        ("photo", image),
+                                        ("reply_to_message_id", str(reply_to) if reply_to else ''),
+                                        ('allow_sending_without_reply', 'true'),
+                                        ("caption", caption if caption else '')
+                                )
+                            )
+                    ) as resp:
+                        logging.info(resp.status)
+                        if 200 <= resp.status < 300:
+                            break
+            except Exception as exc:
+                logging.exception(exc)
+            await asyncio.sleep(10)
 
     async def send_video(self, video: bytes, chat_id: int, reply_to=None, sleep_time=0) -> None:
         await asyncio.sleep(sleep_time)
@@ -361,7 +370,7 @@ if __name__ == '__main__':
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
         secrets_file='secrets.json',
-        debug_mode=True
+        debug_mode=False
     )
 
     asyncio.run(

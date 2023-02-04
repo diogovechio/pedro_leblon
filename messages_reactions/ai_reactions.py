@@ -3,6 +3,7 @@ import random
 from constants.constants import OPENAI_BLOCK_WORDS, OPENAI_REACT_WORDS, OPENAI_PROMPTS, OPENAI_TRASH_LIST
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
+from utils.face_utils import put_list_of_faces_on_background
 from utils.openai_utils import extract_website_paragraph_content
 from utils.roleta_utils import get_roletas_from_pavuna, arrombado_classifier
 from utils.text_utils import https_url_extract
@@ -108,15 +109,51 @@ async def openai_reactions(
                     reply_to=message.message_id)
             )
 
-        elif "/image" in message.text.lower()[0:6] and message.from_.username == 'diogovechio':
-            bot.loop.create_task(
-                bot.send_photo(
-                    image=await bot.openai.generate_image(
-                        text=input_text[6:],
-                    ),
-                    chat_id=message.chat.id,
-                    reply_to=message.message_id)
-            )
+        elif "/imag" in message.text.lower()[0:5]:
+            prompt = input_text[6:]
+            if message.from_.username == 'diogovechio' or bot.used_dall_e_today.count(message.from_.id) >= bot.config.openai.dall_e_daily_limit / 5:
+                message_filtered = message.text.lower().replace(
+                    ",", " ").replace(
+                    ".", " ").replace(
+                    "!"," ").replace(
+                    "?", " ").replace(
+                    "cocão", "cocao")
+                words_list = message_filtered.split(" ")
+                recognized_names = []
+                for word in words_list:
+                    if word in bot.faces_names:
+                        recognized_names.append(word)
+                        prompt = prompt.replace(word, "rapaz")
+                if len(recognized_names):
+                    background = await put_list_of_faces_on_background(bot, recognized_names)
+
+                    bot.loop.create_task(
+                        bot.send_photo(
+                            image=await bot.openai.edit_image(
+                                text=prompt,
+                                square_png=background
+                            ),
+                            chat_id=message.chat.id,
+                            reply_to=message.message_id)
+                    )
+                else:
+                    bot.loop.create_task(
+                        bot.send_photo(
+                            image=await bot.openai.generate_image(
+                                text=input_text[6:],
+                            ),
+                            chat_id=message.chat.id,
+                            reply_to=message.message_id)
+                    )
+                bot.used_dall_e_today.append(message.from_.id)
+            else:
+                bot.loop.create_task(
+                    bot.send_message(
+                        message_text=f"{message.from_.first_name} você já gerou {bot.config.openai.dall_e_daily_limit / 5} imagens hoje, agora só amanhã",
+                        chat_id=message.chat.id,
+                        reply_to=message.message_id
+                    )
+                )
 
         elif "/pedro" in message.text.lower()[0:6]:
             bot.loop.create_task(
