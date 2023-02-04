@@ -16,7 +16,8 @@
     "max_sentences": 100,
     "ada_only_users": [],
     "davinci_daily_limit": 20,
-    "curie_daily_limit": 50
+    "curie_daily_limit": 50,
+    "dall_e_daily_limit": 30
   },
   "rss_feed": {
     "news": "",

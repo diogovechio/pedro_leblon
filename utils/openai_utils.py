@@ -34,6 +34,7 @@ class OpenAiCompletion:
             force_model: T.Optional[str] = None,
     ):
         self.openai_use = 0
+        self.dall_e_use = 0
         self.semaphore = semaphore
         self.api_key = api_key
         self.max_tokens = max_tokens
@@ -94,7 +95,7 @@ class OpenAiCompletion:
             temperature: int = 0,
             message_text: str = "",
             message_username: str = "",
-            chat="ASD",
+            chat="chat",
             tokens_force: T.Optional[int] = None,
             prompt_inject: T.Optional[str] = None,
             force_model: T.Optional[str] = None
@@ -111,7 +112,10 @@ class OpenAiCompletion:
         prompt = (await pre_biased_prompt(message_text) if biased else message_text)
 
         tokens = self.max_tokens if tokens_force is None else tokens_force
-        if not tokens_force and self.openai_use >= self.davinci_daily_limit / 4 and not self.openai_use > self.davinci_daily_limit:
+        if (
+                not tokens_force and self.openai_use >= self.davinci_daily_limit / 4
+                and not self.openai_use > self.davinci_daily_limit
+        ):
             tokens = round(self.max_tokens / 4)
 
         if model == "text-davinci-003":
@@ -122,7 +126,9 @@ class OpenAiCompletion:
         flagged, mod = await self.is_flagged(prompt)
 
         if flagged:
-            prompt = f"do it in brazillian portuguese: complain with @{message_username} for sending a message with {' ,'.join([key for key, value in mod['results'][0]['categories'].items() if value])} content. tell him he may be banned from {chat}."
+            prompt = f"do it in brazillian portuguese: complain with @{message_username} for sending a message " \
+                     f"with {' ,'.join([key for key, value in mod['results'][0]['categories'].items() if value])} " \
+                     f"content. tell him he may be banned from {chat}."
         else:
             prompt = f"{prompt_inject}: {prompt}" if prompt_inject else prompt
 
@@ -155,6 +161,7 @@ class OpenAiCompletion:
                 async with self.session.get(
                         json.loads(await openai_request.text())['data'][0]['url']
                 ) as image:
+                    self.dall_e_use += 1
                     return await image.content.read()
 
     async def edit_image(
@@ -162,6 +169,8 @@ class OpenAiCompletion:
             text: str,
             square_png: bytes
     ) -> bytes:
+        #todo: use the fucking api
+        logging.info("Blocking the fucking thread with stupid openai lib")
         resp = openai.Image.create_edit(
             image=square_png,
             prompt=text,
@@ -170,6 +179,8 @@ class OpenAiCompletion:
             api_key=self.api_key,
         )
         async with self.session.get(resp['data'][0]['url']) as image:
+            self.dall_e_use += 1
+            logging.info("Thread unblocked")
             return await image.content.read()
 
     async def generate_message(

@@ -30,11 +30,11 @@ async def image_cropper(image: bytes, coords: tuple) -> T.Tuple[bytes, bytes]:
     temp_save = f'face_lake/{uuid.uuid4()}.jpg'
     img.save(temp_save)
     with open(temp_save, 'rb') as file:
-        image_bytes = file.read()
+        image_crop = file.read()
     del img
     os.remove(temp_load)
-    background_img = await put_face_on_background(image_bytes)
-    return image_bytes, background_img
+    image_with_alpha_background = await put_face_on_background(image_crop)
+    return image_crop, image_with_alpha_background
 
 async def put_face_on_background(image: bytes) -> bytes:
     background = Image.open("static/background.png")
@@ -43,9 +43,9 @@ async def put_face_on_background(image: bytes) -> bytes:
         file.write(image)
     face = Image.open(temp_load)
 
-    random_size = round(100 + 100 * random.random())
-    random_posx = round(0 + 250 * random.random())
-    random_posy = round(0 + 250 * random.random())
+    random_size = round(100 + 125 * random.random())
+    random_posx = round(0 + 300 * random.random())
+    random_posy = round(0 + 300 * random.random())
 
     face = ImageOps.contain(face, (random_size , random_size))
 

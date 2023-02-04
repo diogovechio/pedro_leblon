@@ -42,19 +42,24 @@ async def image_reactions(
                                     recognized_face[0],
                                     recognized_face[1],
                                     bot.config.face_classifier.face_min_accepted_matches
-                                ) if recognized_face is not None else None
+                                ) + "\n" + random.choice(
+                                    await get_roletas_from_pavuna(bot, 25)
+                                )['text'].lower() if recognized_face is not None else None
                             )
 
-                        elif dall_e and recognized_face is not None:
-                            is_flagged, roleta_text = True, ""
+                        elif (
+                                dall_e and recognized_face is not None
+                                and bot.openai.dall_e_use < bot.config.openai.dall_e_daily_limit
+                        ):
+                            is_flagged, roulette_text = True, ""
 
                             while is_flagged:
-                                roleta_text = random.choice(await get_roletas_from_pavuna(bot, 25))['text']
-                                is_flagged, _ = await bot.openai.is_flagged(roleta_text)
+                                roulette_text = random.choice(await get_roletas_from_pavuna(bot, 25))['text']
+                                is_flagged, _ = await bot.openai.is_flagged(roulette_text)
 
                             await bot.send_photo(
                                 image=await bot.openai.edit_image(
-                                    text=roleta_text,
+                                    text=roulette_text,
                                     square_png=crop_bytes[1]
                                 ),
                                 chat_id=message.chat.id,
@@ -62,7 +67,7 @@ async def image_reactions(
                                     recognized_face[0],
                                     recognized_face[1],
                                     bot.config.face_classifier.face_min_accepted_matches
-                                )) + "\n" + roleta_text.lower() if recognized_face is not None else None
+                                )) + "\n" + roulette_text.lower() if recognized_face is not None else None
                             )
 
                         else:

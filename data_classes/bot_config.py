@@ -44,7 +44,7 @@ class OpenAI:
     max_tokens: int
     ada_only_users: T.List[str]
     force_model: T.Optional[str] = None
-
+    dall_e_daily_limit = 30
 
 @dataclass
 class BotSecret:
