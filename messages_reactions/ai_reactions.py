@@ -111,7 +111,9 @@ async def openai_reactions(
 
         elif "/imag" in message.text.lower()[0:5]:
             prompt = input_text[6:]
-            if message.from_.username == 'diogovechio' or bot.used_dall_e_today.count(message.from_.id) >= bot.config.openai.dall_e_daily_limit / 5:
+
+            if bot.used_dall_e_today.count(message.from_.id) < bot.config.openai.dall_e_daily_limit / 5:
+                bot.used_dall_e_today.append(message.from_.id)
                 message_filtered = message.text.lower().replace(
                     ",", " ").replace(
                     ".", " ").replace(
@@ -145,11 +147,10 @@ async def openai_reactions(
                             chat_id=message.chat.id,
                             reply_to=message.message_id)
                     )
-                bot.used_dall_e_today.append(message.from_.id)
             else:
                 bot.loop.create_task(
                     bot.send_message(
-                        message_text=f"{message.from_.first_name} você já gerou {bot.config.openai.dall_e_daily_limit / 5} imagens hoje, agora só amanhã",
+                        message_text=f"{message.from_.first_name} você já gerou {int(bot.config.openai.dall_e_daily_limit / 5)} imagens hoje, agora só amanhã",
                         chat_id=message.chat.id,
                         reply_to=message.message_id
                     )

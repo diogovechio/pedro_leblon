@@ -370,7 +370,7 @@ if __name__ == '__main__':
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
         secrets_file='secrets.json',
-        debug_mode=False
+        debug_mode=True
     )
 
     asyncio.run(

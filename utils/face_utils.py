@@ -78,7 +78,7 @@ async def put_list_of_faces_on_background(bot: FakePedro, names: T.List[str]) ->
             random_posx = 25
             random_size += 20
         if i >= 2:
-            random_posy = 250
+            random_posy = 270
 
         random_file_choice = random.choice([file_name for file_name in bot.faces_files if name in file_name])
         face_file = f"faces/{random_file_choice}"
