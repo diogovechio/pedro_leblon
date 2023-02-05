@@ -75,7 +75,7 @@ async def openai_reactions(
                     reply_to=message.message_id)
             )
 
-        elif 'pedr' in message.text.lower()[0:5] and "/pedro" not in message.text.lower()[0:6]:
+        if 'pedr' in message.text.lower()[0:5] and "/pedro" not in message.text.lower()[0:6]:
             bot.loop.create_task(
                 bot.send_message(
                     message_text=await bot.openai.generate_message(
@@ -110,16 +110,28 @@ async def openai_reactions(
             )
 
         elif "/imag" in message.text.lower()[0:5]:
+            limit_per_user = round(bot.config.openai.dall_e_daily_limit / 8)
+            current = bot.used_dall_e_today.count(message.from_.id) + 1
+            remain = limit_per_user - current
+            feedback = ""
+
+            for i in range(current):
+                feedback += "❎"
+
+            for i in range(remain):
+                feedback += "◻️"
+
             prompt = input_text[6:]
 
-            if bot.used_dall_e_today.count(message.from_.id) < bot.config.openai.dall_e_daily_limit / 5:
+            if bot.used_dall_e_today.count(message.from_.id) < limit_per_user:
                 bot.used_dall_e_today.append(message.from_.id)
                 message_filtered = message.text.lower().replace(
                     ",", " ").replace(
                     ".", " ").replace(
                     "!"," ").replace(
                     "?", " ").replace(
-                    "cocão", "cocao")
+                    "cocão", "cocao").replace(
+                    "@", " ")
                 words_list = message_filtered.split(" ")
                 recognized_names = []
                 for word in words_list:
@@ -135,6 +147,7 @@ async def openai_reactions(
                                 text=prompt,
                                 square_png=background
                             ),
+                            caption=feedback,
                             chat_id=message.chat.id,
                             reply_to=message.message_id)
                     )
@@ -144,13 +157,14 @@ async def openai_reactions(
                             image=await bot.openai.generate_image(
                                 text=input_text[6:],
                             ),
+                            caption=feedback,
                             chat_id=message.chat.id,
                             reply_to=message.message_id)
                     )
             else:
                 bot.loop.create_task(
                     bot.send_message(
-                        message_text=f"{message.from_.first_name} você já gerou {int(bot.config.openai.dall_e_daily_limit / 5)} imagens hoje, agora só amanhã",
+                        message_text=f"{message.from_.first_name} você já gerou {limit_per_user} imagens hoje, agora só amanhã",
                         chat_id=message.chat.id,
                         reply_to=message.message_id
                     )

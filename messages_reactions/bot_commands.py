@@ -76,6 +76,45 @@ async def bot_commands(
                     )
                 )
 
+    elif '/nomes' in message.text.lower()[0:6]:
+        msg = f"eu conheço essas pessoas:\n" + '\n'.join(set(bot.faces_names))
+
+        message_split = message.text.lower().split(" ")
+
+        if len(message_split) == 1:
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=msg,
+                    chat_id=message.chat.id,
+                    reply_to=message.message_id
+                )
+            )
+        else:
+            for i, name in enumerate(message_split):
+                if i == 0:
+                    continue
+                if name in bot.faces_names:
+                    random_file_choice = random.choice(
+                        [file_name for file_name in bot.faces_files
+                         if name in file_name]
+                    )
+
+                    bot.loop.create_task(
+                        bot.send_photo(
+                            image=open(f"faces/{random_file_choice}", "rb").read(),
+                            chat_id=message.chat.id,
+                            reply_to=message.message_id)
+                    )
+
+                else:
+                    bot.loop.create_task(
+                        bot.send_message(
+                            message_text=f"nao conheço {name}",
+                            chat_id=message.chat.id,
+                            reply_to=message.message_id
+                        )
+                    )
+
     elif '/agendar' in message.text.lower()[0:8]:
         frequency = None
 
