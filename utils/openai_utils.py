@@ -256,3 +256,16 @@ async def extract_website_paragraph_content(
         logging.exception(exc)
 
     return f"essa URL parece inacessível: {url} - opine sobre o que acha que se trata a URL e finalize dizendo que é só sua opinião e que você não conseguiu acessar a URL"
+
+async def return_dall_e_limit(_id: int, limit_per_user: int, used_dall_e_today: list) -> str:
+    current = used_dall_e_today.count(_id) + 1
+    remain = limit_per_user - current
+    feedback = ""
+
+    for i in range(current):
+        feedback += "❎"
+
+    for i in range(remain):
+        feedback += "◻️"
+
+    return feedback

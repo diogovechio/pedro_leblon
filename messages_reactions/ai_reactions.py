@@ -4,7 +4,7 @@ from constants.constants import OPENAI_BLOCK_WORDS, OPENAI_REACT_WORDS, OPENAI_P
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
 from utils.face_utils import put_list_of_faces_on_background
-from utils.openai_utils import extract_website_paragraph_content
+from utils.openai_utils import extract_website_paragraph_content, return_dall_e_limit
 from utils.roleta_utils import get_roletas_from_pavuna, arrombado_classifier
 from utils.text_utils import https_url_extract
 
@@ -110,16 +110,13 @@ async def openai_reactions(
             )
 
         elif "/imag" in message.text.lower()[0:5]:
-            limit_per_user = round(bot.config.openai.dall_e_daily_limit / 8)
-            current = bot.used_dall_e_today.count(message.from_.id) + 1
-            remain = limit_per_user - current
-            feedback = ""
+            limit_per_user = round(bot.config.openai.dall_e_daily_limit / 10)
 
-            for i in range(current):
-                feedback += "❎"
-
-            for i in range(remain):
-                feedback += "◻️"
+            feedback = await return_dall_e_limit(
+                _id=message.from_.id,
+                limit_per_user=limit_per_user,
+                used_dall_e_today=bot.used_dall_e_today
+            )
 
             prompt = input_text[6:]
 
@@ -139,7 +136,7 @@ async def openai_reactions(
                         recognized_names.append(word)
                         prompt = prompt.replace(word, "rapaz")
                 if len(recognized_names):
-                    background = await put_list_of_faces_on_background(bot, recognized_names)
+                    background = await put_list_of_faces_on_background(bot, recognized_names, "-s" in message.text.lower())
 
                     bot.loop.create_task(
                         bot.send_photo(

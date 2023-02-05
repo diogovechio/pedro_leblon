@@ -9,3 +9,4 @@ __pycache__/
 *__pycache__*
 /nohup.out
 /secrets.json
+/faces_alpha/

@@ -39,16 +39,21 @@ async def image_cropper(image: bytes, coords: tuple) -> T.Tuple[bytes, bytes]:
     image_with_alpha_background = await put_face_on_background(image_crop)
     return image_crop, image_with_alpha_background
 
-async def put_face_on_background(image: bytes) -> bytes:
+async def put_face_on_background(image: bytes, small_face=False) -> bytes:
     background = Image.open("static/background.png")
     temp_load = f'tmp/{uuid.uuid4()}.tmp'
     with open(temp_load, 'wb') as file:
         file.write(image)
     face = Image.open(temp_load)
 
-    random_size = round(100 + 125 * random.random())
-    random_posx = round(0 + 300 * random.random())
-    random_posy = round(0 + 300 * random.random())
+    if not small_face:
+        random_size = round(100 + 125 * random.random())
+        random_posx = round(0 + 300 * random.random())
+        random_posy = round(0 + 300 * random.random())
+    else:
+        random_size = round(60 + 40 * random.random())
+        random_posx = round(0 + 300 * random.random())
+        random_posy = round(0 + 120 * random.random())
 
     face = ImageOps.contain(face, (random_size , random_size))
 
@@ -64,7 +69,7 @@ async def put_face_on_background(image: bytes) -> bytes:
         return file.read()
 
 
-async def put_list_of_faces_on_background(bot: FakePedro, names: T.List[str]) -> bytes:
+async def put_list_of_faces_on_background(bot: FakePedro, names: T.List[str], small_face=False) -> bytes:
     background = Image.open("static/background.png")
     background = background.convert('RGBA')
 
@@ -80,26 +85,21 @@ async def put_list_of_faces_on_background(bot: FakePedro, names: T.List[str]) ->
         if i >= 2:
             random_posy = 270
 
-        random_file_choice = random.choice([file_name for file_name in bot.faces_files if name in file_name])
-        face_file = f"faces/{random_file_choice}"
-        for _ in range(5):
-            try:
-                with open(f"faces/{random_file_choice}", "rb") as face:
-                    face_bytes = face.read()
-                    face_detected = await faces_detector(face_bytes, 32)
-                    face_cropped = await image_cropper(face_bytes, face_detected[0])
-                    face_file = f'tmp/{uuid.uuid4()}.jpg'
-                    with open(face_file, 'wb') as file:
-                        file.write(face_cropped[0])
-                        break
-            except Exception as exc:
-                logging.exception(exc)
-                random_file_choice = random.choice([file_name for file_name in bot.faces_files if name in file_name])
+        alpha_faces_list = [file_name for file_name in bot.alpha_faces_files if name in file_name]
+        regular_faces_list = [file_name for file_name in bot.faces_files if name in file_name]
 
+        if len(alpha_faces_list):
+            random_file_choice = random.choice(alpha_faces_list)
+            faces_dir = "faces_alpha"
+        else:
+            random_file_choice = random.choice(regular_faces_list)
+            faces_dir = "faces"
+
+        face_file = f"{faces_dir}/{random_file_choice}"
 
         if len(names) == 1:
-            with open(face_file, "rb") as single_face:
-                return await put_face_on_background(single_face.read())
+            with open(f"{faces_dir}/{random.choice(regular_faces_list)}", "rb") as single_face:
+                return await put_face_on_background(single_face.read(), small_face)
 
         face = Image.open(face_file)
         face = ImageOps.contain(face, (random_size, random_size))

@@ -4,6 +4,7 @@ import random
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
 from utils.face_utils import faces_detector, image_cropper, face_classifier
+from utils.openai_utils import return_dall_e_limit
 from utils.roleta_utils import get_roletas_from_pavuna
 from utils.text_utils import greeter
 
@@ -30,8 +31,19 @@ async def image_reactions(
                         face_tolerance=bot.config.face_classifier.face_tolerance
                     )
 
+                    limit_per_user = round(bot.config.openai.dall_e_daily_limit / 10)
+                    feedback = await return_dall_e_limit(
+                        _id=message.from_.id,
+                        limit_per_user=limit_per_user,
+                        used_dall_e_today=bot.used_dall_e_today
+                    )
+
                     if recognized_face or always_send_crop:
-                        if dall_e and recognized_face is not None and recognized_face[0] == "samuel":
+                        if (
+                                dall_e and recognized_face is not None and recognized_face[0] == "samuel"
+                                and bot.used_dall_e_today.count(message.from_.id) < limit_per_user
+                        ):
+                            bot.used_dall_e_today.append(message.from_.id)
                             await bot.send_photo(
                                 image=await bot.openai.edit_image(
                                     text="manifestação do partido dos trabalhadores com MST em brasília, muita gente de vermelho segurando bandeiras",
@@ -50,7 +62,9 @@ async def image_reactions(
                         elif (
                                 dall_e and recognized_face is not None
                                 and bot.openai.dall_e_use < bot.config.openai.dall_e_daily_limit
+                                and bot.used_dall_e_today.count(message.from_.id) < limit_per_user
                         ):
+                            bot.used_dall_e_today.append(message.from_.id)
                             is_flagged, roulette_text = True, ""
 
                             while is_flagged:
@@ -63,11 +77,9 @@ async def image_reactions(
                                     square_png=crop_bytes[1]
                                 ),
                                 chat_id=message.chat.id,
-                                caption=(await greeter(
-                                    recognized_face[0],
-                                    recognized_face[1],
-                                    bot.config.face_classifier.face_min_accepted_matches
-                                )) + "\n" + roulette_text.lower() if recognized_face is not None else None
+                                caption=roulette_text.lower(
+
+                                ) + f" - {recognized_face[0]}" + f"\n{feedback}" if recognized_face is not None else None
                             )
 
                         else:

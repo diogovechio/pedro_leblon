@@ -61,8 +61,10 @@ class FakePedro:
         self.session: T.Optional[ClientSession] = None
 
         self.face_images_path = 'faces'
+        self.alpha_faces_path = 'faces_alpha'
         self.faces_names = []
         self.faces_files = []
+        self.alpha_faces_files = []
         self.face_embeddings = []
 
         self.used_dall_e_today = []
@@ -143,11 +145,16 @@ class FakePedro:
                 self.api_route = f"https://api.telegram.org/bot{self.config.secrets.bot_token}"
 
                 self.faces_files = []
+                self.alpha_faces_files = []
                 self.faces_names = []
                 self.face_embeddings = []
 
                 for (_, _, filenames) in os.walk(self.face_images_path):
                     self.faces_files.extend(filenames)
+                    break
+
+                for (_, _, filenames) in os.walk(self.alpha_faces_path):
+                    self.alpha_faces_files.extend(filenames)
                     break
 
 
