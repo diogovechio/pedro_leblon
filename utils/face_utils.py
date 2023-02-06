@@ -99,7 +99,7 @@ async def put_list_of_faces_on_background(bot: FakePedro, names: T.List[str], sm
         face_file = f"{faces_dir}/{random_file_choice}"
 
         if len(names) == 1:
-            with open(f"{faces_dir}/{random.choice(regular_faces_list)}", "rb") as single_face:
+            with open(f"faces/{random.choice(regular_faces_list)}", "rb") as single_face:
                 return await put_face_on_background(single_face.read(), small_face)
 
         face = Image.open(face_file)
