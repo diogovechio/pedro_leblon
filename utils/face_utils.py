@@ -73,10 +73,18 @@ async def put_list_of_faces_on_background(bot: FakePedro, names: T.List[str], sm
     background = Image.open("static/background.png")
     background = background.convert('RGBA')
 
+    random_size = round(120 + 25 * random.random())
+    random_posx = round(10 + 5 * random.random())
+
     for i, name in enumerate(names):
-        random_size = round(100 + 60 * random.random())
-        random_posx = round(0 + 300 * random.random())
-        random_posy = round(0 + 300 * random.random())
+        random_posy = round(5 + 130 * random.random())
+
+        if i == 2:
+            random_size = round(175 + 25 * random.random())
+            random_posx = 125
+            random_size += 20
+        if i >= 2:
+            random_posy = 270
 
         alpha_faces_list = [file_name for file_name in bot.alpha_faces_files if name in file_name]
         regular_faces_list = [file_name for file_name in bot.faces_files if name in file_name]
@@ -100,7 +108,7 @@ async def put_list_of_faces_on_background(bot: FakePedro, names: T.List[str], sm
 
         background.paste(face, (random_posx, random_posy), face)
 
-        random_posx += round(350 + 25 * random.random())
+        random_posx += round(225 + 25 * random.random())
 
     temp_save = f'tmp/{uuid.uuid4()}.png'
     background.save(temp_save)
