@@ -121,7 +121,6 @@ async def openai_reactions(
             prompt = input_text[6:]
 
             if bot.used_dall_e_today.count(message.from_.id) < limit_per_user:
-                bot.used_dall_e_today.append(message.from_.id)
                 message_filtered = message.text.lower().replace(
                     ",", " ").replace(
                     ".", " ").replace(
@@ -137,27 +136,45 @@ async def openai_reactions(
                         prompt = prompt.replace(word, "rapaz")
                 if len(recognized_names):
                     background = await put_list_of_faces_on_background(bot, recognized_names, "-s" in message.text.lower())
+                    image = await bot.openai.edit_image(text=prompt,square_png=background)
 
-                    bot.loop.create_task(
-                        bot.send_photo(
-                            image=await bot.openai.edit_image(
-                                text=prompt,
-                                square_png=background
-                            ),
-                            caption=feedback,
-                            chat_id=message.chat.id,
-                            reply_to=message.message_id)
-                    )
+                    if image is not None:
+                        bot.used_dall_e_today.append(message.from_.id)
+                        bot.loop.create_task(
+                            bot.send_photo(
+                                image=image,
+                                caption=feedback,
+                                chat_id=message.chat.id,
+                                reply_to=message.message_id)
+                        )
+                    else:
+                        bot.loop.create_task(
+                            bot.send_message(
+                                message_text=f"veio nada",
+                                chat_id=message.chat.id,
+                                reply_to=message.message_id
+                            )
+                        )
                 else:
-                    bot.loop.create_task(
-                        bot.send_photo(
-                            image=await bot.openai.generate_image(
-                                text=input_text[6:],
-                            ),
-                            caption=feedback,
-                            chat_id=message.chat.id,
-                            reply_to=message.message_id)
-                    )
+                    image = await bot.openai.generate_image(text=input_text[6:])
+
+                    if image is not None:
+                        bot.used_dall_e_today.append(message.from_.id)
+                        bot.loop.create_task(
+                            bot.send_photo(
+                                image=image,
+                                caption=feedback,
+                                chat_id=message.chat.id,
+                                reply_to=message.message_id)
+                        )
+                    else:
+                        bot.loop.create_task(
+                            bot.send_message(
+                                message_text=f"veio nada",
+                                chat_id=message.chat.id,
+                                reply_to=message.message_id
+                            )
+                        )
             else:
                 bot.loop.create_task(
                     bot.send_message(

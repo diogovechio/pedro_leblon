@@ -151,24 +151,28 @@ class OpenAiCompletion:
     async def generate_image(
             self,
             text: str
-    ) -> bytes:
+    ) -> T.Optional[bytes]:
         async with asyncio.Semaphore(self.semaphore):
             async with self.session.post(
                     "https://api.openai.com/v1/images/generations",
                     headers=self.headers,
                     json={'prompt': text,'n': 1, 'size': "256x256"}
             ) as openai_request:
-                async with self.session.get(
-                        json.loads(await openai_request.text())['data'][0]['url']
-                ) as image:
-                    self.dall_e_use += 1
-                    return await image.content.read()
+                try:
+                    async with self.session.get(
+                            json.loads(await openai_request.text())['data'][0]['url']
+                    ) as image:
+                        self.dall_e_use += 1
+                        return await image.content.read()
+                except Exception as exc:
+                    logging.exception(exc)
+                    return None
 
     async def edit_image(
             self,
             text: str,
             square_png: bytes
-    ) -> bytes:
+    ) -> T.Optional[bytes]:
         #todo: use the fucking api
         logging.info("Blocking the fucking thread with stupid openai lib")
         resp = openai.Image.create_edit(
@@ -178,10 +182,14 @@ class OpenAiCompletion:
             n=1,
             api_key=self.api_key,
         )
-        async with self.session.get(resp['data'][0]['url']) as image:
-            self.dall_e_use += 1
-            logging.info("Thread unblocked")
-            return await image.content.read()
+        try:
+            async with self.session.get(resp['data'][0]['url']) as image:
+                self.dall_e_use += 1
+                logging.info("Thread unblocked")
+                return await image.content.read()
+        except Exception as exc:
+            logging.exception(exc)
+            return None
 
     async def generate_message(
             self,
