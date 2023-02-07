@@ -212,6 +212,7 @@ async def openai_reactions(
                             message_text=f"faça um curto resumo dessa conversa:\n{chat}",
                             chat=message.chat.title,
                             prompt_inject=None,
+                            biased=False,
                             destroy_message=destroy_message,
                             remove_words_list=None
                         ),
