@@ -202,19 +202,36 @@ async def openai_reactions(
             )
 
         elif "/tldr" in message.text.lower()[0:5]:
-            bot.loop.create_task(
-                bot.send_message(
-                    message_text=await bot.openai.generate_message(
-                        message_username=message.from_.username,
-                        message_text=f"faça um resumo do texto a seguir: {input_text}",
-                        chat=message.chat.title,
-                        prompt_inject=None,
-                        destroy_message=destroy_message,
-                        remove_words_list=None
-                    ),
-                    chat_id=message.chat.id,
-                    reply_to=message.message_id)
-            )
+            if " " not in message.text or ":" not in message.text:
+                chat = "\n".join(bot.messages_in_memory[message.chat.id])
+
+                bot.loop.create_task(
+                    bot.send_message(
+                        message_text=await bot.openai.generate_message(
+                            message_username=message.from_.username,
+                            message_text=f"faça um curto resumo dessa conversa:\n{chat}",
+                            chat=message.chat.title,
+                            prompt_inject=None,
+                            destroy_message=destroy_message,
+                            remove_words_list=None
+                        ),
+                        chat_id=message.chat.id,
+                        reply_to=message.message_id)
+                )
+            else:
+                bot.loop.create_task(
+                    bot.send_message(
+                        message_text=await bot.openai.generate_message(
+                            message_username=message.from_.username,
+                            message_text=f"faça um resumo do texto a seguir: {input_text}",
+                            chat=message.chat.title,
+                            prompt_inject=None,
+                            destroy_message=destroy_message,
+                            remove_words_list=None
+                        ),
+                        chat_id=message.chat.id,
+                        reply_to=message.message_id)
+                )
 
         elif "/critique" in message.text.lower()[0:9] or "/elogie" in message.text.lower()[0:7]:
             roleta_from_pavuna = None

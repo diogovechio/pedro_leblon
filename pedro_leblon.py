@@ -53,6 +53,9 @@ class FakePedro:
         self.interacted_updates = MaxSizeList(400)
         self.interacted_messages_with_chat_id = MaxSizeList(400)
 
+        self.messages_in_memory = {}
+        self.message_in_memory_min_chars = 35
+
         self.datetime_now = datetime.now() - timedelta(hours=3)
 
         self.schedule = schedule
@@ -158,16 +161,17 @@ class FakePedro:
                     break
 
 
-                for file in self.faces_files:
-                    embeddings = face_recognition.face_encodings(
-                        face_recognition.load_image_file(f"{self.face_images_path}/{file}")
-                    )
-                    if len(embeddings):
-                        self.faces_names.append(file[:-7])
-                        self.face_embeddings.append(embeddings[0])
-                        logging.info(f"Loaded embeddings for {file}")
-                    else:
-                        logging.critical(f'NO EMBEDDINGS FOR {file}')
+                if not self.debug_mode:
+                    for file in self.faces_files:
+                        embeddings = face_recognition.face_encodings(
+                            face_recognition.load_image_file(f"{self.face_images_path}/{file}")
+                        )
+                        if len(embeddings):
+                            self.faces_names.append(file[:-7])
+                            self.face_embeddings.append(embeddings[0])
+                            logging.info(f"Loaded embeddings for {file}")
+                        else:
+                            logging.critical(f'NO EMBEDDINGS FOR {file}')
 
         logging.info('Loading finished')
 
@@ -213,6 +217,14 @@ class FakePedro:
                         self.interacted_updates.append(incoming.update_id)
                         self.interacted_messages_with_chat_id.append(f"{incoming.message.chat.id}:"
                                                                      f"{incoming.message.message_id}")
+
+                        if incoming.message.chat.id not in self.messages_in_memory:
+                            self.messages_in_memory[incoming.message.chat.id] = MaxSizeList(50)
+
+                        if incoming.message.text is not None and len(incoming.message.text) > self.message_in_memory_min_chars:
+                            self.messages_in_memory[incoming.message.chat.id].append(
+                                f"{incoming.message.from_.first_name}: '{incoming.message.text[0:80]}'")
+
                         logging.info(incoming)
 
                         if incoming.message is not None:
