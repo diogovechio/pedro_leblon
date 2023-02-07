@@ -161,17 +161,16 @@ class FakePedro:
                     break
 
 
-                if not self.debug_mode:
-                    for file in self.faces_files:
-                        embeddings = face_recognition.face_encodings(
-                            face_recognition.load_image_file(f"{self.face_images_path}/{file}")
-                        )
-                        if len(embeddings):
-                            self.faces_names.append(file[:-7])
-                            self.face_embeddings.append(embeddings[0])
-                            logging.info(f"Loaded embeddings for {file}")
-                        else:
-                            logging.critical(f'NO EMBEDDINGS FOR {file}')
+                for file in self.faces_files:
+                    embeddings = face_recognition.face_encodings(
+                        face_recognition.load_image_file(f"{self.face_images_path}/{file}")
+                    )
+                    if len(embeddings):
+                        self.faces_names.append(file[:-7])
+                        self.face_embeddings.append(embeddings[0])
+                        logging.info(f"Loaded embeddings for {file}")
+                    else:
+                        logging.critical(f'NO EMBEDDINGS FOR {file}')
 
         logging.info('Loading finished')
 
@@ -291,6 +290,19 @@ class FakePedro:
                                 ("video", video),
                                 ("reply_to_message_id", str(reply_to) if reply_to else ''),
                                 ('allow_sending_without_reply', 'true'),
+                        )
+                    )
+            ) as resp:
+                logging.info(resp.status)
+
+    async def send_action(self, chat_id: int, action=T.Union[T.Literal['typing'], T.Literal['upload_photo']]) -> None:
+        async with asyncio.Semaphore(self.config.telegram_api_semaphore):
+            async with self.session.post(
+                    url=f"{self.api_route}/sendChatAction".replace('\n', ''),
+                    data=aiohttp.FormData(
+                        (
+                            ("chat_id", str(chat_id)),
+                            ('action', action),
                         )
                     )
             ) as resp:

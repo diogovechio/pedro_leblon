@@ -34,6 +34,7 @@ async def send_roleta(bot: FakePedro) -> None:
                 for messages_ids in bot.interacted_messages_with_chat_id
                 if str(chat_id) in messages_ids
             ]
+            bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
 
             bot.loop.create_task(
                 bot.send_message(

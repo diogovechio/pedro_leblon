@@ -34,6 +34,8 @@ async def openai_reactions(
             block_word in message.text.lower() for block_word in OPENAI_BLOCK_WORDS
     ):
         if random.random() < bot.config.random_params.words_react_frequency or 'pedr' in message.text.lower():
+            bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
+
             bot.loop.create_task(
                 bot.send_message(
                     message_text=await bot.openai.generate_message(
@@ -56,6 +58,8 @@ async def openai_reactions(
 
     if not openai_block_word_detected:
         if 'pedr' in message.text.lower()[0:5] and "/pedro" not in message.text.lower()[0:6]:
+            bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
+
             bot.loop.create_task(
                 bot.send_message(
                     message_text=await bot.openai.generate_message(
@@ -76,6 +80,8 @@ async def openai_reactions(
                     react_word in message.text.lower() for react_word in OPENAI_REACT_WORDS
                 )
         ):
+            bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
+
             bot.loop.create_task(
                 bot.send_message(
                     message_text=await bot.openai.generate_message(
@@ -115,6 +121,8 @@ async def openai_reactions(
                         recognized_names.append(word)
                         prompt = prompt.replace(word, "rapaz")
                 if len(recognized_names):
+                    bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="upload_photo"))
+
                     background = await put_list_of_faces_on_background(bot, recognized_names, "-s" in message.text.lower())
                     image = await bot.openai.edit_image(text=prompt,square_png=background)
 
@@ -136,6 +144,8 @@ async def openai_reactions(
                             )
                         )
                 else:
+                    bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="upload_photo"))
+
                     image = await bot.openai.generate_image(text=input_text[6:])
 
                     if image is not None:
@@ -148,6 +158,8 @@ async def openai_reactions(
                                 reply_to=message.message_id)
                         )
                     else:
+                        bot.loop.create_task(bot.send_action(chat_id=message.chat.id,action="typing"))
+
                         bot.loop.create_task(
                             bot.send_message(
                                 message_text=f"veio nada",
@@ -165,6 +177,8 @@ async def openai_reactions(
                 )
 
         elif "/pedro" in message.text.lower()[0:6]:
+            bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
+
             bot.loop.create_task(
                 bot.send_message(
                     message_text=await bot.openai.generate_message(
@@ -184,6 +198,7 @@ async def openai_reactions(
         elif "/tldr" in message.text.lower()[0:5]:
             if " " not in message.text or ":" not in message.text:
                 chat = "\n".join(bot.messages_in_memory[message.chat.id])
+                bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
 
                 bot.loop.create_task(
                     bot.send_message(
@@ -200,6 +215,8 @@ async def openai_reactions(
                         reply_to=message.message_id)
                 )
             else:
+                bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
+
                 bot.loop.create_task(
                     bot.send_message(
                         message_text=await bot.openai.generate_message(
@@ -246,6 +263,8 @@ async def openai_reactions(
                     message_id=roleta_from_pavuna['message_id'],
                     replace_token=bot.config.secrets.alternate_bot_token
                 )
+
+            bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
 
             openai_text = await bot.openai.generate_message(
                 message_username=message.from_.username,
@@ -295,6 +314,7 @@ async def openai_reactions(
         ):
             roleta_list = (await get_roletas_from_pavuna(bot, 25))
             prompt = f"assumindo que alguém disse: '{random.choice(roleta_list)['text']}' e o {username} disse: '{message.text}', {'continue o assunto' if round(random.random()) else 'puxe outro assunto com base no que está sendo conversado'}."
+            bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
 
             bot.loop.create_task(
                 bot.send_message(
@@ -317,6 +337,8 @@ async def openai_reactions(
         elif any(
                 react_word in message.text.lower() for react_word in OPENAI_REACT_WORDS
         ) and random.random() < bot.config.random_params.words_react_frequency:
+            bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
+
             bot.loop.create_task(
                 bot.send_message(
                     message_text=await bot.openai.generate_message(

@@ -20,6 +20,7 @@ async def image_reactions(
 
     if image_bytes := await bot.image_downloader(message):
         if faces_coordinates := await faces_detector(image_bytes, bot.config.face_classifier.box_min_size):
+            bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="upload_photo"))
 
             if method == 'cropper':
                 async def _crop_and_send(img_bytes: bytes, coord: tuple):

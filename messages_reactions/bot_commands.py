@@ -94,6 +94,13 @@ async def bot_commands(
                 if i == 0:
                     continue
                 if name in bot.faces_names:
+                    bot.loop.create_task(
+                        bot.send_action(
+                            chat_id=message.chat.id,
+                            action="upload_photo",
+                        )
+                    )
+
                     random_file_choice = random.choice(
                         [file_name for file_name in bot.faces_files
                          if name in file_name]
