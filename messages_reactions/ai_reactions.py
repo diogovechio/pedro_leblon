@@ -55,26 +55,6 @@ async def openai_reactions(
             )
 
     if not openai_block_word_detected:
-        if any(
-                react_word in message.text.lower() for react_word in OPENAI_REACT_WORDS
-        ) and random.random() < bot.config.random_params.words_react_frequency:
-            bot.loop.create_task(
-                bot.send_message(
-                    message_text=await bot.openai.generate_message(
-                        message_username=message.from_.username,
-                        message_text=input_text,
-                        chat=message.chat.title,
-                        prompt_inject=OPENAI_PROMPTS['fale'],
-                        sentences=1,
-                        tokens=150,
-                        destroy_message=destroy_message,
-                        mock_message=True
-                    ),
-                    chat_id=message.chat.id,
-                    sleep_time=1 + (round(random.random()) * 5),
-                    reply_to=message.message_id)
-            )
-
         if 'pedr' in message.text.lower()[0:5] and "/pedro" not in message.text.lower()[0:6]:
             bot.loop.create_task(
                 bot.send_message(
@@ -333,3 +313,23 @@ async def openai_reactions(
             )
 
             bot.mocked_today = True
+
+        elif any(
+                react_word in message.text.lower() for react_word in OPENAI_REACT_WORDS
+        ) and random.random() < bot.config.random_params.words_react_frequency:
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=await bot.openai.generate_message(
+                        message_username=message.from_.username,
+                        message_text=input_text,
+                        chat=message.chat.title,
+                        prompt_inject=OPENAI_PROMPTS['fale'],
+                        sentences=1,
+                        tokens=150,
+                        destroy_message=destroy_message,
+                        mock_message=True
+                    ),
+                    chat_id=message.chat.id,
+                    sleep_time=1 + (round(random.random()) * 5),
+                    reply_to=message.message_id)
+            )

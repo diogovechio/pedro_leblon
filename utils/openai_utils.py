@@ -113,10 +113,10 @@ class OpenAiCompletion:
 
         tokens = self.max_tokens if tokens_force is None else tokens_force
         if (
-                not tokens_force and self.openai_use >= self.davinci_daily_limit / 4
+                not tokens_force and self.openai_use >= self.davinci_daily_limit / 1.5
                 and not self.openai_use > self.davinci_daily_limit
         ):
-            tokens = round(self.max_tokens / 4)
+            tokens = round(self.max_tokens / 2)
 
         if model == "text-davinci-003":
             prompt = prompt[:3500]
