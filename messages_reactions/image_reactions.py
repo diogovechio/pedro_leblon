@@ -1,6 +1,8 @@
 import asyncio
 import random
 
+import typing as T
+
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
 from utils.face_utils import faces_detector, image_cropper, face_classifier
@@ -26,7 +28,8 @@ async def image_reactions(
                 async def _crop_and_send(img_bytes: bytes, coord: tuple):
                     crop_bytes = await image_cropper(img_bytes, coord)
                     recognized_face = await face_classifier(
-                        image=crop_bytes[0],
+                        crop_image=crop_bytes[0],
+                        full_image=img_bytes,
                         faces_embeddings=bot.face_embeddings,
                         faces_names=bot.faces_names,
                         face_tolerance=bot.config.face_classifier.face_tolerance
@@ -40,10 +43,9 @@ async def image_reactions(
                     )
 
                     if recognized_face or always_send_crop:
-                        if (
-                                dall_e and recognized_face is not None and recognized_face[0] == "samuel"
-                                and bot.used_dall_e_today.count(message.from_.id) < limit_per_user
-                        ):
+                        caption = await create_caption(bot=bot, face_recognized=recognized_face)
+
+                        if dall_e and recognized_face is not None and recognized_face[0] == "samuel" and bot.used_dall_e_today.count(message.from_.id) < limit_per_user:
                             image = await bot.openai.edit_image(
                                 text="manifestação do partido dos trabalhadores com MST em brasília, muita gente de vermelho segurando bandeiras",
                                 square_png=crop_bytes[1]
@@ -53,23 +55,16 @@ async def image_reactions(
                                 bot.used_dall_e_today.append(message.from_.id)
 
                             bot.used_dall_e_today.append(message.from_.id)
+
                             await bot.send_photo(
                                 image=image,
                                 chat_id=message.chat.id,
-                                caption=await greeter(
-                                    recognized_face[0],
-                                    recognized_face[1],
-                                    bot.config.face_classifier.face_min_accepted_matches
-                                ) + "\n" + random.choice(
+                                caption=caption + "\n" + random.choice(
                                     await get_roletas_from_pavuna(bot, 25)
-                                )['text'].lower() if recognized_face is not None else None
+                                )['text'].lower()
                             )
 
-                        elif (
-                                dall_e and recognized_face is not None
-                                and bot.openai.dall_e_use < bot.config.openai.dall_e_daily_limit
-                                and bot.used_dall_e_today.count(message.from_.id) < limit_per_user
-                        ):
+                        elif dall_e and recognized_face is not None and bot.openai.dall_e_use < bot.config.openai.dall_e_daily_limit and bot.used_dall_e_today.count(message.from_.id) < limit_per_user:
                             is_flagged, roulette_text = True, ""
 
                             while is_flagged:
@@ -87,20 +82,16 @@ async def image_reactions(
                             await bot.send_photo(
                                 image=image,
                                 chat_id=message.chat.id,
-                                caption=roulette_text.lower(
-
-                                ) + f" - {recognized_face[0]}" + f"\n{feedback}" if recognized_face is not None else None
+                                caption=roulette_text.lower() + f" - {recognized_face[0]}" + f"\n{feedback}" if recognized_face is not None else None
                             )
+
+                            await greet_user(bot=bot, face_recognized=recognized_face, message=message)
 
                         else:
                             await bot.send_photo(
                                 image=crop_bytes[0],
                                 chat_id=message.chat.id,
-                                caption=await greeter(
-                                    recognized_face[0],
-                                    recognized_face[1],
-                                    bot.config.face_classifier.face_min_accepted_matches
-                                ) if recognized_face is not None else None
+                                caption=await create_caption(bot=bot, face_recognized=recognized_face)
                             )
 
                 for img_coord in faces_coordinates:
@@ -110,18 +101,11 @@ async def image_reactions(
 
             elif method == 'face_classifier':
                 if face_recognized := await face_classifier(
-                        image_bytes, bot.face_embeddings, bot.faces_names,
-                        bot.config.face_classifier.face_tolerance):
+                    image_bytes, image_bytes, bot.face_embeddings, bot.faces_names,
+                    bot.config.face_classifier.face_tolerance
+                ):
+                    await greet_user(bot=bot, face_recognized=face_recognized, message=message)
 
-                    loop.create_task(
-                        bot.send_message(
-                            message_text=await greeter(
-                                face_recognized[0],
-                                face_recognized[1],
-                                bot.config.face_classifier.face_min_accepted_matches
-                            ),
-                            chat_id=message.chat.id)
-                    )
             else:
                 raise NotImplementedError('implementa vc')
 
@@ -129,3 +113,40 @@ async def image_reactions(
                 *[image_cropper(image_bytes, img_coord)
                   for img_coord in faces_coordinates]
             )
+
+
+async def greet_user(bot: FakePedro, face_recognized: T.Optional[tuple], message: TelegramMessage):
+    bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
+
+    bot.loop.create_task(
+        bot.send_message(
+            message_text=await bot.openai.generate_message(
+                message_text=f"do it in brazillian portuguese: tell {face_recognized[0]} he looks kind "
+                             f"of {face_recognized[2]} in this picture, and tell him if you liked it or not",
+                temperature=1.0,
+                biased=True
+            ) if face_recognized[2] else await greeter(
+                face_recognized[0],
+                face_recognized[1],
+                bot.config.face_classifier.face_min_accepted_matches
+            ),
+            chat_id=message.chat.id)
+    )
+
+
+async def create_caption(bot: FakePedro, face_recognized: T.Optional[tuple]) -> T.Optional[str]:
+    caption = None
+
+    if face_recognized:
+        caption = await bot.openai.generate_message(
+            message_text=f"do it in brazillian portuguese: tell {face_recognized[0]} he looks kind "
+                         f"of {face_recognized[2]} in this picture, and tell him if you liked it or not",
+            temperature=1.0,
+            biased=True
+        ) if face_recognized[2] else await greeter(
+            face_recognized[0],
+            face_recognized[1],
+            bot.config.face_classifier.face_min_accepted_matches
+        )
+
+    return caption

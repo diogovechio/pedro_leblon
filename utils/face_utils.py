@@ -1,10 +1,13 @@
-import logging
 import os
 import random
 import uuid
 import typing as T
 
+import logging
+
 import face_recognition
+from deepface import DeepFace
+
 from PIL import Image, ImageOps
 
 from pedro_leblon import FakePedro
@@ -118,19 +121,28 @@ async def put_list_of_faces_on_background(bot: FakePedro, names: T.List[str], sm
 
 
 async def face_classifier(
-        image: bytes,
+        crop_image: bytes,
+        full_image: bytes,
         faces_embeddings: list,
         faces_names: list,
         face_tolerance=0.6
-) -> T.Optional[T.Tuple[str, float]]:
-    temp_filename = f'tmp/{uuid.uuid4()}.tmp'
+) -> T.Optional[T.Tuple[str, float, str]]:
+    temp_filename = f'tmp/{uuid.uuid4()}.png'
+    temp_filename_2 = f'tmp/{uuid.uuid4()}.png'
     with open(temp_filename, 'wb') as file:
-        file.write(image)
+        file.write(crop_image)
 
     faces_result = {key: 0 for key in faces_names}
 
     input_image_embeddings = face_recognition.face_encodings(face_recognition.load_image_file(temp_filename))
     data = None
+
+    emotion = await face_emotion(temp_filename)
+    if not emotion:
+        with open(temp_filename_2, 'wb') as file:
+            file.write(full_image)
+
+        emotion = await face_emotion(temp_filename_2)
 
     if len(input_image_embeddings):
         results = face_recognition.compare_faces(
@@ -150,9 +162,22 @@ async def face_classifier(
 
         if valid_result and len(balanced_predict_result):
             result_name: str = max(balanced_predict_result, key=balanced_predict_result.get)
-            data = result_name, balanced_predict_result[result_name]
+            data = result_name, balanced_predict_result[result_name], emotion
 
     del input_image_embeddings
     os.remove(temp_filename)
 
+    try:
+        os.remove(temp_filename_2)
+    except Exception as exc:
+        logging.exception(exc)
+
     return data
+
+
+async def face_emotion(img_path: str) -> str:
+    emotion = ''
+    try:
+        emotion = DeepFace.analyze(img_path)[0]['dominant_emotion']
+    finally:
+        return emotion

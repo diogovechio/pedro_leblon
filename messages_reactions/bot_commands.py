@@ -4,6 +4,8 @@ import random
 import uuid
 import math
 
+from deepface import DeepFace
+
 from constants.constants import BOLSOFF_LIST
 from data_classes.commemorations import Commemoration
 from data_classes.received_message import TelegramMessage
