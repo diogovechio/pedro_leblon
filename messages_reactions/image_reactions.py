@@ -121,8 +121,8 @@ async def greet_user(bot: FakePedro, face_recognized: T.Optional[tuple], message
     bot.loop.create_task(
         bot.send_message(
             message_text=await bot.openai.generate_message(
-                message_text=f"do it in brazillian portuguese: tell {face_recognized[0]} he looks kind "
-                             f"of {face_recognized[2]} in this picture, and tell him if you liked it or not",
+                message_text=f"do it in brazillian portuguese: tell {face_recognized[0]} he looks "
+                             f"{face_recognized[2]} in this picture, give him a advice about this.",
                 temperature=1.0,
                 biased=True
             ) if face_recognized[2] else await greeter(
@@ -130,7 +130,9 @@ async def greet_user(bot: FakePedro, face_recognized: T.Optional[tuple], message
                 face_recognized[1],
                 bot.config.face_classifier.face_min_accepted_matches
             ),
-            chat_id=message.chat.id)
+            chat_id=message.chat.id,
+            reply_to=message.message_id
+        )
     )
 
 
@@ -139,8 +141,8 @@ async def create_caption(bot: FakePedro, face_recognized: T.Optional[tuple]) -> 
 
     if face_recognized:
         caption = await bot.openai.generate_message(
-            message_text=f"do it in brazillian portuguese: tell {face_recognized[0]} he looks kind "
-                         f"of {face_recognized[2]} in this picture, and tell him if you liked it or not",
+            message_text=f"do it in brazillian portuguese: tell {face_recognized[0]} he looks "
+                         f"{face_recognized[2]} in this picture, give him a advice about this.",
             temperature=1.0,
             biased=True
         ) if face_recognized[2] else await greeter(

@@ -178,6 +178,6 @@ async def face_classifier(
 async def face_emotion(img_path: str) -> str:
     emotion = ''
     try:
-        emotion = DeepFace.analyze(img_path)[0]['dominant_emotion']
+        emotion = DeepFace.analyze(img_path=img_path, actions="emotion")[0]['dominant_emotion']
     finally:
         return emotion
