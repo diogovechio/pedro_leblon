@@ -151,10 +151,10 @@ async def normalize_openai_text(
         if ai_message:
             logging.info(ai_message)
 
-            while any(word in ai_message[0] for word in ['.', ',', '?', ' ']):
+            while any(word in ai_message[0] for word in ['.', ',', '?', ' ', '"']):
                 ai_message = ai_message[1:]
 
-            while any(word in ai_message[-1] for word in ['.', ',', '?', ' ']):
+            while any(word in ai_message[-1] for word in ['.', ',', '?', ' ', '"']):
                 ai_message = ai_message[:-1]
 
             if random.random() < 0.03:

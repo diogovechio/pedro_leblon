@@ -295,7 +295,11 @@ class FakePedro:
             ) as resp:
                 logging.info(resp.status)
 
-    async def send_action(self, chat_id: int, action=T.Union[T.Literal['typing'], T.Literal['upload_photo']]) -> None:
+    async def send_action(
+            self,
+            chat_id: int,
+            action=T.Union[T.Literal['typing'], T.Literal['upload_photo'], T.Literal['find_location']]
+    ) -> None:
         async with asyncio.Semaphore(self.config.telegram_api_semaphore):
             async with self.session.post(
                     url=f"{self.api_route}/sendChatAction".replace('\n', ''),
@@ -401,7 +405,7 @@ if __name__ == '__main__':
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
         secrets_file='secrets.json',
-        debug_mode=False
+        debug_mode=True
     )
 
     asyncio.run(

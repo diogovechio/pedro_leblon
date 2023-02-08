@@ -5,7 +5,7 @@ import typing as T
 
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
-from utils.face_utils import faces_detector, image_cropper, face_classifier
+from utils.face_utils import faces_coordinates_detector, image_cropper, face_recognizer
 from utils.openai_utils import return_dall_e_limit
 from utils.roleta_utils import get_roletas_from_pavuna
 from utils.text_utils import greeter
@@ -21,13 +21,13 @@ async def image_reactions(
     loop = bot.loop
 
     if image_bytes := await bot.image_downloader(message):
-        if faces_coordinates := await faces_detector(image_bytes, bot.config.face_classifier.box_min_size):
+        if faces_coordinates := await faces_coordinates_detector(image_bytes, bot.config.face_classifier.box_min_size):
             bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="upload_photo"))
 
             if method == 'cropper':
                 async def _crop_and_send(img_bytes: bytes, coord: tuple):
                     crop_bytes = await image_cropper(img_bytes, coord)
-                    recognized_face = await face_classifier(
+                    recognized_face = await face_recognizer(
                         crop_image=crop_bytes[0],
                         full_image=img_bytes,
                         faces_embeddings=bot.face_embeddings,
@@ -100,7 +100,7 @@ async def image_reactions(
                 return
 
             elif method == 'face_classifier':
-                if face_recognized := await face_classifier(
+                if face_recognized := await face_recognizer(
                     image_bytes, image_bytes, bot.face_embeddings, bot.faces_names,
                     bot.config.face_classifier.face_tolerance
                 ):

@@ -13,7 +13,7 @@ from PIL import Image, ImageOps
 from pedro_leblon import FakePedro
 
 
-async def faces_detector(image: bytes, min_size: int) -> T.Optional[T.List[T.Tuple]]:
+async def faces_coordinates_detector(image: bytes, min_size: int) -> T.Optional[T.List[T.Tuple]]:
     temp_filename = f'tmp/{uuid.uuid4()}.tmp'
     with open(temp_filename, 'wb') as file:
         file.write(image)
@@ -68,9 +68,16 @@ async def put_face_on_background(image: bytes, small_face=False) -> bytes:
     temp_save = f'tmp/{uuid.uuid4()}.png'
     background.save(temp_save)
 
-    with open(temp_save, 'rb') as file:
-        return file.read()
+    file_bytes: bytes
 
+    with open(temp_save, 'rb') as file:
+        file_bytes = file.read()
+
+    del background, face
+    os.remove(temp_save)
+    os.remove(temp_load)
+
+    return file_bytes
 
 async def put_list_of_faces_on_background(bot: FakePedro, names: T.List[str], small_face=False) -> bytes:
     background = Image.open("static/background.png")
@@ -116,11 +123,18 @@ async def put_list_of_faces_on_background(bot: FakePedro, names: T.List[str], sm
     temp_save = f'tmp/{uuid.uuid4()}.png'
     background.save(temp_save)
 
+    file_bytes: bytes
+
     with open(temp_save, 'rb') as file:
-        return file.read()
+        file_bytes = file.read()
+
+    del background
+    os.remove(temp_save)
+
+    return file_bytes
 
 
-async def face_classifier(
+async def face_recognizer(
         crop_image: bytes,
         full_image: bytes,
         faces_embeddings: list,
