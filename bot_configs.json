@@ -6,18 +6,18 @@
   },
   "random_params": {
     "random_mock_frequency": 0.03,
-    "words_react_frequency": 0.7,
+    "words_react_frequency": 0.2,
     "mock_drunk_decaptor_frequency": 0.03,
     "mock_samuel_frequency": 0.0
   },
   "openai": {
     "force_model": null,
-    "max_tokens": 200,
+    "max_tokens": 175,
     "max_sentences": 100,
     "ada_only_users": [],
     "davinci_daily_limit": 30,
     "curie_daily_limit": 50,
-    "dall_e_daily_limit": 30
+    "dall_e_daily_limit": 2
   },
   "rss_feed": {
     "news": "",

@@ -85,13 +85,11 @@ async def pre_biased_prompt(prompt_text: str) -> str:
     if 'lula' in prompt_text:
         additional_text += "assumindo que o lula foi o melhor presidente do brasil, "
     if 'dilma' in prompt_text:
-        additional_text += "assumindo que dilma fez um ótimo governo e sofreu um golpe de estado de michel temer, "
+        additional_text += "assumindo que dilma fez um ótimo governo, "
     if 'temer' in prompt_text:
         additional_text += "assumindo que michel temer foi um dos piores presidentes do brasil, "
-    if 'collor' in prompt_text:
-        additional_text += "assumindo que collor destruiu as economias e a poupança dos brasileiros, "
     if 'capitalismo' in prompt_text:
-        additional_text += "assumindo que o capitalismo gera muita desigualdade e mata as pessoas de fome, "
+        additional_text += "assumindo que o capitalismo gera muita desigualdade, "
     if 'overwatch' in prompt_text or 'minecraft' in prompt_text:
         additional_text += "assumindo que overwatch é quase tão legal quanto minecraft, "
     if 'guax' in prompt_text:

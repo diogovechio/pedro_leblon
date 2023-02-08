@@ -35,17 +35,16 @@ async def image_reactions(
                         face_tolerance=bot.config.face_classifier.face_tolerance
                     )
 
-                    limit_per_user = round(bot.config.openai.dall_e_daily_limit / 10)
                     feedback = await return_dall_e_limit(
                         _id=message.from_.id,
-                        limit_per_user=limit_per_user,
+                        limit_per_user=bot.config.openai.dall_e_daily_limit,
                         used_dall_e_today=bot.used_dall_e_today
                     )
 
                     if recognized_face or always_send_crop:
                         caption = await create_caption(bot=bot, face_recognized=recognized_face)
 
-                        if dall_e and recognized_face is not None and recognized_face[0] == "samuel" and bot.used_dall_e_today.count(message.from_.id) < limit_per_user:
+                        if dall_e and recognized_face is not None and recognized_face[0] == "samuel" and bot.used_dall_e_today.count(message.from_.id) < bot.config.openai.dall_e_daily_limit:
                             image = await bot.openai.edit_image(
                                 text="manifestação do partido dos trabalhadores com MST em brasília, muita gente de vermelho segurando bandeiras",
                                 square_png=crop_bytes[1]
@@ -64,7 +63,7 @@ async def image_reactions(
                                 )['text'].lower()
                             )
 
-                        elif dall_e and recognized_face is not None and bot.openai.dall_e_use < bot.config.openai.dall_e_daily_limit and bot.used_dall_e_today.count(message.from_.id) < limit_per_user:
+                        elif dall_e and recognized_face is not None and bot.used_dall_e_today.count(message.from_.id) < bot.config.openai.dall_e_daily_limit:
                             is_flagged, roulette_text = True, ""
 
                             while is_flagged:

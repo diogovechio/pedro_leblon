@@ -29,9 +29,9 @@ OPENAI_REACT_WORDS = ['bolsonaro', 'segundo turno', 'macho', ' lula ', 'dilma', 
 OPENAI_TRASH_LIST = ['"', "r:", "o:", "a:", "q:"]
 
 OPENAI_PROMPTS = {
-    'fale': 'fale sobre esse tema:',
-    'responda': 'responda essa pergunta:',
-    'comente': 'comente sobre isso:',
+    'fale': 'fale brevemente sobre esse tema:',
+    'responda': 'responda objetivamente essa pergunta:',
+    'comente': 'comente objetivamente sobre isso:',
     'critique': 'critique o linguajar dessa mensagem:',
     'critique_reformule': 'critique o linguagem dessa mensagem e reformule para uma forma apropriada:',
     'critique_negativamente': 'comente negativamente em relação a esse tema:'

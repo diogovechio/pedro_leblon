@@ -96,17 +96,15 @@ async def openai_reactions(
             )
 
         elif "/imag" in message.text.lower()[0:5]:
-            limit_per_user = round(bot.config.openai.dall_e_daily_limit / 10)
-
             feedback = await return_dall_e_limit(
                 _id=message.from_.id,
-                limit_per_user=limit_per_user,
+                limit_per_user=bot.config.openai.dall_e_daily_limit,
                 used_dall_e_today=bot.used_dall_e_today
             )
 
             prompt = input_text[6:]
 
-            if bot.used_dall_e_today.count(message.from_.id) < limit_per_user:
+            if bot.used_dall_e_today.count(message.from_.id) < bot.config.openai.dall_e_daily_limit:
                 message_filtered = message.text.lower().replace(
                     ",", " ").replace(
                     ".", " ").replace(
@@ -170,7 +168,7 @@ async def openai_reactions(
             else:
                 bot.loop.create_task(
                     bot.send_message(
-                        message_text=f"{message.from_.first_name} você já gerou {limit_per_user} imagens hoje, agora só amanhã",
+                        message_text=f"{message.from_.first_name} você já gerou {bot.config.openai.dall_e_daily_limit} imagens hoje, agora só amanhã",
                         chat_id=message.chat.id,
                         reply_to=message.message_id
                     )
@@ -189,7 +187,8 @@ async def openai_reactions(
                         biased=False,
                         destroy_message=destroy_message,
                         remove_words_list=['/pedro'],
-                        return_raw_text=True
+                        return_raw_text=True,
+                        tokens=100
                     ),
                     chat_id=message.chat.id,
                     reply_to=message.message_id)
@@ -209,7 +208,8 @@ async def openai_reactions(
                             prompt_inject=None,
                             biased=False,
                             destroy_message=destroy_message,
-                            remove_words_list=None
+                            remove_words_list=None,
+                            force_model="text-davinci-003"
                         ),
                         chat_id=message.chat.id,
                         reply_to=message.message_id)
@@ -225,7 +225,8 @@ async def openai_reactions(
                             chat=message.chat.title,
                             prompt_inject=None,
                             destroy_message=destroy_message,
-                            remove_words_list=None
+                            remove_words_list=None,
+                            force_model="text-davinci-003"
                         ),
                         chat_id=message.chat.id,
                         reply_to=message.message_id)

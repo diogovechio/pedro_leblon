@@ -205,13 +205,17 @@ class OpenAiCompletion:
             mock_message: bool = False,
             return_raw_text: bool = False,
             destroy_message: bool = False,
-            remove_words_list=None
+            remove_words_list=None,
+            force_model:T.Optional[str] = None
     ) -> str:
         if destroy_message:
-            force_model = "text-ada-001"
+            model = "text-ada-001"
             message_text = await message_destroyer(message_text)
         else:
-            force_model = self.force_model
+            model = self.force_model
+
+        if force_model:
+            model=force_model
 
         if not chat:
             chat = "ASD"
@@ -228,7 +232,7 @@ class OpenAiCompletion:
                     biased=biased,
                     mock_message=mock_message,
                     random_model=random_model,
-                    force_model=force_model,
+                    force_model=model,
                     tokens_force=tokens,
                     prompt_inject=prompt_inject,
                     message_text=message_text,
