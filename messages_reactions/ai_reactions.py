@@ -210,6 +210,7 @@ async def openai_reactions(
                             biased=False,
                             destroy_message=destroy_message,
                             remove_words_list=None,
+                            tokens=220,
                             force_model="text-davinci-003"
                         ),
                         chat_id=message.chat.id,
