@@ -67,6 +67,7 @@ async def openai_reactions(
                         prompt_inject=OPENAI_PROMPTS[
                             'responda'] if '?' in message.text.lower() else OPENAI_PROMPTS['fale'],
                         destroy_message=destroy_message,
+                        remove_words_list=['pedro'],
                         force_model="text-davinci-003" if url_detector else None,
                     ),
                     chat_id=message.chat.id,
