@@ -54,7 +54,7 @@ class FakePedro:
         self.interacted_messages_with_chat_id = MaxSizeList(400)
 
         self.messages_in_memory = {}
-        self.message_in_memory_min_chars = 25
+        self.message_in_memory_min_chars = 15
 
         self.datetime_now = datetime.now() - timedelta(hours=3)
 
