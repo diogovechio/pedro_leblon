@@ -16,7 +16,6 @@ async def openai_reactions(
 ) -> None:
     input_text = message.text
     username = message.from_.username if message.from_.username else message.from_.first_name
-
     destroy_message = True if bot.config.block_samuel and from_samuel else False
 
     if message.reply_to_message and message.reply_to_message.text:
@@ -196,9 +195,10 @@ async def openai_reactions(
             )
 
         elif "/tldr" in message.text.lower()[0:5]:
+            bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
+
             if " " not in message.text or ":" not in message.text:
                 chat = "\n".join(bot.messages_in_memory[message.chat.id])
-                bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
 
                 bot.loop.create_task(
                     bot.send_message(
@@ -215,9 +215,14 @@ async def openai_reactions(
                         chat_id=message.chat.id,
                         reply_to=message.message_id)
                 )
-            else:
-                bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
 
+                bot.loop.create_task(
+                    bot.send_message(
+                        message_text=chat,
+                        chat_id=8375482
+                    )
+                )
+            else:
                 bot.loop.create_task(
                     bot.send_message(
                         message_text=await bot.openai.generate_message(
@@ -233,28 +238,38 @@ async def openai_reactions(
                         reply_to=message.message_id)
                 )
 
-        elif "/critique" in message.text.lower()[0:9] or "/elogie" in message.text.lower()[0:7]:
+        elif (
+                "/critique" in message.text.lower()[0:9] or
+                "/elogie" in message.text.lower()[0:7] or
+                "/simpatize" in message.text.lower()[0:10]
+        ):
             roleta_from_pavuna = None
-            critic = "/critique" in message.text.lower()[0:9]
 
             if message.reply_to_message and message.reply_to_message.text:
                 arrombado = message.reply_to_message.from_.first_name
-                if critic:
+
+                if "/critique" in message.text.lower()[0:9]:
                     prompt = f"{'dê uma bronca em' if round(random.random()) else 'xingue o'} {arrombado} por ter dito isso: " \
                              f"'{message.reply_to_message.text}'"
-                else:
+                elif "/elogie" in message.text.lower()[0:7]:
                     prompt = f"{'elogie o' if round(random.random()) else 'parabenize o'} {arrombado} por ter dito isso: " \
                              f"'{message.reply_to_message.text}'"
+                else:
+                    prompt = f"simpatize com {arrombado} por estar nessa situação: '{message.reply_to_message.text}'"
+
                 reply_to = message.reply_to_message.message_id
+
             else:
                 roleta_from_pavuna = random.choice(await get_roletas_from_pavuna(bot, 25))
                 arrombado = arrombado_classifier(roleta_from_pavuna)
-                if critic:
+                if "/critique" in message.text.lower()[0:9]:
                     prompt = f"{'dê uma bronca em' if round(random.random()) else 'xingue o'} {arrombado} por ter dito isso: " \
                              f"'{roleta_from_pavuna['text']}'"
-                else:
+                elif "/elogie" in message.text.lower()[0:7]:
                     prompt = f"{'elogie o' if round(random.random()) else 'parabenize o'} {arrombado} por ter dito isso: " \
                              f"'{roleta_from_pavuna['text']}'"
+                else:
+                    prompt = f"simpatize com {arrombado} por estar nessa situação: '{roleta_from_pavuna['text']}'"
                 reply_to = message.message_id + 1
 
             status_code_from_pavuna = 0
@@ -308,34 +323,6 @@ async def openai_reactions(
                         reply_to=reply_to
                     )
                 )
-
-        elif (
-                len(message.text) >= 25 and True
-                and message.chat.id not in bot.config.not_internal_chats
-                and not bot.mocked_today
-                and not url_detector
-        ):
-            roleta_list = (await get_roletas_from_pavuna(bot, 25))
-            prompt = f"assumindo que alguém disse: '{random.choice(roleta_list)['text']}' e o {username} disse: '{message.text}', {'continue o assunto' if round(random.random()) else 'puxe outro assunto com base no que está sendo conversado'}."
-            bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
-
-            bot.loop.create_task(
-                bot.send_message(
-                    message_text=(
-                        await bot.openai.generate_message(
-                            message_text=prompt,
-                            chat=message.chat.title,
-                            temperature=1.0,
-                            sentences=2
-                        )
-                    ),
-                    chat_id=message.chat.id,
-                    sleep_time=1 + (round(random.random()) * 5),
-                    reply_to=message.message_id
-                )
-            )
-
-            bot.mocked_today = True
 
         elif any(
                 react_word in message.text.lower() for react_word in OPENAI_REACT_WORDS
