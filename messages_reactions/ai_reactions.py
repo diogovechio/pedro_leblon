@@ -22,17 +22,16 @@ async def openai_reactions(
     if message.reply_to_message and message.reply_to_message.text:
         input_text += ' : ' + message.reply_to_message.text
 
-    if bot.openai.openai_use < bot.openai.davinci_daily_limit:
-        if url_detector := await https_url_extract(input_text):
-            url_content = await extract_website_paragraph_content(
-                url=url_detector,
-                session=bot.session
-            )
-            input_text = input_text.replace(url_detector, url_content)
+    if url_detector := await https_url_extract(input_text):
+        url_content = await extract_website_paragraph_content(
+            url=url_detector,
+            session=bot.session
+        )
+        input_text = input_text.replace(url_detector, url_content)
 
     if openai_block_word_detected := any(
             block_word in message.text.lower() for block_word in OPENAI_BLOCK_WORDS
-    ):
+    ) and not url_detector:
         if random.random() < bot.config.random_params.words_react_frequency or 'pedr' in message.text.lower():
             bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
 
@@ -68,7 +67,8 @@ async def openai_reactions(
                         chat=message.chat.title,
                         prompt_inject=OPENAI_PROMPTS[
                             'responda'] if '?' in message.text.lower() else OPENAI_PROMPTS['fale'],
-                        destroy_message=destroy_message
+                        destroy_message=destroy_message,
+                        force_model="text-davinci-003" if url_detector else None,
                     ),
                     chat_id=message.chat.id,
                     reply_to=message.message_id)
@@ -188,7 +188,8 @@ async def openai_reactions(
                         destroy_message=destroy_message,
                         remove_words_list=['/pedro'],
                         return_raw_text=True,
-                        tokens=100
+                        tokens=100,
+                        force_model="text-davinci-003" if url_detector else None,
                     ),
                     chat_id=message.chat.id,
                     reply_to=message.message_id)
@@ -312,6 +313,7 @@ async def openai_reactions(
                 len(message.text) >= 25 and True
                 and message.chat.id not in bot.config.not_internal_chats
                 and not bot.mocked_today
+                and not url_detector
         ):
             roleta_list = (await get_roletas_from_pavuna(bot, 25))
             prompt = f"assumindo que alguém disse: '{random.choice(roleta_list)['text']}' e o {username} disse: '{message.text}', {'continue o assunto' if round(random.random()) else 'puxe outro assunto com base no que está sendo conversado'}."
@@ -337,7 +339,7 @@ async def openai_reactions(
 
         elif any(
                 react_word in message.text.lower() for react_word in OPENAI_REACT_WORDS
-        ) and random.random() < bot.config.random_params.words_react_frequency:
+        ) and random.random() < bot.config.random_params.words_react_frequency and not url_detector:
             bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
 
             bot.loop.create_task(

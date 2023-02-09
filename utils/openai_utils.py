@@ -34,7 +34,6 @@ class OpenAiCompletion:
             force_model: T.Optional[str] = None,
     ):
         self.openai_use = 0
-        self.dall_e_use = 0
         self.semaphore = semaphore
         self.api_key = api_key
         self.max_tokens = max_tokens
@@ -162,7 +161,6 @@ class OpenAiCompletion:
                     async with self.session.get(
                             json.loads(await openai_request.text())['data'][0]['url']
                     ) as image:
-                        self.dall_e_use += 1
                         return await image.content.read()
                 except Exception as exc:
                     logging.exception(exc)
@@ -184,7 +182,6 @@ class OpenAiCompletion:
         )
         try:
             async with self.session.get(resp['data'][0]['url']) as image:
-                self.dall_e_use += 1
                 logging.info("Thread unblocked")
                 return await image.content.read()
         except Exception as exc:

@@ -42,9 +42,9 @@ class OpenAI:
     curie_daily_limit: int
     max_sentences: int
     max_tokens: int
+    dall_e_daily_limit: int
     ada_only_users: T.List[str]
     force_model: T.Optional[str] = None
-    dall_e_daily_limit = 30
 
 @dataclass
 class BotSecret:
