@@ -69,7 +69,8 @@ async def openai_reactions(
                         chat=message.chat.title,
                         prompt_inject=OPENAI_PROMPTS[
                             'responda'] if '?' in message.text.lower() else OPENAI_PROMPTS['fale'],
-                        destroy_message=destroy_message
+                        destroy_message=destroy_message,
+                        remove_words_list=['pedro'],
                     ),
                     chat_id=message.chat.id,
                     reply_to=message.message_id)
@@ -189,7 +190,7 @@ async def openai_reactions(
                         destroy_message=destroy_message,
                         remove_words_list=['/pedro'],
                         return_raw_text=True,
-                        tokens=100
+                        tokens=100,
                     ),
                     chat_id=message.chat.id,
                     reply_to=message.message_id)
@@ -202,7 +203,7 @@ async def openai_reactions(
                 if len(bot.messages_in_memory[message.chat.id]) > 25:
                     bot.messages_in_memory[message.chat.id] = [
                         msg for i, msg in enumerate(bot.messages_in_memory[message.chat.id])
-                        if i % 3 == 0]
+                        if i % 4 == 0]
 
                 chat = "\n".join(bot.messages_in_memory[message.chat.id]) + "."
 
