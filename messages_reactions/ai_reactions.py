@@ -57,7 +57,7 @@ async def openai_reactions(
 
     if not openai_block_word_detected:
         if (
-                'pedr' in message.text.lower()[0:5] or "pedr" in message.text.lower()[-10:]
+                'pedr' in message.text.lower()[0:5] or "pedro?" in message.text.lower()[-10:]
         ) and "/pedro" not in message.text.lower()[0:6]:
             bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
 
