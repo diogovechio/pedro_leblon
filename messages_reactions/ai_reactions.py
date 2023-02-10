@@ -21,12 +21,13 @@ async def openai_reactions(
     if message.reply_to_message and message.reply_to_message.text:
         input_text += ' : ' + message.reply_to_message.text
 
-    if url_detector := await https_url_extract(input_text):
-        url_content = await extract_website_paragraph_content(
-            url=url_detector,
-            session=bot.session
-        )
-        input_text = input_text.replace(url_detector, url_content)
+    if bot.openai.openai_use < bot.openai.davinci_daily_limit:
+        if url_detector := await https_url_extract(input_text):
+            url_content = await extract_website_paragraph_content(
+                url=url_detector,
+                session=bot.session
+            )
+            input_text = input_text.replace(url_detector, url_content)
 
     if openai_block_word_detected := any(
             block_word in message.text.lower() for block_word in OPENAI_BLOCK_WORDS
@@ -55,7 +56,9 @@ async def openai_reactions(
             )
 
     if not openai_block_word_detected:
-        if ('pedr' in message.text.lower()[0:5] or "pedr" in message.text.lower()[-10:]) and "/pedro" not in message.text.lower()[0:6]:
+        if (
+                'pedr' in message.text.lower()[0:5] or "pedr" in message.text.lower()[-10:]
+        ) and "/pedro" not in message.text.lower()[0:6]:
             bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
 
             bot.loop.create_task(
@@ -66,8 +69,7 @@ async def openai_reactions(
                         chat=message.chat.title,
                         prompt_inject=OPENAI_PROMPTS[
                             'responda'] if '?' in message.text.lower() else OPENAI_PROMPTS['fale'],
-                        destroy_message=destroy_message,
-                        force_model="text-davinci-003" if url_detector else None,
+                        destroy_message=destroy_message
                     ),
                     chat_id=message.chat.id,
                     reply_to=message.message_id)
@@ -187,8 +189,7 @@ async def openai_reactions(
                         destroy_message=destroy_message,
                         remove_words_list=['/pedro'],
                         return_raw_text=True,
-                        tokens=100,
-                        force_model="text-davinci-003" if url_detector else None,
+                        tokens=100
                     ),
                     chat_id=message.chat.id,
                     reply_to=message.message_id)
@@ -201,7 +202,7 @@ async def openai_reactions(
                 if len(bot.messages_in_memory[message.chat.id]) > 25:
                     bot.messages_in_memory[message.chat.id] = [
                         msg for i, msg in enumerate(bot.messages_in_memory[message.chat.id])
-                        if i % 4 == 0]
+                        if i % 3 == 0]
 
                 chat = "\n".join(bot.messages_in_memory[message.chat.id]) + "."
 

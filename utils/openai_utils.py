@@ -221,34 +221,38 @@ class OpenAiCompletion:
             for word in remove_words_list:
                 message_text = message_text.replace(word, '')
 
-        try:
-            response = await asyncio.wait_for(
-                self._completion(
-                    message_username=message_username,
-                    chat=chat,
-                    biased=biased,
-                    mock_message=mock_message,
-                    random_model=random_model,
-                    force_model=model,
-                    tokens_force=tokens,
-                    prompt_inject=prompt_inject,
-                    message_text=message_text,
-                    temperature=temperature,
-                ),
-                timeout=120
-            )
-        except Exception as exc:
-            logging.exception(exc)
-            return "meu cérebro tá fora do ar"
+        for _ in range(5):
+            try:
+                response = await asyncio.wait_for(
+                    self._completion(
+                        message_username=message_username,
+                        chat=chat,
+                        biased=biased,
+                        mock_message=mock_message,
+                        random_model=random_model,
+                        force_model=model,
+                        tokens_force=tokens,
+                        prompt_inject=prompt_inject,
+                        message_text=message_text,
+                        temperature=temperature,
+                    ),
+                    timeout=120
+                )
 
-        if return_raw_text:
-            return response
+                if return_raw_text:
+                    return response
 
-        return await normalize_openai_text(
-            original_message=response,
-            sentences=self.max_sentences if sentences is None else sentences,
-            clean_prompts=OPENAI_PROMPTS
-        )
+                return await normalize_openai_text(
+                    original_message=response,
+                    sentences=self.max_sentences if sentences is None else sentences,
+                    clean_prompts=OPENAI_PROMPTS
+                )
+
+            except Exception as exc:
+                logging.exception(exc)
+                await asyncio.sleep(5)
+
+        return "meu cérebro tá fora do ar"
 
 
 async def extract_website_paragraph_content(
