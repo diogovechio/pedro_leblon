@@ -27,7 +27,7 @@ from utils.openai_utils import OpenAiCompletion
 
 logging.basicConfig(level=logging.INFO)
 
-session_timeout =   aiohttp.ClientTimeout(total=None,sock_connect=120,sock_read=120)
+session_timeout = aiohttp.ClientTimeout(total=None,sock_connect=120,sock_read=120)
 
 class FakePedro:
     def __init__(
@@ -374,6 +374,8 @@ class FakePedro:
         for i in range(max_retries):
             if i == max_retries - 1:
                 message_text = re.sub("[^A-Za-z0-9,.!àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕ]+", " ", message_text)
+                if message_text == "":
+                    message_text = "tenho nada a te dizer"
             async with asyncio.Semaphore(self.config.telegram_api_semaphore):
                 async with self.session.post(
                         f"{self.api_route}/sendMessage".replace('\n', ''),
@@ -405,7 +407,7 @@ if __name__ == '__main__':
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
         secrets_file='secrets.json',
-        debug_mode=True
+        debug_mode=False
     )
 
     asyncio.run(
