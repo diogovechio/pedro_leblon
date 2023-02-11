@@ -270,6 +270,7 @@ async def extract_website_paragraph_content(
 
     return f"essa URL parece inacessível: {url} - opine sobre o que acha que se trata a URL e finalize dizendo que é só sua opinião e que você não conseguiu acessar a URL"
 
+
 async def return_dall_e_limit(_id: int, limit_per_user: int, used_dall_e_today: list) -> str:
     current = used_dall_e_today.count(_id) + 1
     remain = limit_per_user - current
@@ -282,3 +283,23 @@ async def return_dall_e_limit(_id: int, limit_per_user: int, used_dall_e_today: 
         feedback += "◻️"
 
     return feedback
+
+
+async def list_reducer(l: list) -> list:
+    new_list = []
+    if len(l) > 20:
+        total_size = len(l)
+        middle = int(total_size / 2)
+
+        new_list.extend(l[0:2])
+
+        new_list.append(l[int(middle / 2)])
+
+        new_list.extend(l[middle:middle + 5])
+
+        new_list.append(l[int(middle / 2 + middle)])
+
+        new_list.extend(l[total_size-5:-2])
+
+        return new_list
+    return l

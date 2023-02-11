@@ -4,7 +4,7 @@ from constants.constants import OPENAI_BLOCK_WORDS, OPENAI_REACT_WORDS, OPENAI_P
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
 from utils.face_utils import put_list_of_faces_on_background
-from utils.openai_utils import extract_website_paragraph_content, return_dall_e_limit
+from utils.openai_utils import extract_website_paragraph_content, return_dall_e_limit, list_reducer
 from utils.roleta_utils import get_roletas_from_pavuna, arrombado_classifier
 from utils.text_utils import https_url_extract
 
@@ -195,12 +195,9 @@ async def openai_reactions(
             bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
 
             if " " not in message.text or ":" not in message.text:
-                if len(bot.messages_in_memory[message.chat.id]) > 25:
-                    bot.messages_in_memory[message.chat.id] = [
-                        msg for i, msg in enumerate(bot.messages_in_memory[message.chat.id])
-                        if i % 4 == 0]
-
-                chat = "\n".join(bot.messages_in_memory[message.chat.id]) + "."
+                chat = "\n".join(
+                    await list_reducer(bot.messages_in_memory[message.chat.id])
+                ) + "."
 
                 bot.loop.create_task(
                     bot.send_message(
