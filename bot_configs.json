@@ -15,7 +15,7 @@
     "max_tokens": 200,
     "max_sentences": 100,
     "ada_only_users": [],
-    "davinci_daily_limit": 10,
+    "davinci_daily_limit": 15,
     "curie_daily_limit": 30,
     "dall_e_daily_limit": 2
   },

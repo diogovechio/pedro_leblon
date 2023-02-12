@@ -218,11 +218,11 @@ class FakePedro:
                                                                      f"{incoming.message.message_id}")
 
                         if incoming.message.chat.id not in self.messages_in_memory:
-                            self.messages_in_memory[incoming.message.chat.id] = MaxSizeList(100)
+                            self.messages_in_memory[incoming.message.chat.id] = MaxSizeList(75)
 
                         if incoming.message.text is not None and len(incoming.message.text) > self.message_in_memory_min_chars:
                             self.messages_in_memory[incoming.message.chat.id].append(
-                                f"{incoming.message.from_.first_name}: '{incoming.message.text[0:80]}'")
+                                f"{incoming.message.from_.first_name}: '{incoming.message.text[0:70]}'")
 
                         logging.info(incoming)
 

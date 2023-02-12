@@ -291,15 +291,19 @@ async def list_reducer(l: list) -> list:
         total_size = len(l)
         middle = int(total_size / 2)
 
-        new_list.extend(l[0:2])
+        new_list.extend(l[0:4])
 
-        new_list.append(l[int(middle / 2)])
+        new_list.extend(l[
+                        int(middle / 2):int(middle / 2) + 2
+                        ])
 
-        new_list.extend(l[middle:middle + 5])
+        new_list.extend(l[middle:middle + 4])
 
-        new_list.append(l[int(middle / 2 + middle)])
+        new_list.extend(l[
+                        int(middle / 2 + middle): int(middle / 2 + middle) + 2
+                        ])
 
-        new_list.extend(l[total_size-5:-2])
+        new_list.extend(l[total_size-6:-2])
 
         return new_list
     return l
