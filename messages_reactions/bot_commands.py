@@ -281,11 +281,4 @@ async def bot_commands(
                     parse_mode="HTML"
                 )
             )
-
-    elif message.text[0] == '/':
-        if bot.reacted_random_command != round(bot.datetime_now.hour / 12):
-            bot.loop.create_task(bot.send_message(
-                message_text='rs',
-                chat_id=message.chat.id)
-            )
-            bot.reacted_random_command = round(bot.datetime_now.hour / 12)
+            
