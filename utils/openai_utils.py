@@ -217,6 +217,8 @@ class OpenAiCompletion:
         if not chat:
             chat = "ASD"
 
+        message_text = message_text.lower()
+
         if remove_words_list:
             for word in remove_words_list:
                 message_text = message_text.replace(word, '')
