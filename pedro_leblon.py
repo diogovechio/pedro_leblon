@@ -197,7 +197,7 @@ class FakePedro:
                         response = json.loads((await request.text()).replace('"from":{"', '"from_":{"'))
                         if 'ok' in response and response['ok']:
                             logging.info(f'Message polling task running:'
-                                         f"{polling_url.replace(self.config.secrets.bot_token, '#TOKEN#')} last_id: {self.last_id} - {self.datetime_now}")
+                                         f"{polling_url.replace(self.config.secrets.bot_token, '#TOKEN#')} last_id: {self.last_id + 1} - {self.datetime_now}")
                             self.messages = MessagesResults(**response)
                             self.last_id = self.messages.result[-1].update_id
             except Exception as exc:
@@ -212,17 +212,8 @@ class FakePedro:
                 if hasattr(self.messages, 'result'):
                     for incoming in (entry for entry in self.messages.result
                                      if entry.update_id not in self.interacted_updates):
-                        incoming: MessageReceived
-                        self.interacted_updates.append(incoming.update_id)
-                        self.interacted_messages_with_chat_id.append(f"{incoming.message.chat.id}:"
-                                                                     f"{incoming.message.message_id}")
 
-                        if incoming.message.chat.id not in self.messages_in_memory:
-                            self.messages_in_memory[incoming.message.chat.id] = MaxSizeList(75)
-
-                        if incoming.message.text is not None and len(incoming.message.text) > self.message_in_memory_min_chars:
-                            self.messages_in_memory[incoming.message.chat.id].append(
-                                f"{incoming.message.from_.first_name}: '{incoming.message.text[0:70]}'")
+                        await self._store_messages_info(incoming)
 
                         logging.info(incoming)
 
@@ -235,6 +226,18 @@ class FakePedro:
             except Exception as exc:
                 logging.exception(exc)
                 await asyncio.sleep(15)
+
+    async def _store_messages_info(self, incoming: MessageReceived):
+        self.interacted_updates.append(incoming.update_id)
+        self.interacted_messages_with_chat_id.append(f"{incoming.message.chat.id}:"
+                                                     f"{incoming.message.message_id}")
+
+        if incoming.message.chat.id not in self.messages_in_memory:
+            self.messages_in_memory[incoming.message.chat.id] = MaxSizeList(75)
+
+        if incoming.message.text is not None and len(incoming.message.text) > self.message_in_memory_min_chars:
+            self.messages_in_memory[incoming.message.chat.id].append(
+                f"{incoming.message.from_.first_name}: '{incoming.message.text[0:70]}'")
 
     async def image_downloader(
             self,
