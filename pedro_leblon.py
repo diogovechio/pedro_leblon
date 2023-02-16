@@ -237,7 +237,7 @@ class FakePedro:
 
         if incoming.message.text is not None and len(incoming.message.text) > self.message_in_memory_min_chars:
             self.messages_in_memory[incoming.message.chat.id].append(
-                f"{incoming.message.from_.first_name}: '{incoming.message.text[0:70]}'")
+                f"{incoming.message.from_.first_name}: '{incoming.message.text[0:110]}'")
 
     async def image_downloader(
             self,
