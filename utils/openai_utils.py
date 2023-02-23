@@ -289,23 +289,23 @@ async def return_dall_e_limit(_id: int, limit_per_user: int, used_dall_e_today: 
 
 async def list_reducer(l: list) -> list:
     new_list = []
-    if len(l) > 20:
+    if len(l) > 30:
         total_size = len(l)
         middle = int(total_size / 2)
 
-        new_list.extend(l[0:4])
+        new_list.extend(l[0:6])
 
         new_list.extend(l[
-                        int(middle / 2):int(middle / 2) + 2
+                        int(middle / 2):int(middle / 2) + 5
                         ])
 
-        new_list.extend(l[middle:middle + 4])
+        new_list.extend(l[middle:middle + 6])
 
         new_list.extend(l[
-                        int(middle / 2 + middle): int(middle / 2 + middle) + 2
+                        int(middle / 2 + middle): int(middle / 2 + middle) + 4
                         ])
 
-        new_list.extend(l[total_size-6:-2])
+        new_list.extend(l[total_size-9:-2])
 
         return new_list
     return l
