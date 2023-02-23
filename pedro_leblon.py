@@ -232,7 +232,7 @@ class FakePedro:
                                                      f"{incoming.message.message_id}")
 
         if incoming.message.chat.id not in self.messages_in_memory:
-            self.messages_in_memory[incoming.message.chat.id] = MaxSizeList(50)
+            self.messages_in_memory[incoming.message.chat.id] = MaxSizeList(75)
 
         if incoming.message.text is not None and len(incoming.message.text) > 25:
             self.messages_in_memory[incoming.message.chat.id].append(
