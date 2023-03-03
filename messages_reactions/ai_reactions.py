@@ -21,13 +21,12 @@ async def openai_reactions(
     if message.reply_to_message and message.reply_to_message.text:
         input_text += ' : ' + message.reply_to_message.text
 
-    if bot.openai.openai_use < bot.openai.davinci_daily_limit:
-        if url_detector := await https_url_extract(input_text):
-            url_content = await extract_website_paragraph_content(
-                url=url_detector,
-                session=bot.session
-            )
-            input_text = input_text.replace(url_detector, url_content)
+    if url_detector := await https_url_extract(input_text):
+        url_content = await extract_website_paragraph_content(
+            url=url_detector,
+            session=bot.session
+        )
+        input_text = input_text.replace(url_detector, url_content)
 
     if openai_block_word_detected := any(
             block_word in message.text.lower() for block_word in OPENAI_BLOCK_WORDS
@@ -67,6 +66,7 @@ async def openai_reactions(
                         message_username=message.from_.username,
                         message_text=input_text,
                         chat=message.chat.title,
+                        use_chatgpt=True if url_detector else False,
                         prompt_inject=OPENAI_PROMPTS[
                             'responda'] if '?' in message.text.lower() else OPENAI_PROMPTS['fale'],
                         destroy_message=destroy_message,
@@ -181,6 +181,7 @@ async def openai_reactions(
                         message_text=input_text,
                         chat=message.chat.title,
                         prompt_inject=None,
+                        use_chatgpt=True,
                         biased=False,
                         destroy_message=destroy_message,
                         remove_words_list=['/pedro'],
@@ -199,7 +200,7 @@ async def openai_reactions(
                     await list_reducer(bot.messages_in_memory[message.chat.id])
                 ) + "."
 
-                bot.loop.create_task(
+               bot.loop.create_task(
                     bot.send_message(
                         message_text=await bot.openai.generate_message(
                             message_username=message.from_.username,
@@ -207,6 +208,7 @@ async def openai_reactions(
                             chat=message.chat.title,
                             prompt_inject=None,
                             biased=False,
+                            use_chatgpt=True,
                             destroy_message=destroy_message,
                             remove_words_list=None,
                             tokens=220,
@@ -216,7 +218,7 @@ async def openai_reactions(
                         reply_to=message.message_id)
                 )
 
-                bot.loop.create_task(
+               bot.loop.create_task(
                     bot.send_message(
                         message_text=chat,
                         chat_id=8375482
