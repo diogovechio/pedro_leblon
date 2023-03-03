@@ -95,9 +95,10 @@ class OpenAiCompletion:
             message_text: str = "",
             message_username: str = "",
             chat="chat",
+            use_chatgpt=False,
             tokens_force: T.Optional[int] = None,
             prompt_inject: T.Optional[str] = None,
-            force_model: T.Optional[str] = None
+            force_model: T.Optional[str] = None,
     ) -> str:
         if not message_username:
             message_username = "arrombado"
@@ -132,20 +133,32 @@ class OpenAiCompletion:
             prompt = f"{prompt_inject}: {prompt}" if prompt_inject else prompt
 
         async with asyncio.Semaphore(self.semaphore):
-            async with self.session.post(
-                    "https://api.openai.com/v1/completions",
-                    headers=self.headers,
-                    json={
-                        "model": model,
-                        'prompt': prompt,
-                        'max_tokens': tokens,
-                        'temperature': temperature,
-                        'top_p': 1,
-                        'frequency_penalty': 1.0,
-                        'presence_penalty': 2.0,
-                    }
-            ) as openai_request:
-                return json.loads(await openai_request.text())['choices'][0]['text']
+            if use_chatgpt:
+                async with self.session.post(
+                        "https://api.openai.com/v1/chat/completions",
+                        headers=self.headers,
+                        json={
+                            "model": "gpt-3.5-turbo",
+                            'messages': [{"role": "user", "content": prompt}],
+                        }
+                ) as openai_request:
+                    response = await openai_request.text()
+                    return json.loads(response)['choices'][0]['message']['content']
+            else:
+                async with self.session.post(
+                        "https://api.openai.com/v1/completions",
+                        headers=self.headers,
+                        json={
+                            "model": model,
+                            'prompt': prompt,
+                            'max_tokens': tokens,
+                            'temperature': temperature,
+                            'top_p': 1,
+                            'frequency_penalty': 1.0,
+                            'presence_penalty': 2.0,
+                        }
+                ) as openai_request:
+                    return json.loads(await openai_request.text())['choices'][0]['text']
 
     async def generate_image(
             self,
@@ -193,6 +206,7 @@ class OpenAiCompletion:
             message_text: str,
             message_username: T.Optional[str] = "",
             chat="ASD",
+            use_chatgpt=False,
             biased=True,
             sentences: T.Optional[int] = None,
             temperature=0,
@@ -234,6 +248,7 @@ class OpenAiCompletion:
                         random_model=random_model,
                         force_model=model,
                         tokens_force=tokens,
+                        use_chatgpt=use_chatgpt,
                         prompt_inject=prompt_inject,
                         message_text=message_text,
                         temperature=temperature,
