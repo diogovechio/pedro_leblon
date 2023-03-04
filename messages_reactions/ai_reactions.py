@@ -30,8 +30,10 @@ async def openai_reactions(
 
     if openai_block_word_detected := any(
             block_word in message.text.lower() for block_word in OPENAI_BLOCK_WORDS
-    ) and not url_detector:
+    ) and not url_detector and bot.sent_news != bot.datetime_now.hour:
         if random.random() < bot.config.random_params.words_react_frequency or 'pedr' in message.text.lower():
+            bot.sent_news = bot.datetime_now.hour
+
             bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
 
             bot.loop.create_task(
@@ -53,6 +55,7 @@ async def openai_reactions(
                     sleep_time=1 + (round(random.random()) * 4),
                     reply_to=message.message_id)
             )
+
 
     if not openai_block_word_detected:
         if (
