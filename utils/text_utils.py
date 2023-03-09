@@ -117,33 +117,28 @@ async def pre_biased_prompt(prompt_text: str) -> str:
     return prompt_text
 
 
+async def send_message_last_try(message_text: str) -> str:
+    message_text = re.sub("[^A-Za-z0-9,.!àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕ]+", " ", message_text)
+    if message_text == "":
+        message_text = "tenho nada a te dizer"
+
+    return message_text
+
+
 async def normalize_openai_text(
         original_message: str,
-        sentences=2,
         clean_prompts: T.Optional[dict] = None
 ) -> str:
     try:
-        ai_message = (
-            '. '.join(
-                list(
-                    filter(
-                        lambda entry: re.sub(" +", '', entry) != '', original_message.split('.')
-                    )
-                )[:sentences]
-            )
-        ).lower()
+        ai_message = original_message.lower()
+
+        if ai_message.count(".") == 1 and ai_message[-1] == ".":
+            ai_message = ai_message.replace(".", "")
 
         if clean_prompts:
             for _, msg in clean_prompts.items():
                 ai_message = ai_message.replace(msg, '')
 
-        ai_message = re.sub(', +,', ' ', ai_message)
-        ai_message = re.sub('\\. +\\.', ' ', ai_message)
-        ai_message = re.sub(', +,', ' ', ai_message)
-        ai_message = re.sub(': +,', ' ', ai_message)
-        ai_message = re.sub(': +:', ' ', ai_message)
-        ai_message = ai_message.split("::")[-1]
-        ai_message = ai_message.strip()
         ai_message = ai_message.replace("pedro: ","rs, ")
 
         if ai_message:
@@ -152,7 +147,7 @@ async def normalize_openai_text(
             while any(word in ai_message[0] for word in ['.', ',', '?', ' ', '"']):
                 ai_message = ai_message[1:]
 
-            while any(word in ai_message[-1] for word in ['.', ',', '?', ' ', '"']):
+            while any(word in ai_message[-1] for word in ['"']):
                 ai_message = ai_message[:-1]
 
             if random.random() < 0.03:

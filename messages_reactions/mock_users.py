@@ -31,7 +31,7 @@ async def mock_users(
 
     if (
             (message.from_.username in ['nands93'])
-            and bot.sent_news != bot.datetime_now.hour
+            and bot.mocked_hour != bot.datetime_now.hour
             and random.random() < bot.config.random_params.words_react_frequency
             and bot.config.rss_feed.news != ""
     ):
@@ -50,7 +50,7 @@ async def mock_users(
             )
         )
 
-        bot.sent_news = bot.datetime_now.hour
+        bot.mocked_hour = bot.datetime_now.hour
 
     if message.from_.username == f"{'decaptor' if not bot.debug_mode else 'diogovechio'}":
         if random.random() < bot.config.random_params.random_mock_frequency and not bot.mocked_today:

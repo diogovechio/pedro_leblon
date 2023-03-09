@@ -36,7 +36,8 @@ async def messages_coordinator(
                 bot_commands(bot=bot, message=message, from_samuel=from_samuel),
                 mock_users(bot=bot, message=message, from_samuel=from_samuel, from_debug_chats=from_debug_chats),
             )
-    elif not bot.debug_mode:
+
+    else:
         bot.loop.create_task(
             bot.leave_chat(
                 chat_id=message.chat.id

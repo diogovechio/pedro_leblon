@@ -70,8 +70,6 @@ class OpenAiCompletion:
 
         self.openai_use += usage_mapping[model]
 
-        logging.info(f"Model selected: {model} - OpenAI usage: {self.openai_use}")
-
         return model
 
     async def is_flagged(self, text: str) -> T.Tuple[bool, dict]:
@@ -96,7 +94,6 @@ class OpenAiCompletion:
             message_username: str = "",
             chat="chat",
             use_chatgpt=False,
-            tokens_force: T.Optional[int] = None,
             prompt_inject: T.Optional[str] = None,
             force_model: T.Optional[str] = None,
     ) -> str:
@@ -111,47 +108,41 @@ class OpenAiCompletion:
 
         prompt = (await pre_biased_prompt(message_text) if biased else message_text)
 
-        tokens = self.max_tokens if tokens_force is None else tokens_force
-        if (
-                not tokens_force and self.openai_use >= self.davinci_daily_limit / 1.5
-                and not self.openai_use > self.davinci_daily_limit
-        ):
-            tokens = round(self.max_tokens / 2)
+        is_flagged, moderation_results = await self.is_flagged(prompt)
 
-        if model == "text-davinci-003":
-            prompt = prompt[:3500]
-        else:
-            prompt = prompt[:1600]
-
-        flagged, mod = await self.is_flagged(prompt)
-
-        if flagged:
-            prompt = f"do it in brazillian portuguese: complain with @{message_username} for sending a message " \
-                     f"with {' ,'.join([key for key, value in mod['results'][0]['categories'].items() if value])} " \
+        if is_flagged:
+            prompt = f"do it in brazillian portuguese: complain with @{message_username} because he sent a message " \
+                     f"with {' ,'.join([key for key, value in moderation_results['results'][0]['categories'].items() if value])} " \
                      f"content. tell him he may be banned from {chat}."
         else:
             prompt = f"{prompt_inject}: {prompt}" if prompt_inject else prompt
 
         async with asyncio.Semaphore(self.semaphore):
             if use_chatgpt:
+                logging.info(f"Using ChatGPT - OpenAI usage: {self.openai_use}")
+
                 async with self.session.post(
                         "https://api.openai.com/v1/chat/completions",
                         headers=self.headers,
                         json={
                             "model": "gpt-3.5-turbo",
-                            'messages': [{"role": "user", "content": prompt}],
+                            'messages': [
+                                {"role": "user", "content": prompt}
+                            ],
                         }
                 ) as openai_request:
                     response = await openai_request.text()
                     return json.loads(response)['choices'][0]['message']['content']
             else:
+                logging.info(f"Model selected: {model} - OpenAI usage: {self.openai_use}")
+
                 async with self.session.post(
                         "https://api.openai.com/v1/completions",
                         headers=self.headers,
                         json={
                             "model": model,
                             'prompt': prompt,
-                            'max_tokens': tokens,
+                            'max_tokens': self.max_tokens,
                             'temperature': temperature,
                             'top_p': 1,
                             'frequency_penalty': 1.0,
@@ -210,7 +201,6 @@ class OpenAiCompletion:
             biased=True,
             sentences: T.Optional[int] = None,
             temperature=0,
-            tokens: T.Optional[int] = None,
             prompt_inject: T.Optional[str] = None,
             random_model: bool = False,
             mock_message: bool = False,
@@ -247,7 +237,6 @@ class OpenAiCompletion:
                         mock_message=mock_message,
                         random_model=random_model,
                         force_model=model,
-                        tokens_force=tokens,
                         use_chatgpt=use_chatgpt,
                         prompt_inject=prompt_inject,
                         message_text=message_text,
@@ -261,7 +250,6 @@ class OpenAiCompletion:
 
                 return await normalize_openai_text(
                     original_message=response,
-                    sentences=self.max_sentences if sentences is None else sentences,
                     clean_prompts=OPENAI_PROMPTS
                 )
 

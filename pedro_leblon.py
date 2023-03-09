@@ -24,6 +24,7 @@ from data_classes.received_message import MessagesResults, TelegramMessage, Mess
 from data_structures.max_size_list import MaxSizeList
 from messages_reactions import messages_coordinator
 from utils.openai_utils import OpenAiCompletion
+from utils.text_utils import send_message_last_try
 
 logging.basicConfig(level=logging.INFO)
 
@@ -70,14 +71,15 @@ class FakePedro:
         self.face_embeddings = []
 
         self.used_dall_e_today = []
+
         self.asked_for_photo = 0
-        self.sent_news = 0
+
+        self.mocked_hour = 0
+        self.mocked_today = False
         self.sent_games_news = 0
-        self.reacted_random_command = 0
+
         self.roleta_hour = 13
         self.last_roleta_day = 0
-
-        self.mocked_today = False
 
         self.openai: T.Optional[OpenAiCompletion] = None
 
@@ -375,9 +377,7 @@ class FakePedro:
 
         for i in range(max_retries):
             if i == max_retries - 1:
-                message_text = re.sub("[^A-Za-z0-9,.!àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕ]+", " ", message_text)
-                if message_text == "":
-                    message_text = "tenho nada a te dizer"
+                message_text = await send_message_last_try(message_text)
             async with asyncio.Semaphore(self.config.telegram_api_semaphore):
                 async with self.session.post(
                         f"{self.api_route}/sendMessage".replace('\n', ''),

@@ -2,7 +2,7 @@ import random
 
 import feedparser
 
-from constants.constants import ASK_PHOTOS, OPENAI_BLOCK_WORDS
+from constants.constants import ASK_PHOTOS, SWEAR_WORDS
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
 from utils.roleta_utils import get_roletas_from_pavuna
@@ -31,7 +31,7 @@ async def words_reactions(
         )
 
     if any(
-            block_word in message.text.lower() for block_word in OPENAI_BLOCK_WORDS
+            swear_word in message.text.lower() for swear_word in SWEAR_WORDS
     ):
         if (
                 random.random() < bot.config.random_params.words_react_frequency

@@ -1,6 +1,6 @@
 import random
 
-from constants.constants import OPENAI_BLOCK_WORDS, OPENAI_REACT_WORDS, OPENAI_PROMPTS, OPENAI_TRASH_LIST
+from constants.constants import SWEAR_WORDS, OPENAI_REACT_WORDS, OPENAI_PROMPTS, OPENAI_TRASH_LIST
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
 from utils.face_utils import put_list_of_faces_on_background
@@ -15,6 +15,7 @@ async def openai_reactions(
         from_samuel: bool
 ) -> None:
     input_text = message.text
+
     username = message.from_.username if message.from_.username else message.from_.first_name
     destroy_message = True if bot.config.block_samuel and from_samuel else False
 
@@ -28,11 +29,11 @@ async def openai_reactions(
         )
         input_text = input_text.replace(url_detector, url_content)
 
-    if openai_block_word_detected := any(
-            block_word in message.text.lower() for block_word in OPENAI_BLOCK_WORDS
-    ) and not url_detector and bot.sent_news != bot.datetime_now.hour:
+    if swear_word_detected := any(
+            block_word in message.text.lower() for block_word in SWEAR_WORDS
+    ) and not url_detector and bot.mocked_hour != bot.datetime_now.hour:
         if random.random() < bot.config.random_params.words_react_frequency or 'pedr' in message.text.lower():
-            bot.sent_news = bot.datetime_now.hour
+            bot.mocked_hour = bot.datetime_now.hour
 
             bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
 
@@ -46,7 +47,6 @@ async def openai_reactions(
                             random.random()) else OPENAI_PROMPTS['critique_reformule'],
                         remove_words_list=['pedro'],
                         sentences=2,
-                        tokens=165,
                         temperature=1.0,
                         destroy_message=destroy_message,
                         mock_message=True
@@ -56,8 +56,7 @@ async def openai_reactions(
                     reply_to=message.message_id)
             )
 
-
-    if not openai_block_word_detected:
+    if not swear_word_detected:
         if (
                 'pedr' in message.text.lower()[0:5] or "pedro?" in message.text.lower()[-10:]
         ) and "/pedro" not in message.text.lower()[0:6]:
@@ -189,7 +188,6 @@ async def openai_reactions(
                         destroy_message=destroy_message,
                         remove_words_list=['/pedro'],
                         return_raw_text=True,
-                        tokens=100,
                     ),
                     chat_id=message.chat.id,
                     reply_to=message.message_id)
@@ -198,7 +196,7 @@ async def openai_reactions(
         elif "/tldr" in message.text.lower()[0:5]:
             bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
 
-            if " " not in message.text or ":" not in message.text:
+            if " " not in message.text or ":" not in input_text:
                chat = "\n".join(
                     await list_reducer(bot.messages_in_memory[message.chat.id])
                 ) + "."
@@ -214,7 +212,6 @@ async def openai_reactions(
                             use_chatgpt=True,
                             destroy_message=destroy_message,
                             remove_words_list=None,
-                            tokens=220,
                             force_model="text-davinci-003"
                         ),
                         chat_id=message.chat.id,
@@ -342,7 +339,6 @@ async def openai_reactions(
                         chat=message.chat.title,
                         prompt_inject=OPENAI_PROMPTS['fale'],
                         sentences=1,
-                        tokens=150,
                         destroy_message=destroy_message,
                         mock_message=True
                     ),

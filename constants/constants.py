@@ -19,7 +19,7 @@ ASK_PHOTOS = ['melhorar', 'fotos', 'foto', 'melhorou']
 DECAPTOR_DISAPPOINTS = [' lula ', 'esquerdista', ' fato', 'venezuela', 'hipócrita', 'hipocrisia', 'hipocrita', 'dilma',
                         'imparcial']
 
-OPENAI_BLOCK_WORDS = [' viado', 'porra', 'fuck', 'cock', 'transar', 'buceta', 'boceta',
+SWEAR_WORDS = [' viado', 'porra', 'fuck', 'cock', 'transar', 'buceta', 'boceta',
                       'piroca', 'pornô', 'porno', 'sexo', 'cu?', ' cu ', 'caralho', 'foder', 'pinto',
                       'cú', 'chupa meu', 'chupa um', 'penis', 'pênis', 'chupa o', 'o saco do']
 
