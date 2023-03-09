@@ -196,7 +196,7 @@ async def openai_reactions(
         elif "/tldr" in message.text.lower()[0:5]:
             bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
 
-            if " " not in message.text or ":" not in input_text:
+            if ":" not in input_text:
                chat = "\n".join(
                     await list_reducer(bot.messages_in_memory[message.chat.id])
                 ) + "."
