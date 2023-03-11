@@ -30,7 +30,7 @@ OPENAI_TRASH_LIST = ['"', "r:", "o:", "a:", "q:"]
 
 OPENAI_PROMPTS = {
     'fale': 'fale brevemente sobre esse tema:',
-    'responda': 'responda objetivamente essa pergunta:',
+    'responda': 'responda brevemente isso:',
     'comente': 'comente objetivamente sobre isso:',
     'critique': 'critique o linguajar dessa mensagem:',
     'critique_reformule': 'critique o linguagem dessa mensagem e reformule para uma forma apropriada:',
