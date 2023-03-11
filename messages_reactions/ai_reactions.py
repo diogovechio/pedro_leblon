@@ -234,7 +234,7 @@ async def openai_reactions(
                             destroy_message=destroy_message,
                             remove_words_list=None,
                             force_model="text-davinci-003"
-                        )).split('tldr:)[-1],
+                        )).split('tldr:')[-1],
                         chat_id=message.chat.id,
                         reply_to=message.message_id)
                 )
