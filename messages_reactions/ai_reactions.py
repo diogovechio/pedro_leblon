@@ -226,7 +226,7 @@ async def openai_reactions(
             else:
                 bot.loop.create_task(
                     bot.send_message(
-                        message_text=await bot.openai.generate_message(
+                        message_text=(await bot.openai.generate_message(
                             message_username=message.from_.username,
                             message_text=f"faça um resumo do texto a seguir: {input_text}",
                             chat=message.chat.title,
@@ -234,7 +234,7 @@ async def openai_reactions(
                             destroy_message=destroy_message,
                             remove_words_list=None,
                             force_model="text-davinci-003"
-                        ),
+                        )).split('tldr:)[-1],
                         chat_id=message.chat.id,
                         reply_to=message.message_id)
                 )
