@@ -61,7 +61,7 @@ async def openai_reactions(
                 'pedr' in message.text.lower()[0:5] or "pedro?" in message.text.lower()[-10:]
         ) and "/pedro" not in message.text.lower()[0:6]:
             bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
-
+        
             bot.loop.create_task(
                 bot.send_message(
                     message_text=await bot.openai.generate_message(
@@ -69,8 +69,7 @@ async def openai_reactions(
                         message_text=input_text,
                         chat=message.chat.title,
                         use_chatgpt=True if url_detector else False,
-                        prompt_inject=OPENAI_PROMPTS[
-                            'responda'] if '?' in message.text.lower() else OPENAI_PROMPTS['fale'],
+                        prompt_inject=None if url_detector else OPENAI_PROMPTS['fale'],
                         destroy_message=destroy_message,
                         remove_words_list=['pedro'],
                     ),
