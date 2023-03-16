@@ -42,12 +42,19 @@ async def image_reactions(
                     )
 
                     if recognized_face or always_send_crop:
-                        caption = await create_caption(bot=bot, face_recognized=recognized_face)
-
                         if dall_e and recognized_face is not None and recognized_face[0] == "samuel" and bot.used_dall_e_today.count(message.from_.id) < bot.config.openai.dall_e_daily_limit:
-                            image = await bot.openai.edit_image(
-                                text="manifestação do partido dos trabalhadores com MST em brasília, muita gente de vermelho segurando bandeiras",
-                                square_png=crop_bytes[1]
+                            caption: str
+                            image: bytes
+
+                            caption, image = await asyncio.gather(
+                                create_caption(
+                                    bot=bot,
+                                    face_recognized=recognized_face
+                                ),
+                                bot.openai.edit_image(
+                                    text="manifestação do partido dos trabalhadores com MST em brasília, muita gente de vermelho segurando bandeiras",
+                                    square_png=crop_bytes[1]
+                                )
                             )
 
                             if image is not None:

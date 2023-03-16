@@ -175,22 +175,29 @@ class OpenAiCompletion:
             text: str,
             square_png: bytes
     ) -> T.Optional[bytes]:
-        #todo: use the fucking api
-        logging.info("Blocking the fucking thread with stupid openai lib")
-        resp = openai.Image.create_edit(
-            image=square_png,
-            prompt=text,
-            size="256x256",
-            n=1,
-            api_key=self.api_key,
-        )
-        try:
-            async with self.session.get(resp['data'][0]['url']) as image:
-                logging.info("Thread unblocked")
-                return await image.content.read()
-        except Exception as exc:
-            logging.exception(exc)
-            return None
+        async with self.session.post(
+                "https://api.openai.com/v1/images/edits",
+                headers={
+                    "Authorization": f"Bearer {self.api_key}"
+                },
+                data=aiohttp.FormData(
+                    (
+                        ("image", square_png),
+                        ("prompt", text),
+                        ("size", "256x256"),
+                    )
+                )
+        ) as openai_request:
+            try:
+                req = await openai_request.text()
+
+                async with self.session.get(
+                    json.loads(await openai_request.text())['data'][0]['url']
+                ) as image:
+                    return await image.content.read()
+            except Exception as exc:
+                logging.exception(exc)
+                return None
 
     async def generate_message(
             self,
