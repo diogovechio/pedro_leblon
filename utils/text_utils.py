@@ -86,6 +86,8 @@ async def pre_biased_prompt(prompt_text: str) -> str:
         additional_text += "assumindo que o governo bolsonaro é péssimo, "
     if 'lula' in prompt_text:
         additional_text += "assumindo que o lula foi o melhor presidente do brasil, "
+    if 'president' in prompt_text:
+        additional_text += "assumindo que estamos em 2023 e lula é o atual presidente do brasil, "
     if 'dilma' in prompt_text:
         additional_text += "assumindo que dilma fez um ótimo governo, "
     if 'temer' in prompt_text:
