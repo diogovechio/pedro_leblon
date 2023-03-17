@@ -104,9 +104,9 @@ async def openai_reactions(
 
         elif "/imag" in message.text.lower()[0:5]:
             feedback = await return_dall_e_limit(
-                _id=message.from_.id,
+                id_to_count=message.from_.id,
                 limit_per_user=bot.config.openai.dall_e_daily_limit,
-                used_dall_e_today=bot.used_dall_e_today
+                dall_uses_list=bot.used_dall_e_today
             )
 
             prompt = input_text[6:]
