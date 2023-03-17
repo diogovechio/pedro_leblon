@@ -78,6 +78,7 @@ async def openai_reactions(
                         chat=message.chat.title,
                         use_chatgpt=True if url_detector else False,
                         prompt_inject=None if url_detector else OPENAI_PROMPTS['responda'],
+                        biased=False if url_detector else True,
                         destroy_message=destroy_message,
                         remove_words_list=['pedro'],
                     ),

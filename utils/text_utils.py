@@ -49,7 +49,7 @@ async def html_paragraph_extractor(text: str) -> str:
 
     split_cleaned_html = [
         x.strip().replace("\n", "") for x in split_cleaned_html
-        if len(x) > 1 and "function(" not in x and "{" not in x and "window." not in x]
+        if len(x.strip()) > 0 and "function(" not in x and "{" not in x and "window." not in x]
 
     new_split = [""]
 
