@@ -68,7 +68,7 @@ async def openai_reactions(
         if (
                 'pedr' in message.text.lower()[0:5] or "pedro?" in message.text.lower()[-10:]
         ) and "/pedro" not in message.text.lower()[0:6]:
-            sending_message = bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing", repeats=10))
+            sending_message = bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing", repeats=100))
         
             bot.loop.create_task(
                 bot.send_message(
@@ -128,7 +128,7 @@ async def openai_reactions(
                         recognized_names.append(word)
                         prompt = prompt.replace(word, "rapaz")
                 if len(recognized_names):
-                    sending_message = bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="upload_photo", repeats=10))
+                    sending_message = bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="upload_photo", repeats=100))
 
                     background = await put_list_of_faces_on_background(bot, recognized_names, "-s" in message.text.lower())
                     image = await bot.openai.edit_image(text=prompt,square_png=background)
@@ -153,7 +153,7 @@ async def openai_reactions(
 
                     sending_message.cancel()
                 else:
-                    sending_message = bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="upload_photo", repeats=10))
+                    sending_message = bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="upload_photo", repeats=100))
 
                     image = await bot.openai.generate_image(text=input_text[6:])
 
@@ -188,7 +188,7 @@ async def openai_reactions(
                 )
 
         elif "/pedro" in message.text.lower()[0:6]:
-            sending_message = bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing", repeats=10))
+            sending_message = bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing", repeats=100))
 
             bot.loop.create_task(
                 bot.send_message(
@@ -210,7 +210,7 @@ async def openai_reactions(
             sending_message.cancel()
 
         elif "/tldr" in message.text.lower()[0:5]:
-            sending_message = bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing", repeats=10))
+            sending_message = bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing", repeats=100))
 
             if ":" not in input_text:
                chat = "\n".join(

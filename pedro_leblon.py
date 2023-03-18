@@ -317,7 +317,7 @@ class FakePedro:
                         )
                 ) as resp:
                     logging.info(resp.status)
-                await asyncio.sleep(3)
+                await asyncio.sleep(5)
 
     async def send_document(self, document: bytes, chat_id: int, caption=None, reply_to=None, sleep_time=0) -> None:
         await asyncio.sleep(sleep_time)
