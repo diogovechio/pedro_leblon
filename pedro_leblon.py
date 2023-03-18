@@ -25,6 +25,7 @@ from data_structures.max_size_list import MaxSizeList
 from messages_reactions import messages_coordinator
 from utils.openai_utils import OpenAiCompletion
 from utils.text_utils import send_message_last_try
+from contextlib import contextmanager
 
 logging.basicConfig(level=logging.INFO)
 
@@ -303,9 +304,9 @@ class FakePedro:
             self,
             chat_id: int,
             action=T.Union[T.Literal['typing'], T.Literal['upload_photo'], T.Literal['find_location']],
-            repeats=1
+            repeats=False
     ) -> None:
-        for _ in range(repeats):
+        while True:
             async with asyncio.Semaphore(self.config.telegram_api_semaphore):
                 async with self.session.post(
                         url=f"{self.api_route}/sendChatAction".replace('\n', ''),
@@ -317,7 +318,11 @@ class FakePedro:
                         )
                 ) as resp:
                     logging.info(resp.status)
-                await asyncio.sleep(5)
+
+            if not repeats:
+                break
+
+            await asyncio.sleep(5)
 
     async def send_document(self, document: bytes, chat_id: int, caption=None, reply_to=None, sleep_time=0) -> None:
         await asyncio.sleep(sleep_time)
@@ -405,6 +410,18 @@ class FakePedro:
                 json={"chat_id": chat_id}
         ) as resp:
             logging.info(resp.status)
+
+    @contextmanager
+    def sending_action(
+            self,
+            chat_id: int,
+            action=T.Union[T.Literal['typing'], T.Literal['upload_photo'], T.Literal['find_location']]
+    ):
+        sending = self.loop.create_task(self.send_action(chat_id, action, True))
+        try:
+            yield sending
+        finally:
+            sending.cancel()
 
 
 if __name__ == '__main__':
