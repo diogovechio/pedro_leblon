@@ -302,19 +302,22 @@ class FakePedro:
     async def send_action(
             self,
             chat_id: int,
-            action=T.Union[T.Literal['typing'], T.Literal['upload_photo'], T.Literal['find_location']]
+            action=T.Union[T.Literal['typing'], T.Literal['upload_photo'], T.Literal['find_location']],
+            repeats=1
     ) -> None:
-        async with asyncio.Semaphore(self.config.telegram_api_semaphore):
-            async with self.session.post(
-                    url=f"{self.api_route}/sendChatAction".replace('\n', ''),
-                    data=aiohttp.FormData(
-                        (
-                            ("chat_id", str(chat_id)),
-                            ('action', action),
+        for _ in range(repeats):
+            async with asyncio.Semaphore(self.config.telegram_api_semaphore):
+                async with self.session.post(
+                        url=f"{self.api_route}/sendChatAction".replace('\n', ''),
+                        data=aiohttp.FormData(
+                            (
+                                ("chat_id", str(chat_id)),
+                                ('action', action),
+                            )
                         )
-                    )
-            ) as resp:
-                logging.info(resp.status)
+                ) as resp:
+                    logging.info(resp.status)
+                await asyncio.sleep(3)
 
     async def send_document(self, document: bytes, chat_id: int, caption=None, reply_to=None, sleep_time=0) -> None:
         await asyncio.sleep(sleep_time)
@@ -409,7 +412,7 @@ if __name__ == '__main__':
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
         secrets_file='secrets.json',
-        debug_mode=True
+        debug_mode=False
     )
 
     asyncio.run(

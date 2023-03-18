@@ -68,7 +68,7 @@ async def openai_reactions(
         if (
                 'pedr' in message.text.lower()[0:5] or "pedro?" in message.text.lower()[-10:]
         ) and "/pedro" not in message.text.lower()[0:6]:
-            bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
+            sending_message = bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing", repeats=10))
         
             bot.loop.create_task(
                 bot.send_message(
@@ -85,6 +85,8 @@ async def openai_reactions(
                     chat_id=message.chat.id,
                     reply_to=message.message_id)
             )
+
+            sending_message.cancel()
 
         elif from_samuel and random.random() < bot.config.random_params.mock_samuel_frequency:
             bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
@@ -126,7 +128,7 @@ async def openai_reactions(
                         recognized_names.append(word)
                         prompt = prompt.replace(word, "rapaz")
                 if len(recognized_names):
-                    bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="upload_photo"))
+                    sending_message = bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="upload_photo", repeats=10))
 
                     background = await put_list_of_faces_on_background(bot, recognized_names, "-s" in message.text.lower())
                     image = await bot.openai.edit_image(text=prompt,square_png=background)
@@ -148,8 +150,10 @@ async def openai_reactions(
                                 reply_to=message.message_id
                             )
                         )
+
+                    sending_message.cancel()
                 else:
-                    bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="upload_photo"))
+                    sending_message = bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="upload_photo", repeats=10))
 
                     image = await bot.openai.generate_image(text=input_text[6:])
 
@@ -172,6 +176,8 @@ async def openai_reactions(
                                 reply_to=message.message_id
                             )
                         )
+
+                    sending_message.cancel()
             else:
                 bot.loop.create_task(
                     bot.send_message(
@@ -182,7 +188,7 @@ async def openai_reactions(
                 )
 
         elif "/pedro" in message.text.lower()[0:6]:
-            bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
+            sending_message = bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing", repeats=10))
 
             bot.loop.create_task(
                 bot.send_message(
@@ -201,8 +207,10 @@ async def openai_reactions(
                     reply_to=message.message_id)
             )
 
+            sending_message.cancel()
+
         elif "/tldr" in message.text.lower()[0:5]:
-            bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
+            sending_message = bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing", repeats=10))
 
             if ":" not in input_text:
                chat = "\n".join(
@@ -247,6 +255,8 @@ async def openai_reactions(
                         chat_id=message.chat.id,
                         reply_to=message.message_id)
                 )
+
+            sending_message.cancel()
 
         elif (
                 "/critique" in message.text.lower()[0:9] or
