@@ -94,6 +94,7 @@ class OpenAiCompletion:
             message_username: str = "",
             chat="chat",
             use_chatgpt=False,
+            moderate=True,
             prompt_inject: T.Optional[str] = None,
             force_model: T.Optional[str] = None,
     ) -> str:
@@ -110,10 +111,10 @@ class OpenAiCompletion:
 
         is_flagged, moderation_results = await self.is_flagged(prompt)
 
-        if is_flagged:
-            prompt = f"do it in brazillian portuguese: complain with @{message_username} because he sent a message " \
-                     f"with {' ,'.join([key for key, value in moderation_results['results'][0]['categories'].items() if value])} " \
-                     f"content. tell him he may be banned from {chat}."
+        if is_flagged and moderate:
+            prompt = f"critique o @{message_username} por ele ter enviado uma mensagem com conteúdo de" \
+                     f"{' ,'.join([key for key, value in moderation_results['results'][0]['categories'].items() if value])}. " \
+                     f"diga que ele pode ser banido de {chat}."
         else:
             prompt = f"{prompt_inject}: {prompt}" if prompt_inject else prompt
 
@@ -207,6 +208,7 @@ class OpenAiCompletion:
             use_chatgpt=False,
             biased=True,
             sentences: T.Optional[int] = None,
+            moderate=True,
             temperature=0,
             prompt_inject: T.Optional[str] = None,
             random_model: bool = False,
@@ -244,6 +246,7 @@ class OpenAiCompletion:
                         mock_message=mock_message,
                         random_model=random_model,
                         force_model=model,
+                        moderate=moderate,
                         use_chatgpt=use_chatgpt,
                         prompt_inject=prompt_inject,
                         message_text=message_text,
