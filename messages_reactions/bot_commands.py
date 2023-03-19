@@ -4,13 +4,12 @@ import random
 import uuid
 import math
 
-from deepface import DeepFace
-
-from constants.constants import BOLSOFF_LIST
+from constants.constants import BOLSOFF_LIST, ANNUAL_DATE_PATTERN, ONCE_DATE_PATTERN
 from data_classes.commemorations import Commemoration
 from data_classes.received_message import TelegramMessage
 from messages_reactions.utils.date_utils import display_time
 from pedro_leblon import FakePedro
+from utils.text_utils import command_in
 
 
 async def bot_commands(
@@ -20,24 +19,21 @@ async def bot_commands(
 ) -> None:
     message_split = message.text.lower().split(' ')
 
-    annual_date_pattern = r'^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])'
-    once_date_pattern = r'^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/([2-9][0-9][0-9][0-9])$'
-
-    if message.text == '/andrebebado' and message.from_.username != 'decaptor' and not from_samuel:
+    if command_in('/andrebebado', message.text) and message.from_.username != 'decaptor' and not from_samuel:
         bot.config.random_params.mock_drunk_decaptor_frequency = 1.0
         bot.loop.create_task(bot.send_message(
             message_text='Modo André Bêbado ativado',
             chat_id=message.from_.id)
         )
 
-    elif message.text == '/andresobrio' and message.from_.username != 'decaptor' and not from_samuel:
+    elif command_in('/andresobrio', message.text) and message.from_.username != 'decaptor' and not from_samuel:
         bot.config.random_params.mock_drunk_decaptor_frequency = 0.0
         bot.loop.create_task(bot.send_message(
             message_text='Modo André Sóbrio ativado',
             chat_id=message.from_.id)
         )
 
-    elif message.text == '/reload' and message.from_.username == 'diogovechio':
+    elif command_in('/reload', message.text) and message.from_.username == 'diogovechio':
         await bot.send_message(
             message_text='Recarregando parâmetros',
             chat_id=message.chat.id
@@ -54,7 +50,7 @@ async def bot_commands(
             chat_id=message.chat.id)
         )
 
-    elif '/bolso' in message.text.lower()[0:6]:
+    elif command_in('/bolso', message.text):
         bolso_expires_at = datetime.strptime('1/1/2023', "%m/%d/%Y")
         remaining = bolso_expires_at - bot.datetime_now
 
@@ -78,7 +74,7 @@ async def bot_commands(
                     )
                 )
 
-    elif '/nomes' in message.text.lower()[0:6]:
+    elif command_in('/nomes', message.text):
         msg = f"eu conheço essas pessoas:\n" + '\n'.join(set(bot.faces_names))
 
         message_split = message.text.lower().split(" ")
@@ -124,12 +120,12 @@ async def bot_commands(
                         )
                     )
 
-    elif '/agendar' in message.text.lower()[0:8]:
+    elif command_in('/agendar', message.text):
         frequency = None
 
-        if re.fullmatch(annual_date_pattern, message_split[-1]):
+        if re.fullmatch(ANNUAL_DATE_PATTERN, message_split[-1]):
             frequency = 'annual'
-        elif re.fullmatch(once_date_pattern, message_split[-1]):
+        elif re.fullmatch(ONCE_DATE_PATTERN, message_split[-1]):
             frequency = 'once'
 
         if len(message_split) < 3 or not frequency:
@@ -175,7 +171,7 @@ async def bot_commands(
                 )
             )
 
-    elif '/agenda' in message.text.lower()[0:7]:
+    elif command_in('/agenda', message.text):
         agendas = []
 
         agenda = [
@@ -205,7 +201,7 @@ async def bot_commands(
                 )
             )
 
-    elif '/delete' in message.text.lower()[0:7]:
+    elif command_in('/delete', message.text):
         msg_id = message.text.split(' ')
 
         if len(msg_id) != 2:
@@ -245,8 +241,8 @@ async def bot_commands(
                     )
                 )
 
-    elif '/aniversario' in message.text.lower()[0:12]:
-        if len(message_split) < 3 or not re.fullmatch(annual_date_pattern, message_split[-1]):
+    elif command_in('/aniversario', message.text):
+        if len(message_split) < 3 or not re.fullmatch(ANNUAL_DATE_PATTERN, message_split[-1]):
             bot.loop.create_task(
                 bot.send_message(
                     message_text=f"exemplo pra agendar:\n\n/aniversario @thommazk 29/12",

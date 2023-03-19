@@ -25,7 +25,6 @@ class OpenAiCompletion:
             self,
             api_key: str,
             max_tokens: int,
-            max_sentences: int,
             session: aiohttp.ClientSession,
             semaphore: int,
             davinci_daily_limit: int,
@@ -37,7 +36,6 @@ class OpenAiCompletion:
         self.semaphore = semaphore
         self.api_key = api_key
         self.max_tokens = max_tokens
-        self.max_sentences = max_sentences
         self.session = session
         self.force_model = force_model
         self.davinci_daily_limit = davinci_daily_limit
@@ -206,7 +204,6 @@ class OpenAiCompletion:
             chat="ASD",
             use_chatgpt=False,
             biased=True,
-            sentences: T.Optional[int] = None,
             temperature=0,
             prompt_inject: T.Optional[str] = None,
             random_model: bool = False,
@@ -272,7 +269,8 @@ async def extract_website_paragraph_content(
         session: aiohttp.ClientSession
 ) -> str:
     try:
-        headers = {"User-Agent": "Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"}
+        headers = {"User-Agent": "Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) "
+                                 "AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"}
         async with session.get(url, headers=headers) as site:
             text = (await html_paragraph_extractor(await site.text()))[:3500]
             if len(text) >= 500 and (200 <= site.status < 300):
@@ -280,10 +278,15 @@ async def extract_website_paragraph_content(
     except Exception as exc:
         logging.exception(exc)
 
-    return f"essa URL parece inacessível: {url} - opine sobre o que acha que se trata a URL e finalize dizendo que é só sua opinião e que você não conseguiu acessar a URL"
+    return f"essa URL parece inacessível: {url} - opine sobre o que acha que se trata a URL e finalize dizendo que " \
+           f"é só sua opinião e que você não conseguiu acessar a URL"
 
 
-async def return_dall_e_limit(id_to_count: int, limit_per_user: int, dall_uses_list: list) -> str:
+async def return_dall_e_limit(
+        id_to_count: int,
+        limit_per_user: int,
+        dall_uses_list: list
+) -> str:
     current = dall_uses_list.count(id_to_count) + 1
     remain = limit_per_user - current
     feedback = ""

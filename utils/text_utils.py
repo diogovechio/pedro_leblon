@@ -166,3 +166,13 @@ async def normalize_openai_text(
         logging.exception(exc)
 
         return '@diogovechio dei pau vai ver o log'
+
+def command_in(
+        command: str,
+        text: str,
+        text_end=False
+) -> bool:
+    if not text_end:
+        return command.lower() in text.lower()[0:len(command) + 2]
+    else:
+        return command.lower() in text.lower()[-(len(command) + 6):]

@@ -12,8 +12,7 @@
   },
   "openai": {
     "force_model": null,
-    "max_tokens": 300,
-    "max_sentences": 100,
+    "max_tokens": 500,
     "ada_only_users": [],
     "davinci_daily_limit": 30,
     "curie_daily_limit": 50,

@@ -40,7 +40,6 @@ class MockMessage:
 class OpenAI:
     davinci_daily_limit: int
     curie_daily_limit: int
-    max_sentences: int
     max_tokens: int
     dall_e_daily_limit: int
     ada_only_users: T.List[str]

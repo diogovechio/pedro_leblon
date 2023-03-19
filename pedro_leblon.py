@@ -136,7 +136,6 @@ class FakePedro:
                 self.openai = OpenAiCompletion(
                     api_key=self.config.secrets.openai_key,
                     max_tokens=self.config.openai.max_tokens,
-                    max_sentences=self.config.openai.max_sentences,
                     session=self.session,
                     semaphore=self.config.telegram_api_semaphore,
                     davinci_daily_limit=self.config.openai.davinci_daily_limit,
@@ -235,11 +234,11 @@ class FakePedro:
                                                      f"{incoming.message.message_id}")
 
         if incoming.message.chat.id not in self.messages_in_memory:
-            self.messages_in_memory[incoming.message.chat.id] = MaxSizeList(75)
+            self.messages_in_memory[incoming.message.chat.id] = MaxSizeList(120)
 
-        if incoming.message.text is not None and len(incoming.message.text) > 25:
+        if incoming.message.text is not None and len(incoming.message.text) > 5:
             self.messages_in_memory[incoming.message.chat.id].append(
-                f"{incoming.message.from_.first_name}: '{incoming.message.text[0:110]}'")
+                f"{incoming.message.from_.first_name}: '{incoming.message.text[0:100]}'")
 
     async def image_downloader(
             self,
@@ -429,7 +428,7 @@ if __name__ == '__main__':
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
         secrets_file='secrets.json',
-        debug_mode=False
+        debug_mode=True
     )
 
     asyncio.run(

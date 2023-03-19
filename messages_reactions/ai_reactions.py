@@ -6,7 +6,7 @@ from pedro_leblon import FakePedro
 from utils.face_utils import put_list_of_faces_on_background
 from utils.openai_utils import extract_website_paragraph_content, return_dall_e_limit, list_reducer
 from utils.roleta_utils import get_roletas_from_pavuna, arrombado_classifier
-from utils.text_utils import https_url_extract
+from utils.text_utils import https_url_extract, command_in
 
 
 async def openai_reactions(
@@ -47,13 +47,12 @@ async def openai_reactions(
                 bot.loop.create_task(
                     bot.send_message(
                         message_text=await bot.openai.generate_message(
-                            message_username=message.from_.username,
+                            message_username=username,
                             message_text=input_text,
                             chat=message.chat.title,
                             prompt_inject=OPENAI_PROMPTS['critique'] if round(
                                 random.random()) else OPENAI_PROMPTS['critique_reformule'],
                             remove_words_list=['pedro'],
-                            sentences=2,
                             temperature=1.0,
                             destroy_message=destroy_message,
                             mock_message=True
@@ -65,13 +64,13 @@ async def openai_reactions(
 
     if not swear_word_detected:
         if (
-                'pedr' in message.text.lower()[0:5] or "pedro?" in message.text.lower()[-10:]
-        ) and "/pedro" not in message.text.lower()[0:6]:
+                command_in('pedr', message.text) or command_in('pedro?', message.text, text_end=True)
+        ) and not command_in('/pedro', message.text):
             with bot.sending_action(message.chat.id, "typing"):
                 bot.loop.create_task(
                     bot.send_message(
                         message_text=await bot.openai.generate_message(
-                            message_username=message.from_.username,
+                            message_username=username,
                             message_text=input_text,
                             chat=message.chat.title,
                             use_chatgpt=True if url_detector else False,
@@ -90,7 +89,7 @@ async def openai_reactions(
             bot.loop.create_task(
                 bot.send_message(
                     message_text=await bot.openai.generate_message(
-                        message_username=message.from_.username,
+                        message_username=username,
                         chat=message.chat.title,
                         message_text=f"O samuel disse: {input_text}",
                         prompt_inject=OPENAI_PROMPTS['critique_negativamente'],
@@ -100,7 +99,7 @@ async def openai_reactions(
                     reply_to=message.message_id)
             )
 
-        elif "/imag" in message.text.lower()[0:5]:
+        elif command_in('/imag', message.text):
             with bot.sending_action(message.chat.id, "upload_photo"):
                 feedback = await return_dall_e_limit(
                     id_to_count=message.from_.id,
@@ -179,12 +178,12 @@ async def openai_reactions(
                         )
                     )
 
-        elif "/pedro" in message.text.lower()[0:6]:
+        elif command_in("/pedro", message.text):
             with bot.sending_action(message.chat.id, "typing"):
                 bot.loop.create_task(
                     bot.send_message(
                         message_text=await bot.openai.generate_message(
-                            message_username=message.from_.username,
+                            message_username=username,
                             message_text=input_text,
                             chat=message.chat.title,
                             prompt_inject=None,
@@ -198,17 +197,15 @@ async def openai_reactions(
                         reply_to=message.message_id)
                 )
 
-        elif "/tldr" in message.text.lower()[0:5]:
+        elif command_in("/tldr", message.text):
             with bot.sending_action(message.chat.id, "typing"):
                 if ":" not in input_text:
-                   chat = "\n".join(
-                        await list_reducer(bot.messages_in_memory[message.chat.id])
-                    ) + "."
+                   chat = "\n".join(bot.messages_in_memory[message.chat.id]) + "."
 
                    bot.loop.create_task(
                         bot.send_message(
                             message_text=await bot.openai.generate_message(
-                                message_username=message.from_.username,
+                                message_username=username,
                                 message_text=f"faça um curto resumo dessa conversa:\n{chat}",
                                 chat=message.chat.title,
                                 prompt_inject=None,
@@ -232,7 +229,7 @@ async def openai_reactions(
                     bot.loop.create_task(
                         bot.send_message(
                             message_text=(await bot.openai.generate_message(
-                                message_username=message.from_.username,
+                                message_username=username,
                                 message_text=f"faça um resumo do texto a seguir: {input_text}",
                                 chat=message.chat.title,
                                 prompt_inject=None,
@@ -245,9 +242,9 @@ async def openai_reactions(
                     )
 
         elif (
-                "/critique" in message.text.lower()[0:9] or
-                "/elogie" in message.text.lower()[0:7] or
-                "/simpatize" in message.text.lower()[0:10]
+                command_in("/critique", message.text) or
+                command_in("/elogie", message.text) or
+                command_in("/simpatize", message.text)
         ):
             with bot.sending_action(message.chat.id, "typing"):
                 roleta_from_pavuna = None
@@ -255,12 +252,14 @@ async def openai_reactions(
                 if message.reply_to_message and message.reply_to_message.text:
                     arrombado = message.reply_to_message.from_.first_name
 
-                    if "/critique" in message.text.lower()[0:9]:
+                    if command_in("/critique", message.text):
                         prompt = f"{'dê uma bronca em' if round(random.random()) else 'xingue o'} {arrombado} por ter dito isso: " \
                                  f"'{message.reply_to_message.text}'"
-                    elif "/elogie" in message.text.lower()[0:7]:
+
+                    elif command_in("/elogie", message.text):
                         prompt = f"{'elogie o' if round(random.random()) else 'parabenize o'} {arrombado} por ter dito isso: " \
                                  f"'{message.reply_to_message.text}'"
+
                     else:
                         prompt = f"simpatize com {arrombado} por estar nessa situação: '{message.reply_to_message.text}'"
 
@@ -269,14 +268,18 @@ async def openai_reactions(
                 else:
                     roleta_from_pavuna = random.choice(await get_roletas_from_pavuna(bot, 25))
                     arrombado = arrombado_classifier(roleta_from_pavuna)
-                    if "/critique" in message.text.lower()[0:9]:
+
+                    if command_in("/critique", message.text):
                         prompt = f"{'dê uma bronca em' if round(random.random()) else 'xingue o'} {arrombado} por ter dito isso: " \
                                  f"'{roleta_from_pavuna['text']}'"
-                    elif "/elogie" in message.text.lower()[0:7]:
+
+                    elif command_in("/elogie", message.text):
                         prompt = f"{'elogie o' if round(random.random()) else 'parabenize o'} {arrombado} por ter dito isso: " \
                                  f"'{roleta_from_pavuna['text']}'"
+
                     else:
                         prompt = f"simpatize com {arrombado} por estar nessa situação: '{roleta_from_pavuna['text']}'"
+
                     reply_to = message.message_id + 1
 
                 status_code_from_pavuna = 0
@@ -289,13 +292,12 @@ async def openai_reactions(
                     )
 
                 openai_text = await bot.openai.generate_message(
-                    message_username=message.from_.username,
+                    message_username=username,
                     message_text=prompt,
                     chat=message.chat.title,
                     destroy_message=destroy_message,
                     prompt_inject="O",
                     temperature=1.0,
-                    sentences=2,
                     remove_words_list=['asd']
                 )
                 message_text = openai_text.lower()
@@ -336,11 +338,10 @@ async def openai_reactions(
                 bot.loop.create_task(
                     bot.send_message(
                         message_text=await bot.openai.generate_message(
-                            message_username=message.from_.username,
+                            message_username=username,
                             message_text=input_text,
                             chat=message.chat.title,
                             prompt_inject=OPENAI_PROMPTS['fale'],
-                            sentences=1,
                             destroy_message=destroy_message,
                             mock_message=True
                         ),
