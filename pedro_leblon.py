@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+import random
 import re
 from asyncio import AbstractEventLoop
 
@@ -321,7 +322,7 @@ class FakePedro:
             if not repeats:
                 break
 
-            await asyncio.sleep(5)
+            await asyncio.sleep(round(5 + (random.random() * 2)))
 
     async def send_document(self, document: bytes, chat_id: int, caption=None, reply_to=None, sleep_time=0) -> None:
         await asyncio.sleep(sleep_time)
@@ -428,7 +429,7 @@ if __name__ == '__main__':
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
         secrets_file='secrets.json',
-        debug_mode=True
+        debug_mode=False
     )
 
     asyncio.run(
