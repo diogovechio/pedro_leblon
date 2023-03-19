@@ -209,6 +209,7 @@ async def openai_reactions(
                                 message_text=f"faça um curto resumo dessa conversa:\n{chat}",
                                 chat=message.chat.title,
                                 prompt_inject=None,
+                                moderate=False,
                                 biased=False,
                                 use_chatgpt=True,
                                 destroy_message=destroy_message,
@@ -232,6 +233,7 @@ async def openai_reactions(
                                 message_username=username,
                                 message_text=f"faça um resumo do texto a seguir: {input_text}",
                                 chat=message.chat.title,
+                                moderate=False,
                                 prompt_inject=None,
                                 destroy_message=destroy_message,
                                 remove_words_list=None,
@@ -296,6 +298,7 @@ async def openai_reactions(
                     message_text=prompt,
                     chat=message.chat.title,
                     destroy_message=destroy_message,
+                    moderate=False if "/critique" in message.text.lower()[0:9] else True,
                     prompt_inject="O",
                     temperature=1.0,
                     remove_words_list=['asd']
