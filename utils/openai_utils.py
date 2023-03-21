@@ -154,22 +154,22 @@ class OpenAiCompletion:
                         if not any(word in response_text.lower() for word in CHATGPT_BS) and model != "ada":
                             return response_text
 
-                    logging.info(f"Model selected: {model} - OpenAI usage: {self.openai_use}")
+                logging.info(f"Model selected: {model} - OpenAI usage: {self.openai_use}")
 
-                    async with self.session.post(
-                            "https://api.openai.com/v1/completions",
-                            headers=self.headers,
-                            json={
-                                "model": model,
-                                'prompt': prompt,
-                                'max_tokens': self.max_tokens,
-                                'temperature': temperature,
-                                'top_p': 1,
-                                'frequency_penalty': 1.0,
-                                'presence_penalty': 2.0,
-                            }
-                    ) as openai_request:
-                        return json.loads(await openai_request.text())['choices'][0]['text']
+                async with self.session.post(
+                        "https://api.openai.com/v1/completions",
+                        headers=self.headers,
+                        json={
+                            "model": model,
+                            'prompt': prompt,
+                            'max_tokens': self.max_tokens,
+                            'temperature': temperature,
+                            'top_p': 1,
+                            'frequency_penalty': 1.0,
+                            'presence_penalty': 2.0,
+                        }
+                ) as openai_request:
+                    return json.loads(await openai_request.text())['choices'][0]['text']
 
     async def generate_image(
             self,
