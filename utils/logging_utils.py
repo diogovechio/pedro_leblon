@@ -11,7 +11,6 @@ from constants.constants import SECRETS_FILE
 async def telegram_logging(text: T.Union[str, Exception], chat_id=8375482):
     with open(SECRETS_FILE) as secret_file:
         if isinstance(text, Exception):
-            await telegram_logging(text)
             text = "\n".join(traceback.format_exception(text))
         else:
             logging.info(text)
