@@ -213,8 +213,7 @@ async def openai_reactions(
                                 biased=False,
                                 use_chatgpt=True,
                                 destroy_message=destroy_message,
-                                remove_words_list=None,
-                                force_model="text-davinci-003"
+                                remove_words_list=None
                             ),
                             chat_id=message.chat.id,
                             reply_to=message.message_id)
