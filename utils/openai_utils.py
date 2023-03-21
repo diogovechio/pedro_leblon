@@ -7,7 +7,7 @@ import json
 
 import aiohttp
 
-from constants.constants import OPENAI_PROMPTS
+from constants.constants import OPENAI_PROMPTS, CHATGPT_BS
 from utils.text_utils import pre_biased_prompt, message_destroyer, normalize_openai_text, html_paragraph_extractor
 
 usage_mapping = {
@@ -132,22 +132,43 @@ class OpenAiCompletion:
                     response = await openai_request.text()
                     return json.loads(response)['choices'][0]['message']['content']
             else:
-                logging.info(f"Model selected: {model} - OpenAI usage: {self.openai_use}")
+                ## TODO: APENAS PARA TESTE, REFATORE ISSO PELO AMOR DE DEUS
+                logging.info(f"Using ChatGPT - OpenAI usage: {self.openai_use}")
 
                 async with self.session.post(
-                        "https://api.openai.com/v1/completions",
+                        "https://api.openai.com/v1/chat/completions",
                         headers=self.headers,
                         json={
-                            "model": model,
-                            'prompt': prompt,
-                            'max_tokens': self.max_tokens,
-                            'temperature': temperature,
-                            'top_p': 1,
-                            'frequency_penalty': 1.0,
-                            'presence_penalty': 2.0,
+                            "model": "gpt-3.5-turbo",
+                            'messages': [
+                                {"role": "user", "content": prompt}
+                            ],
                         }
-                ) as openai_request:
-                    return json.loads(await openai_request.text())['choices'][0]['text']
+                ) as chatgpt_request:
+                    response = await chatgpt_request.text()
+                    response_text = json.loads(response)['choices'][0]['message']['content']
+
+                    logging.info(f"CHATGPT RESPONSE:  {response_text}")
+
+                    if not any(word in response_text.lower() for word in CHATGPT_BS):
+                        return response_text
+
+                    logging.info(f"Model selected: {model} - OpenAI usage: {self.openai_use}")
+
+                    async with self.session.post(
+                            "https://api.openai.com/v1/completions",
+                            headers=self.headers,
+                            json={
+                                "model": model,
+                                'prompt': prompt,
+                                'max_tokens': self.max_tokens,
+                                'temperature': temperature,
+                                'top_p': 1,
+                                'frequency_penalty': 1.0,
+                                'presence_penalty': 2.0,
+                            }
+                    ) as openai_request:
+                        return json.loads(await openai_request.text())['choices'][0]['text']
 
     async def generate_image(
             self,
