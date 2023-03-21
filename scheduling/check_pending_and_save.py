@@ -2,7 +2,7 @@ from datetime import datetime
 import logging
 from dataclasses import asdict
 
-from pedro_leblon import FakePedro
+from pedro_leblon import FakePedro, telegram_logging
 import json
 import os
 
@@ -69,4 +69,4 @@ def check_agenda_and_save(bot: FakePedro):
 
         os.rename("commemorations_tmp.json", "commemorations.json")
     except Exception as exc:
-        logging.exception(exc)
+        bot.loop.create_task(telegram_logging(exc))

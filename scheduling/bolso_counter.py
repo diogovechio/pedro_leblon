@@ -2,7 +2,7 @@ import logging
 import random
 
 from constants.constants import BOLSOFF_LIST
-from pedro_leblon import FakePedro
+from pedro_leblon import FakePedro, telegram_logging
 from datetime import datetime
 
 
@@ -45,4 +45,4 @@ def bosta_daily_counter(bot: FakePedro) -> None:
                         )
                     )
     except Exception as exc:
-        logging.exception(exc)
+        bot.loop.create_task(telegram_logging(exc))

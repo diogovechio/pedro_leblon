@@ -3,14 +3,12 @@ import random
 import uuid
 import typing as T
 
-import logging
-
 import face_recognition
 from deepface import DeepFace
 
 from PIL import Image, ImageOps
 
-from pedro_leblon import FakePedro
+from pedro_leblon import FakePedro, telegram_logging
 
 
 async def faces_coordinates_detector(image: bytes, min_size: int) -> T.Optional[T.List[T.Tuple]]:
@@ -184,7 +182,7 @@ async def face_recognizer(
     try:
         os.remove(temp_filename_2)
     except Exception as exc:
-        logging.exception(exc)
+        await telegram_logging(exc)
 
     return data
 

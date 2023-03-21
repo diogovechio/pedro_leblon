@@ -3,7 +3,7 @@ import logging
 import random
 
 
-from pedro_leblon import FakePedro
+from pedro_leblon import FakePedro, telegram_logging
 from utils.roleta_utils import get_roletas_from_pavuna
 
 
@@ -17,7 +17,7 @@ def pedro_roleta(bot: FakePedro) -> None:
             bot.roleta_hour = round(random.random() * 23)
             bot.last_roleta_day = bot.datetime_now.day
     except Exception as exc:
-        logging.exception(exc)
+        bot.loop.create_task(telegram_logging(exc))
 
 
 async def send_roleta(bot: FakePedro) -> None:

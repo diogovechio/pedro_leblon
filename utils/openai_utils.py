@@ -8,6 +8,7 @@ import json
 import aiohttp
 
 from constants.constants import OPENAI_PROMPTS, CHATGPT_BS
+from utils.logging_utils import telegram_logging
 from utils.text_utils import pre_biased_prompt, message_destroyer, normalize_openai_text, html_paragraph_extractor
 
 usage_mapping = {
@@ -45,6 +46,7 @@ class OpenAiCompletion:
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self.api_key}"
         }
+
 
     async def _model_selector(
             self,
@@ -117,7 +119,7 @@ class OpenAiCompletion:
 
         async with asyncio.Semaphore(self.semaphore):
             if use_chatgpt and model != "ada":
-                logging.info(f"Using ChatGPT - OpenAI usage: {self.openai_use}")
+                await telegram_logging(f"Using ChatGPT - OpenAI usage: {self.openai_use}")
 
                 async with self.session.post(
                         "https://api.openai.com/v1/chat/completions",
@@ -134,7 +136,7 @@ class OpenAiCompletion:
             else:
                 ## TODO: APENAS PARA TESTE, REFATORE ISSO PELO AMOR DE DEUS
                 if model != "ada":
-                    logging.info(f"Using ChatGPT - OpenAI usage: {self.openai_use}")
+                    await telegram_logging(f"Using ChatGPT - OpenAI usage: {self.openai_use}")
 
                     async with self.session.post(
                             "https://api.openai.com/v1/chat/completions",
@@ -149,12 +151,12 @@ class OpenAiCompletion:
                         response = await chatgpt_request.text()
                         response_text = json.loads(response)['choices'][0]['message']['content']
 
-                        logging.info(f"CHATGPT RESPONSE:  {response_text}")
+                        await telegram_logging(f"CHATGPT RESPONSE:  {response_text}")
 
                         if not any(word in response_text.lower() for word in CHATGPT_BS) and model != "ada":
                             return response_text
 
-                logging.info(f"Model selected: {model} - OpenAI usage: {self.openai_use}")
+                await telegram_logging(f"Model selected: {model} - OpenAI usage: {self.openai_use}")
 
                 async with self.session.post(
                         "https://api.openai.com/v1/completions",
@@ -187,7 +189,7 @@ class OpenAiCompletion:
                     ) as image:
                         return await image.content.read()
                 except Exception as exc:
-                    logging.exception(exc)
+                    await telegram_logging(exc)
                     return None
 
     async def edit_image(
@@ -216,7 +218,7 @@ class OpenAiCompletion:
                 ) as image:
                     return await image.content.read()
             except Exception as exc:
-                logging.exception(exc)
+                await telegram_logging(exc)
                 return None
 
     async def generate_message(
@@ -282,7 +284,7 @@ class OpenAiCompletion:
                 )
 
             except Exception as exc:
-                logging.exception(exc)
+                await telegram_logging(exc)
                 await asyncio.sleep(5)
 
         return "meu cérebro tá fora do ar"
@@ -300,7 +302,7 @@ async def extract_website_paragraph_content(
             if len(text) >= 500 and (200 <= site.status < 300):
                 return text
     except Exception as exc:
-        logging.exception(exc)
+        await telegram_logging(exc)
 
     return f"essa URL parece inacessível: {url} - opine sobre o que acha que se trata a URL e finalize dizendo que " \
            f"é só sua opinião e que você não conseguiu acessar a URL"

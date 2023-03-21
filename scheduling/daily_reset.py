@@ -1,6 +1,6 @@
 import logging
 
-from pedro_leblon import FakePedro
+from pedro_leblon import FakePedro, telegram_logging
 
 
 def daily_routines(bot: FakePedro) -> None:
@@ -19,4 +19,4 @@ def daily_routines(bot: FakePedro) -> None:
             )
         )
     except Exception as exc:
-        logging.exception(exc)
+        bot.loop.create_task(telegram_logging(exc))

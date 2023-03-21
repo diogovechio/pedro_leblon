@@ -2,7 +2,7 @@ import asyncio
 import logging
 import os
 import random
-import re
+import traceback
 from asyncio import AbstractEventLoop
 
 from datetime import datetime, timedelta
@@ -19,11 +19,13 @@ import typing as T
 
 from aiohttp import ClientSession
 
+from constants.constants import SECRETS_FILE
 from data_classes.bot_config import BotConfig
 from data_classes.commemorations import Commemorations
 from data_classes.received_message import MessagesResults, TelegramMessage, MessageReceived
 from data_structures.max_size_list import MaxSizeList
 from messages_reactions import messages_coordinator
+from utils.logging_utils import telegram_logging
 from utils.openai_utils import OpenAiCompletion
 from utils.text_utils import send_message_last_try
 from contextlib import contextmanager
@@ -112,7 +114,7 @@ class FakePedro:
                 await self.session.close()
                 await asyncio.sleep(0.25)
 
-            logging.exception(exc)
+            await telegram_logging(exc)
 
             await asyncio.sleep(60)
 
@@ -183,7 +185,7 @@ class FakePedro:
                 await asyncio.sleep(self.polling_rate)
                 logging.info(f'Scheduler is running. Total jobs: {len(self.schedule.get_jobs())}')
             except Exception as exc:
-                logging.exception(exc)
+                await telegram_logging(exc)
                 await asyncio.sleep(15)
 
     async def _message_polling(self) -> None:
@@ -203,7 +205,7 @@ class FakePedro:
                             self.messages = MessagesResults(**response)
                             self.last_id = self.messages.result[-1].update_id
             except Exception as exc:
-                logging.exception(exc)
+                await telegram_logging(exc)
                 await asyncio.sleep(15)
 
     async def _message_handler(self) -> None:
@@ -226,7 +228,7 @@ class FakePedro:
 
                 await asyncio.sleep(self.polling_rate)
             except Exception as exc:
-                logging.exception(exc)
+                await telegram_logging(exc)
                 await asyncio.sleep(15)
 
     async def _store_messages_info(self, incoming: MessageReceived):
@@ -280,7 +282,7 @@ class FakePedro:
                         if 200 <= resp.status < 300:
                             break
             except Exception as exc:
-                logging.exception(exc)
+                await telegram_logging(exc)
             await asyncio.sleep(10)
 
     async def send_video(self, video: bytes, chat_id: int, reply_to=None, sleep_time=0) -> None:
@@ -377,6 +379,7 @@ class FakePedro:
             reply_to=None,
             sleep_time=0,
             parse_mode: str = "Markdown",
+            disable_notification=False,
             max_retries=7
     ) -> None:
         fallback_parse_modes = ["", "HTML", "MarkdownV2", "Markdown"]
@@ -394,6 +397,7 @@ class FakePedro:
                             'reply_to_message_id': reply_to,
                             'allow_sending_without_reply': True,
                             'text': message_text,
+                            'disable_notification': disable_notification,
                             'parse_mode': parse_mode
                         }
                 ) as resp:
@@ -410,6 +414,7 @@ class FakePedro:
                 json={"chat_id": chat_id}
         ) as resp:
             logging.info(resp.status)
+
 
     @contextmanager
     def sending_action(
@@ -428,7 +433,7 @@ if __name__ == '__main__':
     pedro_leblon = FakePedro(
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
-        secrets_file='secrets.json',
+        secrets_file=SECRETS_FILE,
         debug_mode=True
     )
 

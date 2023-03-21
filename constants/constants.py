@@ -1,3 +1,4 @@
+SECRETS_FILE = 'secrets.json'
 
 DRUNK_DECAPTOR_LIST = [
     'vai dormir merda',
