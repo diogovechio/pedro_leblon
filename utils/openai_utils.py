@@ -133,25 +133,26 @@ class OpenAiCompletion:
                     return json.loads(response)['choices'][0]['message']['content']
             else:
                 ## TODO: APENAS PARA TESTE, REFATORE ISSO PELO AMOR DE DEUS
-                logging.info(f"Using ChatGPT - OpenAI usage: {self.openai_use}")
+                if model != "ada":
+                    logging.info(f"Using ChatGPT - OpenAI usage: {self.openai_use}")
 
-                async with self.session.post(
-                        "https://api.openai.com/v1/chat/completions",
-                        headers=self.headers,
-                        json={
-                            "model": "gpt-3.5-turbo",
-                            'messages': [
-                                {"role": "user", "content": prompt}
-                            ],
-                        }
-                ) as chatgpt_request:
-                    response = await chatgpt_request.text()
-                    response_text = json.loads(response)['choices'][0]['message']['content']
+                    async with self.session.post(
+                            "https://api.openai.com/v1/chat/completions",
+                            headers=self.headers,
+                            json={
+                                "model": "gpt-3.5-turbo",
+                                'messages': [
+                                    {"role": "user", "content": prompt}
+                                ],
+                            }
+                    ) as chatgpt_request:
+                        response = await chatgpt_request.text()
+                        response_text = json.loads(response)['choices'][0]['message']['content']
 
-                    logging.info(f"CHATGPT RESPONSE:  {response_text}")
+                        logging.info(f"CHATGPT RESPONSE:  {response_text}")
 
-                    if not any(word in response_text.lower() for word in CHATGPT_BS) and model != "ada":
-                        return response_text
+                        if not any(word in response_text.lower() for word in CHATGPT_BS) and model != "ada":
+                            return response_text
 
                     logging.info(f"Model selected: {model} - OpenAI usage: {self.openai_use}")
 
