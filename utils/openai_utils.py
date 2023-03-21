@@ -116,7 +116,7 @@ class OpenAiCompletion:
             prompt = f"{prompt_inject}: {prompt}" if prompt_inject else prompt
 
         async with asyncio.Semaphore(self.semaphore):
-            if use_chatgpt:
+            if use_chatgpt and model != "text-ada-001":
                 logging.info(f"Using ChatGPT - OpenAI usage: {self.openai_use}")
 
                 async with self.session.post(
@@ -150,7 +150,7 @@ class OpenAiCompletion:
 
                     logging.info(f"CHATGPT RESPONSE:  {response_text}")
 
-                    if not any(word in response_text.lower() for word in CHATGPT_BS):
+                    if not any(word in response_text.lower() for word in CHATGPT_BS) and model != "text-ada-001":
                         return response_text
 
                     logging.info(f"Model selected: {model} - OpenAI usage: {self.openai_use}")
