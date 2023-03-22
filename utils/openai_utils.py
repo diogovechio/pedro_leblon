@@ -7,6 +7,8 @@ import json
 
 import aiohttp
 
+from datetime import datetime
+
 from constants.constants import OPENAI_PROMPTS, CHATGPT_BS
 from utils.logging_utils import telegram_logging
 from utils.text_utils import pre_biased_prompt, message_destroyer, normalize_openai_text, html_paragraph_extractor
@@ -115,7 +117,7 @@ class OpenAiCompletion:
                      f"{' ,'.join([key for key, value in moderation_results['results'][0]['categories'].items() if value])}. " \
                      f"diga que ele pode ser banido de {chat}."
         else:
-            prompt = f"{prompt_inject}: {prompt}" if prompt_inject else prompt
+            prompt = f"Hoje é dia {datetime.now().day}, do mês {datetime.now().month}, do ano de {datetime.now().year}. {prompt_inject}: {prompt}" if prompt_inject else prompt
 
         async with asyncio.Semaphore(self.semaphore):
             if use_chatgpt and model != "ada":
@@ -127,7 +129,8 @@ class OpenAiCompletion:
                         json={
                             "model": "gpt-3.5-turbo",
                             'messages': [
-                                {"role": "user", "content": prompt}
+                                    {"role": "system", "content": f"Hoje é dia {datetime.now().day}, do mês {datetime.now().month}, do ano de {datetime.now().year}."},
+                                    {"role": "user", "content": prompt}
                             ],
                         }
                 ) as openai_request:
@@ -144,6 +147,7 @@ class OpenAiCompletion:
                             json={
                                 "model": "gpt-3.5-turbo",
                                 'messages': [
+                                    {"role": "system", "content": f"Hoje é dia {datetime.now().day}, do mês {datetime.now().month}, do ano de {datetime.now().year}."},
                                     {"role": "user", "content": prompt}
                                 ],
                             }
