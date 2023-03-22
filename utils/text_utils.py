@@ -2,6 +2,7 @@ import logging
 import random
 import re
 import typing as T
+from asyncio import get_running_loop
 
 from pedro_leblon import telegram_logging
 
@@ -11,7 +12,7 @@ async def greeter(
         match_result: float = 1.0,
         min_accepted_matches: float = 0.9
 ) -> str:
-    await telegram_logging(f"{name}: {match_result}")
+    get_running_loop().create_task(telegram_logging(f"{name}: {match_result}"))
     if match_result > min_accepted_matches:
         return random.choice([
             f'{name} fofs',
@@ -151,7 +152,7 @@ async def normalize_openai_text(
         ai_message = ai_message.replace("pedro: ","rs, ")
 
         if ai_message:
-            await telegram_logging(ai_message)
+            get_running_loop().create_task(telegram_logging(ai_message))
 
             while any(word in ai_message[0] for word in ['.', ',', '?', ' ', '"']):
                 ai_message = ai_message[1:]
@@ -168,7 +169,7 @@ async def normalize_openai_text(
         else:
             return 'estou sem palavras' if round(random.random()) else 'tenho nada a dizer'
     except Exception as exc:
-        await telegram_logging(exc)
+        get_running_loop().create_task(telegram_logging(exc))
 
         return '@diogovechio dei pau vai ver o log'
 

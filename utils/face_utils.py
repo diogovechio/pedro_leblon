@@ -2,6 +2,7 @@ import os
 import random
 import uuid
 import typing as T
+from asyncio import get_running_loop
 
 import face_recognition
 from deepface import DeepFace
@@ -182,7 +183,7 @@ async def face_recognizer(
     try:
         os.remove(temp_filename_2)
     except Exception as exc:
-        await telegram_logging(exc)
+        get_running_loop().create_task(telegram_logging(exc))
 
     return data
 

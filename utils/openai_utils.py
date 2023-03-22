@@ -5,6 +5,7 @@ import random
 import typing as T
 
 import json
+from asyncio import get_running_loop
 
 import aiohttp
 
@@ -42,6 +43,8 @@ class OpenAiCompletion:
         self.davinci_daily_limit = davinci_daily_limit
         self.curie_daily_limit = curie_daily_limit
         self.ada_only_users = only_ada_users
+
+        self.loop = get_running_loop()
 
         self.headers = {
             "Content-Type": "application/json",
@@ -121,7 +124,7 @@ class OpenAiCompletion:
 
         async with asyncio.Semaphore(self.semaphore):
             if use_chatgpt and model != "ada":
-                await telegram_logging(f"Using ChatGPT - OpenAI usage: {self.openai_use}")
+                self.loop.create_task(telegram_logging(f"Using ChatGPT - OpenAI usage: {self.openai_use}"))
 
                 async with self.session.post(
                         "https://api.openai.com/v1/chat/completions",
@@ -143,7 +146,7 @@ class OpenAiCompletion:
             else:
                 ## TODO: APENAS PARA TESTE, REFATORE ISSO PELO AMOR DE DEUS
                 if model != "ada":
-                    await telegram_logging(f"Using ChatGPT - OpenAI usage: {self.openai_use}")
+                    self.loop.create_task(telegram_logging(f"Using ChatGPT - OpenAI usage: {self.openai_use}"))
 
                     async with self.session.post(
                             "https://api.openai.com/v1/chat/completions",
@@ -163,12 +166,12 @@ class OpenAiCompletion:
                         response = await chatgpt_request.text()
                         response_text = json.loads(response)['choices'][0]['message']['content']
 
-                        await telegram_logging(f"CHATGPT RESPONSE:  {response_text}")
+                        self.loop.create_task(telegram_logging(f"CHATGPT RESPONSE:  {response_text}"))
 
                         if not any(word in response_text.lower() for word in CHATGPT_BS) and model != "ada":
                             return response_text
 
-                await telegram_logging(f"Model selected: {model} - OpenAI usage: {self.openai_use}")
+                self.loop.create_task(telegram_logging(f"Model selected: {model} - OpenAI usage: {self.openai_use}"))
 
                 async with self.session.post(
                         "https://api.openai.com/v1/completions",
@@ -201,7 +204,7 @@ class OpenAiCompletion:
                     ) as image:
                         return await image.content.read()
                 except Exception as exc:
-                    await telegram_logging(exc)
+                    self.loop.create_task(telegram_logging(exc))
                     return None
 
     async def edit_image(
@@ -230,7 +233,7 @@ class OpenAiCompletion:
                 ) as image:
                     return await image.content.read()
             except Exception as exc:
-                await telegram_logging(exc)
+                self.loop.create_task(telegram_logging(exc))
                 return None
 
     async def generate_message(
@@ -299,7 +302,7 @@ class OpenAiCompletion:
                 )
 
             except Exception as exc:
-                await telegram_logging(exc)
+                self.loop.create_task(telegram_logging(exc))
                 await asyncio.sleep(5)
 
         return "meu cérebro tá fora do ar"
@@ -317,7 +320,7 @@ async def extract_website_paragraph_content(
             if len(text) >= 500 and (200 <= site.status < 300):
                 return text
     except Exception as exc:
-        await telegram_logging(exc)
+        self.loop.create_task(telegram_logging(exc))
 
     return f"essa URL parece inacessível: {url} - opine sobre o que acha que se trata a URL e finalize dizendo que " \
            f"é só sua opinião e que você não conseguiu acessar a URL"

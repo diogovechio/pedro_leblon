@@ -114,7 +114,7 @@ class FakePedro:
                 await self.session.close()
                 await asyncio.sleep(0.25)
 
-            await telegram_logging(exc)
+            self.loop.create_task(telegram_logging(exc))
 
             await asyncio.sleep(60)
 
@@ -185,7 +185,7 @@ class FakePedro:
                 await asyncio.sleep(self.polling_rate)
                 logging.info(f'Scheduler is running. Total jobs: {len(self.schedule.get_jobs())}')
             except Exception as exc:
-                await telegram_logging(exc)
+                self.loop.create_task(telegram_logging(exc))
                 await asyncio.sleep(15)
 
     async def _message_polling(self) -> None:
@@ -205,7 +205,7 @@ class FakePedro:
                             self.messages = MessagesResults(**response)
                             self.last_id = self.messages.result[-1].update_id
             except Exception as exc:
-                await telegram_logging(exc)
+                self.loop.create_task(telegram_logging(exc))
                 await asyncio.sleep(15)
 
     async def _message_handler(self) -> None:
@@ -228,7 +228,7 @@ class FakePedro:
 
                 await asyncio.sleep(self.polling_rate)
             except Exception as exc:
-                await telegram_logging(exc)
+                self.loop.create_task(telegram_logging(exc))
                 await asyncio.sleep(15)
 
     async def _store_messages_info(self, incoming: MessageReceived):
@@ -282,7 +282,7 @@ class FakePedro:
                         if 200 <= resp.status < 300:
                             break
             except Exception as exc:
-                await telegram_logging(exc)
+                self.loop.create_task(telegram_logging(exc))
             await asyncio.sleep(10)
 
     async def send_video(self, video: bytes, chat_id: int, reply_to=None, sleep_time=0) -> None:
