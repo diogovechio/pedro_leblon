@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import logging
 import random
 import typing as T
@@ -86,6 +87,7 @@ class OpenAiCompletion:
     async def _completion(
             self,
             biased: bool,
+            date: datetime,
             mock_message: bool,
             random_model: bool,
             temperature: int = 0,
@@ -127,6 +129,11 @@ class OpenAiCompletion:
                         json={
                             "model": "gpt-3.5-turbo",
                             'messages': [
+                                {"role": "system", "content":
+                                    f"Hoje é dia {date.day} do mês {date.month} do ano {date.year}. "
+                                    f"São {date.hour} horas e {date.minute} minutos. "
+                                    f"Você irá responder apenas em português do Brasil."
+                                 },
                                 {"role": "user", "content": prompt}
                             ],
                         }
@@ -144,6 +151,11 @@ class OpenAiCompletion:
                             json={
                                 "model": "gpt-3.5-turbo",
                                 'messages': [
+                                    {"role": "system", "content":
+                                        f"Hoje é dia {date.day} do mês {date.month} do ano {date.year}. "
+                                        f"São {date.hour} horas e {date.minute} minutos. "
+                                        f"Você irá responder apenas em português do Brasil."
+                                     },
                                     {"role": "user", "content": prompt}
                                 ],
                             }
@@ -238,6 +250,8 @@ class OpenAiCompletion:
             remove_words_list=None,
             force_model:T.Optional[str] = None
     ) -> str:
+        datetime_now = datetime.datetime.utcnow() - datetime.timedelta(hours=3)
+
         if destroy_message:
             model = "text-ada-001"
             message_text = await message_destroyer(message_text)
@@ -271,6 +285,7 @@ class OpenAiCompletion:
                         prompt_inject=prompt_inject,
                         message_text=message_text,
                         temperature=temperature,
+                        date=datetime_now
                     ),
                     timeout=120
                 )

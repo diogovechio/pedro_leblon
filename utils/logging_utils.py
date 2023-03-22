@@ -12,6 +12,7 @@ async def telegram_logging(text: T.Union[str, Exception], chat_id=8375482):
     with open(SECRETS_FILE) as secret_file:
         if isinstance(text, Exception):
             text = "\n".join(traceback.format_exception(text))
+            text = "#exception\n" + text
         else:
             logging.info(text)
             text = text[:150]
@@ -24,7 +25,7 @@ async def telegram_logging(text: T.Union[str, Exception], chat_id=8375482):
                     f"{api_route}/sendMessage".replace('\n', ''),
                     json={
                         "chat_id": chat_id,
-                        'text': f"LOGGING:\n{text[:3800]}",
+                        'text': f"#log\n{text[:3800]}",
                         'disable_notification': True,
                     }
             ) as resp:

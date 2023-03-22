@@ -136,7 +136,10 @@ async def normalize_openai_text(
         clean_prompts: T.Optional[dict] = None
 ) -> str:
     try:
-        ai_message = original_message.lower()
+        if "```" not in original_message:
+            ai_message = original_message.lower()
+        else:
+            ai_message = original_message
 
         if ai_message.count(".") == 1 and ai_message[-1] == ".":
             ai_message = ai_message.replace(".", "")
