@@ -74,13 +74,13 @@ class FakePedro:
         self.alpha_faces_files = []
         self.face_embeddings = []
 
-        self.used_dall_e_today = []
+        self.dall_e_uses_today = []
 
         self.asked_for_photo = 0
 
         self.mocked_hour = 0
         self.mocked_today = False
-        self.sent_games_news = 0
+        self.sent_news = 0
 
         self.roleta_hour = 13
         self.last_roleta_day = 0
@@ -123,7 +123,7 @@ class FakePedro:
     async def load_config_params(self) -> None:
         logging.info('Loading params')
 
-        with open(self.config_file) as config_file:
+        with open(self.config_file, encoding='utf8') as config_file:
             with open(self.secrets_file) as secret_file:
                 bot_config = json.loads(config_file.read())
 
@@ -164,17 +164,17 @@ class FakePedro:
                     self.alpha_faces_files.extend(filenames)
                     break
 
-
-                for file in self.faces_files:
-                    embeddings = face_recognition.face_encodings(
-                        face_recognition.load_image_file(f"{self.face_images_path}/{file}")
-                    )
-                    if len(embeddings):
-                        self.faces_names.append(file[:-7])
-                        self.face_embeddings.append(embeddings[0])
-                        logging.info(f"Loaded embeddings for {file}")
-                    else:
-                        logging.critical(f'NO EMBEDDINGS FOR {file}')
+                if not self.debug_mode:
+                    for file in self.faces_files:
+                        embeddings = face_recognition.face_encodings(
+                            face_recognition.load_image_file(f"{self.face_images_path}/{file}")
+                        )
+                        if len(embeddings):
+                            self.faces_names.append(file[:-7])
+                            self.face_embeddings.append(embeddings[0])
+                            logging.info(f"Loaded embeddings for {file}")
+                        else:
+                            logging.critical(f'NO EMBEDDINGS FOR {file}')
 
         logging.info('Loading finished')
 

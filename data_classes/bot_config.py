@@ -15,7 +15,7 @@ class RandomParams:
     random_mock_frequency: float
     words_react_frequency: float
     mock_drunk_decaptor_frequency: float
-    mock_samuel_frequency: float
+    annoy_user_frequency: float
 
 
 @dataclass
@@ -33,6 +33,7 @@ class UserID:
 @dataclass
 class MockMessage:
     last_mock_hour: int = 0
+    rss_feed: T.Optional[str] = None
     messages: T.List[str] = Field(default_factory=list)
 
 
@@ -64,4 +65,6 @@ class BotConfig:
     mock_messages: T.Dict[str, MockMessage]
     block_samuel: bool
     not_internal_chats: T.List[int] = Field(default_factory=list)
+    ignore_users: T.List[str] = Field(default_factory=list)
+    annoy_users: T.List[str] = Field(default_factory=list)
     auto_leave_chats: T.List[int] = Field(default_factory=list)

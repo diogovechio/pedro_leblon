@@ -83,7 +83,9 @@ async def openai_reactions(
                         reply_to=message.message_id)
                 )
 
-        elif from_samuel and random.random() < bot.config.random_params.mock_samuel_frequency:
+        elif (
+                str(message.from_.id) in bot.config.annoy_users or message.from_.username in bot.config.annoy_users
+        ) and random.random() < bot.config.random_params.annoy_user_frequency:
             bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
 
             bot.loop.create_task(
@@ -91,7 +93,7 @@ async def openai_reactions(
                     message_text=await bot.openai.generate_message(
                         message_username=username,
                         chat=message.chat.title,
-                        message_text=f"O samuel disse: {input_text}",
+                        message_text=f"O {message.from_.first_name} disse: {input_text}",
                         prompt_inject=OPENAI_PROMPTS['critique_negativamente'],
                         destroy_message=False
                     ),
@@ -104,12 +106,12 @@ async def openai_reactions(
                 feedback = await return_dall_e_limit(
                     id_to_count=message.from_.id,
                     limit_per_user=bot.config.openai.dall_e_daily_limit,
-                    dall_uses_list=bot.used_dall_e_today
+                    dall_uses_list=bot.dall_e_uses_today
                 )
 
                 prompt = input_text[6:]
 
-                if bot.used_dall_e_today.count(message.from_.id) < bot.config.openai.dall_e_daily_limit:
+                if bot.dall_e_uses_today.count(message.from_.id) < bot.config.openai.dall_e_daily_limit:
                     message_filtered = message.text.lower().replace(
                         ",", " ").replace(
                         ".", " ").replace(
@@ -130,7 +132,7 @@ async def openai_reactions(
                         image = await bot.openai.edit_image(text=prompt,square_png=background)
 
                         if image is not None:
-                            bot.used_dall_e_today.append(message.from_.id)
+                            bot.dall_e_uses_today.append(message.from_.id)
                             bot.loop.create_task(
                                 bot.send_photo(
                                     image=image,
@@ -152,7 +154,7 @@ async def openai_reactions(
                         image = await bot.openai.generate_image(text=input_text[6:])
 
                         if image is not None:
-                            bot.used_dall_e_today.append(message.from_.id)
+                            bot.dall_e_uses_today.append(message.from_.id)
                             bot.loop.create_task(
                                 bot.send_photo(
                                     image=image,

@@ -75,7 +75,7 @@ async def words_reactions(
     if (
             random.random() < bot.config.random_params.words_react_frequency
             and bot.config.rss_feed.games != ""
-            and bot.sent_games_news != round(bot.datetime_now.hour / 12)
+            and bot.sent_news != round(bot.datetime_now.hour / 6)
             and message.chat.id not in bot.config.not_internal_chats
     ):
         bot.loop.create_task(
@@ -84,8 +84,8 @@ async def words_reactions(
                     [url.link for url in feedparser.parse(bot.config.rss_feed.games).entries]
                 ),
                 chat_id=message.chat.id,
-                sleep_time=10 + round(random.random() * 5),
+                sleep_time=30 + (random.random() * 60)
             )
         )
 
-        bot.sent_games_news = round(bot.datetime_now.hour / 12)
+        bot.sent_news = round(bot.datetime_now.hour / 6)

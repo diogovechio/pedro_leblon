@@ -9,7 +9,7 @@ def daily_routines(bot: FakePedro) -> None:
 
         if bot.openai is not None:
             bot.openai.openai_use = 0
-            bot.used_dall_e_today = []
+            bot.dall_e_uses_today = []
 
         bot.loop.create_task(
             bot.send_document(

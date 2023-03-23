@@ -137,10 +137,7 @@ async def normalize_openai_text(
         clean_prompts: T.Optional[dict] = None
 ) -> str:
     try:
-        if "```" not in original_message:
-            ai_message = original_message.lower()
-        else:
-            ai_message = original_message
+        ai_message = original_message
 
         if ai_message.count(".") == 1 and ai_message[-1] == ".":
             ai_message = ai_message.replace(".", "")
@@ -154,13 +151,10 @@ async def normalize_openai_text(
         if ai_message:
             get_running_loop().create_task(telegram_logging(ai_message))
 
-            while any(word in ai_message[0] for word in ['.', ',', '?', ' ', '"']):
+            while any(word in ai_message[0] for word in ['.', ',', '?', '\n', ' ', '!']):
                 ai_message = ai_message[1:]
 
-            while any(word in ai_message[-1] for word in ['"']):
-                ai_message = ai_message[:-1]
-
-            if random.random() < 0.03:
+            if random.random() < 0.05:
                 ai_message = ai_message.upper()
 
             return re.sub(' +', ' ', ai_message)

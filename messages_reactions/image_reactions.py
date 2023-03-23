@@ -37,11 +37,11 @@ async def image_reactions(
                         feedback = await return_dall_e_limit(
                             id_to_count=message.from_.id,
                             limit_per_user=bot.config.openai.dall_e_daily_limit,
-                            dall_uses_list=bot.used_dall_e_today
+                            dall_uses_list=bot.dall_e_uses_today
                         )
 
                         if recognized_face or always_send_crop:
-                            if dall_e and recognized_face is not None and recognized_face[0] == "samuel" and bot.used_dall_e_today.count(message.from_.id) < bot.config.openai.dall_e_daily_limit:
+                            if dall_e and recognized_face is not None and recognized_face[0] == "samuel" and bot.dall_e_uses_today.count(message.from_.id) < bot.config.openai.dall_e_daily_limit:
                                 caption: str
                                 image: bytes
 
@@ -57,9 +57,9 @@ async def image_reactions(
                                 )
 
                                 if image is not None:
-                                    bot.used_dall_e_today.append(message.from_.id)
+                                    bot.dall_e_uses_today.append(message.from_.id)
 
-                                bot.used_dall_e_today.append(message.from_.id)
+                                bot.dall_e_uses_today.append(message.from_.id)
 
                                 await bot.send_photo(
                                     image=image,
@@ -69,7 +69,7 @@ async def image_reactions(
                                     )['text'].lower()
                                 )
 
-                            elif dall_e and recognized_face is not None and bot.used_dall_e_today.count(message.from_.id) < bot.config.openai.dall_e_daily_limit:
+                            elif dall_e and recognized_face is not None and bot.dall_e_uses_today.count(message.from_.id) < bot.config.openai.dall_e_daily_limit:
                                 is_flagged, roulette_text = True, ""
 
                                 while is_flagged:
@@ -82,7 +82,7 @@ async def image_reactions(
                                 )
 
                                 if image is not None:
-                                    bot.used_dall_e_today.append(message.from_.id)
+                                    bot.dall_e_uses_today.append(message.from_.id)
 
                                 await bot.send_photo(
                                     image=image,

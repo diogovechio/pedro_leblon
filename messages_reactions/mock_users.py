@@ -14,20 +14,27 @@ async def mock_users(
         from_samuel: bool,
         from_debug_chats: bool
 ) -> None:
+    user_identified = None
+
+    if message.from_.username in bot.config.mock_messages:
+        user_identified = message.from_.username
+    elif str(message.from_.id) in bot.config.mock_messages:
+        user_identified = str(message.from_.id)
+
     if (
-            message.from_.username in bot.config.mock_messages
-            and bot.config.mock_messages[message.from_.username].last_mock_hour != bot.datetime_now.hour
+            user_identified
+            and bot.config.mock_messages[user_identified].last_mock_hour != bot.datetime_now.hour
             and random.random() < bot.config.random_params.random_mock_frequency
     ):
         bot.loop.create_task(
             bot.send_message(
-                message_text=random.choice(bot.config.mock_messages[message.from_.username].messages),
+                message_text=random.choice(bot.config.mock_messages[user_identified].messages),
                 chat_id=message.chat.id,
                 sleep_time=2 + round(random.random() * 5),
                 reply_to=None),
         )
 
-        bot.config.mock_messages[message.from_.username].last_mock_hour = bot.datetime_now.hour
+        bot.config.mock_messages[user_identified].last_mock_hour = bot.datetime_now.hour
 
     if (
             (message.from_.username in ['nands93'])
@@ -46,11 +53,31 @@ async def mock_users(
                     )
                 ),
                 chat_id=message.chat.id,
-                reply_to=message.message_id
+                reply_to=message.message_id,
             )
         )
 
         bot.mocked_hour = bot.datetime_now.hour
+
+    if (
+            user_identified
+            and bot.sent_news != round(bot.datetime_now.hour / 6)
+            and random.random() < bot.config.random_params.words_react_frequency
+            and bot.config.mock_messages[user_identified].rss_feed
+    ):
+        news = [url.link
+                for url in feedparser.parse(bot.config.mock_messages[user_identified].rss_feed).entries]
+
+        if len(news):
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=random.choice(news),
+                    chat_id=message.chat.id,
+                    sleep_time=30 + (random.random() * 60)
+                )
+            )
+
+            bot.sent_news = round(bot.datetime_now.hour / 6)
 
     if message.from_.username == f"{'decaptor' if not bot.debug_mode else 'diogovechio'}":
         if random.random() < bot.config.random_params.random_mock_frequency and not bot.mocked_today:
