@@ -29,7 +29,7 @@ OPENAI_REACT_WORDS = ['bolsonaro', 'segundo turno', 'macho', ' lula ', 'dilma', 
 
 OPENAI_TRASH_LIST = ['"', "r:", "o:", "a:", "q:"]
 
-CHATGPT_BS = ["não vou", "não irei", "linguagem natural", "desculpe", "assistente de", "virtual", "uma ia", "de ia", "como ia", "como uma ai", "como ai,", "de ai,", "openai", "como um modelo", "de linguagem", "não posso", "julgamentos pessoais", "inteligência artificial", "sem viés político", "modelo de"]
+CHATGPT_BS = ["não vejo", "a comentar sobre", "não vou", "não irei", "linguagem natural", "desculpe", "assistente de", "virtual", "uma ia", "de ia", "como ia", "como uma ai", "como ai,", "de ai,", "openai", "como um modelo", "de linguagem", "não posso", "julgamentos pessoais", "inteligência artificial", "sem viés político", "modelo de"]
 
 OPENAI_PROMPTS = {
     'fale': 'fale brevemente sobre esse tema:',

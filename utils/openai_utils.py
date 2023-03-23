@@ -273,7 +273,7 @@ class OpenAiCompletion:
             for word in remove_words_list:
                 message_text = message_text.replace(word, '')
 
-        for _ in range(5):
+        for _ in range(3):
             try:
                 response = await asyncio.wait_for(
                     self._completion(
@@ -290,7 +290,7 @@ class OpenAiCompletion:
                         temperature=temperature,
                         date=datetime_now
                     ),
-                    timeout=120
+                    timeout=240
                 )
 
                 if return_raw_text:
