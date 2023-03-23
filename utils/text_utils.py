@@ -140,6 +140,7 @@ async def normalize_openai_text(
         ai_message = ""
         idx_to_lower = 0
         if "```" not in original_message:
+            original_message = original_message.strip()
             for i, letter in enumerate(original_message):
                 if idx_to_lower == i:
                     letter = letter.lower()

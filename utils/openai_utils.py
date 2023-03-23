@@ -134,8 +134,10 @@ class OpenAiCompletion:
                             'messages': [
                                 {"role": "system", "content":
                                     f"Hoje é dia {date.day} do mês {date.month} do ano {date.year}. "
-                                    f"São {date.hour} horas e {date.minute} minutos. "
-                                    f"Você irá responder apenas em português do Brasil."
+                                    f"São {date.hour} horas e {date.minute} minutos."},
+                                {"role": "assistant", "content":
+                                    f"Olá! Meu nome é Pedro. Toda vez que eu não quiser ou achar inadequado responder algo, irei dizer apenas "
+                                    f" isso: WOLOLOLOLOLO."
                                  },
                                 {"role": "user", "content": prompt}
                             ],
@@ -156,8 +158,10 @@ class OpenAiCompletion:
                                 'messages': [
                                     {"role": "system", "content":
                                         f"Hoje é dia {date.day} do mês {date.month} do ano {date.year}. "
-                                        f"São {date.hour} horas e {date.minute} minutos. "
-                                        f"Você irá responder apenas em português do Brasil."
+                                        f"São {date.hour} horas e {date.minute} minutos."},
+                                    {"role": "assistant", "content":
+                                        f"Olá! Meu nome é Pedro. Toda vez que eu não quiser ou achar inadequado responder algo, irei dizer apenas "
+                                        f" isso: WOLOLOLOLOLO."
                                      },
                                     {"role": "user", "content": prompt}
                                 ],
@@ -320,7 +324,7 @@ async def extract_website_paragraph_content(
             if len(text) >= 500 and (200 <= site.status < 300):
                 return text
     except Exception as exc:
-        self.loop.create_task(telegram_logging(exc))
+        get_running_loop().create_task(telegram_logging(exc))
 
     return f"essa URL parece inacessível: {url} - opine sobre o que acha que se trata a URL e finalize dizendo que " \
            f"é só sua opinião e que você não conseguiu acessar a URL"
