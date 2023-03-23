@@ -415,18 +415,37 @@ class FakePedro:
         ) as resp:
             logging.info(resp.status)
 
+    async def is_taking_too_long(self, chat_id: int, user = "", max_loops=3, timeout=30):
+        if user:
+            messages = [f"{user.lower()} ja vou te responder", "humanos escrevem mais rápido", "meu cérebro tá devagar hoje", f"só 1 minuto {user.lower()}"]
+
+            for _ in range(max_loops):
+                await asyncio.sleep(timeout + int(random.random() * timeout / 5))
+
+                message = random.choice(messages)
+                messages.remove(message)
+
+                self.loop.create_task(
+                    self.send_message(
+                        message_text=message,
+                        chat_id=chat_id
+                    )
+                )
 
     @contextmanager
     def sending_action(
             self,
             chat_id: int,
+            user = "",
             action=T.Union[T.Literal['typing'], T.Literal['upload_photo'], T.Literal['find_location']]
     ):
         sending = self.loop.create_task(self.send_action(chat_id, action, True))
+        timer = self.loop.create_task(self.is_taking_too_long(chat_id=chat_id, user=user))
         try:
-            yield sending
+            yield sending, timer
         finally:
             sending.cancel()
+            timer.cancel()
 
 
 if __name__ == '__main__':

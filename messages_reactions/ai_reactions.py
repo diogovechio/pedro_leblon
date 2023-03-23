@@ -55,7 +55,6 @@ async def openai_reactions(
                             remove_words_list=['pedro'],
                             temperature=1.0,
                             destroy_message=destroy_message,
-                            mock_message=True
                         ),
                         chat_id=message.chat.id,
                         sleep_time=1 + (round(random.random()) * 4),
@@ -66,14 +65,14 @@ async def openai_reactions(
         if (
                 command_in('pedr', message.text) or command_in('pedro?', message.text, text_end=True)
         ) and not command_in('/pedro', message.text):
-            with bot.sending_action(message.chat.id, "typing"):
+            with bot.sending_action(message.chat.id, action="typing", user=message.from_.first_name):
                 bot.loop.create_task(
                     bot.send_message(
                         message_text=await bot.openai.generate_message(
                             message_username=username,
                             message_text=input_text,
                             chat=message.chat.title,
-                            use_chatgpt=True if url_detector else False,
+                            only_chatgpt=True if url_detector else False,
                             prompt_inject=None if url_detector else OPENAI_PROMPTS['responda'],
                             biased=False if url_detector else True,
                             destroy_message=destroy_message,
@@ -102,7 +101,7 @@ async def openai_reactions(
             )
 
         elif command_in('/imag', message.text):
-            with bot.sending_action(message.chat.id, "upload_photo"):
+            with bot.sending_action(message.chat.id, user=message.from_.first_name, action="upload_photo"):
                 feedback = await return_dall_e_limit(
                     id_to_count=message.from_.id,
                     limit_per_user=bot.config.openai.dall_e_daily_limit,
@@ -126,8 +125,6 @@ async def openai_reactions(
                             recognized_names.append(word)
                             prompt = prompt.replace(word, "rapaz")
                     if len(recognized_names):
-                        sending_message = bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="upload_photo", repeats=100))
-
                         background = await put_list_of_faces_on_background(bot, recognized_names, "-s" in message.text.lower())
                         image = await bot.openai.edit_image(text=prompt,square_png=background)
 
@@ -148,8 +145,6 @@ async def openai_reactions(
                                     reply_to=message.message_id
                                 )
                             )
-
-                        sending_message.cancel()
                     else:
                         image = await bot.openai.generate_image(text=input_text[6:])
 
@@ -181,7 +176,7 @@ async def openai_reactions(
                     )
 
         elif command_in("/pedro", message.text):
-            with bot.sending_action(message.chat.id, "typing"):
+            with bot.sending_action(message.chat.id, user=message.from_.first_name, action="typing"):
                 bot.loop.create_task(
                     bot.send_message(
                         message_text=await bot.openai.generate_message(
@@ -189,7 +184,7 @@ async def openai_reactions(
                             message_text=input_text,
                             chat=message.chat.title,
                             prompt_inject=None,
-                            use_chatgpt=True,
+                            only_chatgpt=True,
                             biased=False,
                             destroy_message=destroy_message,
                             remove_words_list=['/pedro'],
@@ -200,7 +195,7 @@ async def openai_reactions(
                 )
 
         elif command_in("/tldr", message.text):
-            with bot.sending_action(message.chat.id, "typing"):
+            with bot.sending_action(message.chat.id, user=message.from_.first_name, action="typing"):
                 if ":" not in input_text:
                    chat = "\n".join(bot.messages_in_memory[message.chat.id]) + "."
 
@@ -213,7 +208,7 @@ async def openai_reactions(
                                 prompt_inject=None,
                                 moderate=False,
                                 biased=False,
-                                use_chatgpt=True,
+                                only_chatgpt=True,
                                 destroy_message=destroy_message,
                                 remove_words_list=None
                             ),
@@ -346,7 +341,6 @@ async def openai_reactions(
                             chat=message.chat.title,
                             prompt_inject=OPENAI_PROMPTS['fale'],
                             destroy_message=destroy_message,
-                            mock_message=True
                         ),
                         chat_id=message.chat.id,
                         sleep_time=1 + (round(random.random()) * 5),

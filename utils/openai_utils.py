@@ -89,41 +89,14 @@ class OpenAiCompletion:
 
     async def _completion(
             self,
-            biased: bool,
             date: datetime,
-            mock_message: bool,
-            random_model: bool,
-            temperature: int = 0,
-            message_text: str = "",
-            message_username: str = "",
-            chat="chat",
-            use_chatgpt=False,
-            moderate=True,
-            prompt_inject: T.Optional[str] = None,
-            force_model: T.Optional[str] = None,
+            prompt: str,
+            model: str = "ada",
+            only_chatgpt=False,
+            temperature: int = 0
     ) -> str:
-        if not message_username:
-            message_username = "arrombado"
-
-        model = await self._model_selector(
-                            message_username=message_username,
-                            mock_message=mock_message,
-                            random_model=random_model
-                        ) if force_model is None else force_model
-
-        prompt = (await pre_biased_prompt(message_text) if biased else message_text)
-
-        is_flagged, moderation_results = await self.is_flagged(prompt)
-
-        if is_flagged and moderate:
-            prompt = f"critique o @{message_username} por ele ter enviado uma mensagem com conteúdo de" \
-                     f"{' ,'.join([key for key, value in moderation_results['results'][0]['categories'].items() if value])}. " \
-                     f"diga que ele pode ser banido de {chat}."
-        else:
-            prompt = f"{prompt_inject}: {prompt}" if prompt_inject else prompt
-
         async with asyncio.Semaphore(self.semaphore):
-            if use_chatgpt and model != "ada":
+            if "ada" not in model or only_chatgpt:
                 self.loop.create_task(telegram_logging(f"Using ChatGPT - OpenAI usage: {self.openai_use}"))
 
                 async with self.session.post(
@@ -142,55 +115,33 @@ class OpenAiCompletion:
                                 {"role": "user", "content": prompt}
                             ],
                         }
-                ) as openai_request:
-                    response = await openai_request.text()
-                    return json.loads(response)['choices'][0]['message']['content']
-            else:
-                ## TODO: APENAS PARA TESTE, REFATORE ISSO PELO AMOR DE DEUS
-                if model != "ada":
-                    self.loop.create_task(telegram_logging(f"Using ChatGPT - OpenAI usage: {self.openai_use}"))
+                ) as chatgpt_request:
+                    response = await chatgpt_request.text()
+                    response_text = json.loads(response)['choices'][0]['message']['content']
 
-                    async with self.session.post(
-                            "https://api.openai.com/v1/chat/completions",
-                            headers=self.headers,
-                            json={
-                                "model": "gpt-3.5-turbo",
-                                'messages': [
-                                    {"role": "system", "content":
-                                        f"Hoje é dia {date.day} do mês {date.month} do ano {date.year}. "
-                                        f"São {date.hour} horas e {date.minute} minutos."},
-                                    {"role": "assistant", "content":
-                                        f"Olá! Meu nome é Pedro. Toda vez que eu não quiser ou achar inadequado responder algo, irei dizer apenas "
-                                        f" isso: WOLOLOLOLOLO."
-                                     },
-                                    {"role": "user", "content": prompt}
-                                ],
-                            }
-                    ) as chatgpt_request:
-                        response = await chatgpt_request.text()
-                        response_text = json.loads(response)['choices'][0]['message']['content']
+                    self.loop.create_task(telegram_logging(f"ChatGPT: {response_text}"))
 
-                        self.loop.create_task(telegram_logging(f"CHATGPT RESPONSE:  {response_text}"))
+                    if not any(word in response_text.lower() for word in CHATGPT_BS) or only_chatgpt:
+                        return response_text
 
-                        if not any(word in response_text.lower() for word in CHATGPT_BS) and model != "ada":
-                            return response_text
+            self.loop.create_task(telegram_logging(f"{model} - OpenAI usage: {self.openai_use}"))
 
-                self.loop.create_task(telegram_logging(f"Model selected: {model} - OpenAI usage: {self.openai_use}"))
+            async with self.session.post(
+                    "https://api.openai.com/v1/completions",
+                    headers=self.headers,
+                    json={
+                        "model": model,
+                        'prompt': prompt,
+                        'max_tokens': self.max_tokens,
+                        'temperature': temperature,
+                        'top_p': 1,
+                        'frequency_penalty': 1.0,
+                        'presence_penalty': 2.0,
+                    }
+            ) as openai_request:
+                self.loop.create_task(telegram_logging(f"{model}: {response_text}"))
 
-                async with self.session.post(
-                        "https://api.openai.com/v1/completions",
-                        headers=self.headers,
-                        json={
-                            "model": model,
-                            'prompt': prompt,
-                            'max_tokens': self.max_tokens,
-                            'temperature': temperature,
-                            'top_p': 1,
-                            'frequency_penalty': 1.0,
-                            'presence_penalty': 2.0,
-                        }
-                ) as openai_request:
-                    return json.loads(await openai_request.text())['choices'][0]['text']
+                return json.loads(await openai_request.text())['choices'][0]['text']
 
     async def generate_image(
             self,
@@ -230,8 +181,6 @@ class OpenAiCompletion:
                 )
         ) as openai_request:
             try:
-                req = await openai_request.text()
-
                 async with self.session.get(
                     json.loads(await openai_request.text())['data'][0]['url']
                 ) as image:
@@ -245,31 +194,16 @@ class OpenAiCompletion:
             message_text: str,
             message_username: T.Optional[str] = "",
             chat="ASD",
-            use_chatgpt=False,
+            only_chatgpt=False,
             biased=True,
             moderate=True,
             temperature=0,
             prompt_inject: T.Optional[str] = None,
-            random_model: bool = False,
-            mock_message: bool = False,
             return_raw_text: bool = False,
             destroy_message: bool = False,
             remove_words_list=None,
-            force_model:T.Optional[str] = None
     ) -> str:
         datetime_now = datetime.datetime.utcnow() - datetime.timedelta(hours=3)
-
-        if destroy_message:
-            model = "text-ada-001"
-            message_text = await message_destroyer(message_text)
-        else:
-            model = self.force_model
-
-        if force_model:
-            model=force_model
-
-        if not chat:
-            chat = "ASD"
 
         message_text = message_text.lower()
 
@@ -277,24 +211,38 @@ class OpenAiCompletion:
             for word in remove_words_list:
                 message_text = message_text.replace(word, '')
 
+        if not message_username:
+            message_username = "arrombado"
+
+        if destroy_message:
+            model = "text-ada-001"
+            prompt = await message_destroyer(message_text)
+        else:
+            model = await self._model_selector(message_username)
+
+            prompt = (await pre_biased_prompt(message_text) if biased else message_text)
+
+        is_flagged, moderation_results = await self.is_flagged(prompt)
+
+        if is_flagged and moderate:
+            prompt = f"critique o @{message_username} por ele ter enviado uma mensagem com conteúdo de" \
+                     f"{' ,'.join([key for key, value in moderation_results['results'][0]['categories'].items() if value])}. " \
+                     f"diga que ele pode ser banido de {chat}."
+        else:
+            prompt = f"{prompt_inject}: {prompt}" if prompt_inject else prompt
+
+        timeout = 480
         for _ in range(3):
             try:
                 response = await asyncio.wait_for(
                     self._completion(
-                        message_username=message_username,
-                        chat=chat,
-                        biased=biased,
-                        mock_message=mock_message,
-                        random_model=random_model,
-                        force_model=model,
-                        moderate=moderate,
-                        use_chatgpt=use_chatgpt,
-                        prompt_inject=prompt_inject,
-                        message_text=message_text,
+                        date=datetime_now,
+                        prompt=prompt,
+                        only_chatgpt=only_chatgpt,
                         temperature=temperature,
-                        date=datetime_now
+                        model=model
                     ),
-                    timeout=240
+                    timeout=timeout
                 )
 
                 if return_raw_text:
@@ -307,7 +255,8 @@ class OpenAiCompletion:
 
             except Exception as exc:
                 self.loop.create_task(telegram_logging(exc))
-                await asyncio.sleep(5)
+                timeout /= 2
+                await asyncio.sleep(2)
 
         return "meu cérebro tá fora do ar"
 
