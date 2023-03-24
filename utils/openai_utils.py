@@ -139,9 +139,10 @@ class OpenAiCompletion:
                         'presence_penalty': 2.0,
                     }
             ) as openai_request:
+                response_text = json.loads(await openai_request.text())['choices'][0]['text']
                 self.loop.create_task(telegram_logging(f"{model}: {response_text}"))
 
-                return json.loads(await openai_request.text())['choices'][0]['text']
+                return response_text
 
     async def generate_image(
             self,
@@ -232,6 +233,8 @@ class OpenAiCompletion:
             prompt = f"{prompt_inject}: {prompt}" if prompt_inject else prompt
 
         timeout = 480
+        retry_sleep = 2
+
         for _ in range(3):
             try:
                 response = await asyncio.wait_for(
@@ -256,7 +259,8 @@ class OpenAiCompletion:
             except Exception as exc:
                 self.loop.create_task(telegram_logging(exc))
                 timeout /= 2
-                await asyncio.sleep(2)
+                retry_sleep *= 2
+                await asyncio.sleep(int(retry_sleep + random.random() * 2))
 
         return "meu cérebro tá fora do ar"
 

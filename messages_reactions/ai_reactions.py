@@ -218,7 +218,7 @@ async def openai_reactions(
 
                    bot.loop.create_task(
                         bot.send_message(
-                            message_text=chat,
+                            message_text=chat[:3500],
                             chat_id=8375482
                         )
                     )
