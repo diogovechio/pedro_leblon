@@ -17,6 +17,8 @@ DRUNK_DECAPTOR_LIST = [
 
 ASK_PHOTOS = ['melhorar', 'fotos', 'foto', 'melhorou']
 
+MOCK_EDITS = ["editou pq", "eu vi oq vc escreveu", "preferia antes", "escreve direito da próxima vez"]
+
 DECAPTOR_DISAPPOINTS = [' lula ', 'esquerdista', ' fato', 'venezuela', 'hipócrita', 'hipocrisia', 'hipocrita', 'dilma',
                         'imparcial']
 

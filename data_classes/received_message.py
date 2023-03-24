@@ -51,6 +51,7 @@ class TelegramMessage:
     text: T.Optional[str] = None
     reply_to_message: T.Optional[ReplyToMessage] = None
     photo: T.Optional[T.List[Photo]] = None
+    edit_date: T.Optional[int] = None
     caption: T.Optional[str] = None
 
 
@@ -58,6 +59,7 @@ class TelegramMessage:
 class MessageReceived:
     update_id: T.Optional[int] = None
     message: T.Optional[TelegramMessage] = None
+    edited_message: T.Optional[TelegramMessage] = None
 
 
 @dataclass

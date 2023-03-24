@@ -217,13 +217,16 @@ class FakePedro:
                     for incoming in (entry for entry in self.messages.result
                                      if entry.update_id not in self.interacted_updates):
 
-                        await self._store_messages_info(incoming)
-
                         logging.info(incoming)
 
-                        if incoming.message is not None:
+                        incoming: MessageReceived
+
+                        if incoming is not None:
                             self.loop.create_task(
-                                messages_coordinator(self, incoming.message)
+                                messages_coordinator(self, incoming)
+                            )
+                            self.loop.create_task(
+                                self._store_messages_info(incoming)
                             )
 
                 await asyncio.sleep(self.polling_rate)
@@ -232,16 +235,18 @@ class FakePedro:
                 await asyncio.sleep(15)
 
     async def _store_messages_info(self, incoming: MessageReceived):
+        message = incoming.message if incoming.message is not None else incoming.edited_message
+
         self.interacted_updates.append(incoming.update_id)
-        self.interacted_messages_with_chat_id.append(f"{incoming.message.chat.id}:"
-                                                     f"{incoming.message.message_id}")
+        self.interacted_messages_with_chat_id.append(f"{message.chat.id}:"
+                                                     f"{message.message_id}")
 
-        if incoming.message.chat.id not in self.messages_in_memory:
-            self.messages_in_memory[incoming.message.chat.id] = MaxSizeList(120)
+        if message.chat.id not in self.messages_in_memory:
+            self.messages_in_memory[message.chat.id] = MaxSizeList(120)
 
-        if incoming.message.text is not None and len(incoming.message.text) > 5:
-            self.messages_in_memory[incoming.message.chat.id].append(
-                f"{incoming.message.from_.first_name}: '{incoming.message.text[0:100]}'")
+        if message.text is not None and len(message.text) > 5:
+            self.messages_in_memory[message.chat.id].append(
+                f"{message.from_.first_name}: '{message.text[0:100]}'")
 
     async def image_downloader(
             self,
