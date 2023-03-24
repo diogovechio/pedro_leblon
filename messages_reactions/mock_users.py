@@ -25,6 +25,7 @@ async def mock_users(
             user_identified
             and bot.config.mock_messages[user_identified].last_mock_hour != bot.datetime_now.hour
             and random.random() < bot.config.random_params.random_mock_frequency
+            and message.chat.id not in bot.config.not_internal_chats
     ):
         bot.loop.create_task(
             bot.send_message(

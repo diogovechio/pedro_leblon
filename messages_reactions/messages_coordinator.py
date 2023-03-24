@@ -49,6 +49,7 @@ async def messages_coordinator(
                     chat_id=message.chat.id
                 )
             )
+
     elif incoming.edited_message is not None:
         bot.loop.create_task(
             bot.send_message(
