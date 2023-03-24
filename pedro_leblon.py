@@ -420,7 +420,7 @@ class FakePedro:
         ) as resp:
             logging.info(resp.status)
 
-    async def is_taking_too_long(self, chat_id: int, user = "", max_loops=3, timeout=30):
+    async def is_taking_too_long(self, chat_id: int, user = "", max_loops=3, timeout=10):
         if user:
             messages = [f"{user.lower()} ja vou te responder", "humanos escrevem mais rápido", "meu cérebro tá devagar hoje", f"só 1 minuto {user.lower()}"]
 
@@ -436,6 +436,8 @@ class FakePedro:
                         chat_id=chat_id
                     )
                 )
+
+                timeout *= 2
 
     @contextmanager
     def sending_action(
