@@ -1,20 +1,3 @@
-import asyncio
-import random
-
-from constants.constants import MOCK_EDITS
-from data_classes.received_message import MessageReceived
-from messages_reactions.mock_users import mock_users
-from pedro_leblon import FakePedro
-from messages_reactions.ai_reactions import openai_reactions
-from messages_reactions.bot_commands import bot_commands
-from messages_reactions.general_text_reactions import words_reactions
-from messages_reactions.image_reactions import image_reactions
-
-
-async def messages_coordinator(
-        bot: FakePedro,
-        incoming: MessageReceived
-) -> None:
     if incoming.message is not None:
         message = incoming.message
 
@@ -58,3 +41,5 @@ async def messages_coordinator(
                 reply_to=incoming.edited_message.message_id
             )
         )
+
+        bot.loop.create_task(telegram_logging(str(incoming)))
