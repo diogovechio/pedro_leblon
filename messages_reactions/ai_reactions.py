@@ -203,7 +203,7 @@ async def openai_reactions(
                         bot.send_message(
                             message_text=await bot.openai.generate_message(
                                 message_username=username,
-                                message_text=f"faça um curto resumo dessa conversa:\n{chat}",
+                                message_text=f"faça um curto resumo dessa conversa entre amigos:\n{chat}",
                                 chat=message.chat.title,
                                 prompt_inject=None,
                                 moderate=False,
