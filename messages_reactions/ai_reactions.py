@@ -41,7 +41,7 @@ async def openai_reactions(
             block_word in message.text.lower() for block_word in SWEAR_WORDS
     ) and not url_detector and bot.mocked_hour != bot.datetime_now.hour:
         if random.random() < bot.config.random_params.words_react_frequency or 'pedr' in message.text.lower():
-            with bot.sending_action(message.chat.id, "typing"):
+            with bot.sending_action(message.chat.id, action="typing"):
                 bot.mocked_hour = bot.datetime_now.hour
 
                 bot.loop.create_task(
@@ -243,7 +243,7 @@ async def openai_reactions(
                 command_in("/elogie", message.text) or
                 command_in("/simpatize", message.text)
         ):
-            with bot.sending_action(message.chat.id, "typing"):
+            with bot.sending_action(message.chat.id, action="typing"):
                 roleta_from_pavuna = None
 
                 if message.reply_to_message and message.reply_to_message.text:
@@ -332,7 +332,7 @@ async def openai_reactions(
         elif any(
                 react_word in message.text.lower() for react_word in OPENAI_REACT_WORDS
         ) and random.random() < bot.config.random_params.words_react_frequency and not url_detector:
-            with bot.sending_action(message.chat.id, "typing"):
+            with bot.sending_action(message.chat.id, action="typing"):
                 bot.loop.create_task(
                     bot.send_message(
                         message_text=await bot.openai.generate_message(
