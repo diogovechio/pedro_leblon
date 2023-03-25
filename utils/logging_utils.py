@@ -15,7 +15,7 @@ async def telegram_logging(text: T.Union[str, Exception], chat_id=8375482):
         text = "#exception\n" + text
     else:
         logging.info(text)
-        text = text[:150]
+        text = text[:1000]
 
     session = aiohttp.ClientSession()
     api_route = f"https://api.telegram.org/bot{TOKEN}"
