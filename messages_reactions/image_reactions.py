@@ -3,6 +3,7 @@ import random
 
 import typing as T
 
+from data_classes.face_data import FaceResult
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
 from utils.face_utils import faces_coordinates_detector, image_cropper, face_recognizer
@@ -27,7 +28,7 @@ async def image_reactions(
                     async def _crop_and_send(img_bytes: bytes, coord: tuple):
                         crop_bytes = await image_cropper(img_bytes, coord)
                         recognized_face = await face_recognizer(
-                            crop_image=crop_bytes[0],
+                            crop_image=crop_bytes.original_face,
                             full_image=img_bytes,
                             faces_embeddings=bot.face_embeddings,
                             faces_names=bot.faces_names,
@@ -41,7 +42,7 @@ async def image_reactions(
                         )
 
                         if recognized_face or always_send_crop:
-                            if dall_e and recognized_face is not None and recognized_face[0] == "samuel" and bot.dall_e_uses_today.count(message.from_.id) < bot.config.openai.dall_e_daily_limit:
+                            if dall_e and recognized_face is not None and recognized_face.face_name == "samuel" and bot.dall_e_uses_today.count(message.from_.id) < bot.config.openai.dall_e_daily_limit:
                                 caption: str
                                 image: bytes
 
@@ -52,7 +53,7 @@ async def image_reactions(
                                     ),
                                     bot.openai.edit_image(
                                         text="manifestação do partido dos trabalhadores com MST em brasília, muita gente de vermelho segurando bandeiras",
-                                        square_png=crop_bytes[1]
+                                        square_png=crop_bytes.face_with_alpha_background
                                     )
                                 )
 
@@ -78,7 +79,7 @@ async def image_reactions(
 
                                 image = await bot.openai.edit_image(
                                     text=roulette_text,
-                                    square_png=crop_bytes[1]
+                                    square_png=crop_bytes.face_with_alpha_background
                                 )
 
                                 if image is not None:
@@ -87,14 +88,14 @@ async def image_reactions(
                                 await bot.send_photo(
                                     image=image,
                                     chat_id=message.chat.id,
-                                    caption=roulette_text.lower() + f" - {recognized_face[0]}" + f"\n{feedback}" if recognized_face is not None else None
+                                    caption=roulette_text.lower() + f" - {recognized_face.face_name}" + f"\n{feedback}" if recognized_face is not None else None
                                 )
 
                                 await greet_user(bot=bot, face_recognized=recognized_face, message=message)
 
                             else:
                                 await bot.send_photo(
-                                    image=crop_bytes[0],
+                                    image=crop_bytes.original_face,
                                     chat_id=message.chat.id,
                                     caption=await create_caption(bot=bot, face_recognized=recognized_face)
                                 )
@@ -120,19 +121,21 @@ async def image_reactions(
                 )
 
 
-async def greet_user(bot: FakePedro, face_recognized: T.Optional[tuple], message: TelegramMessage):
+async def greet_user(
+        bot: FakePedro,
+        face_recognized: T.Optional[FaceResult],
+        message: TelegramMessage
+) -> None:
     with bot.sending_action(message.chat.id, "typing"):
         bot.loop.create_task(
             bot.send_message(
                 message_text=await bot.openai.generate_message(
-                    message_text=f"diga ao {face_recognized[0]} que ele parece "
-                                 f"{face_recognized[2]} nessa foto e dê a ele um conselho sobre isso.",
+                    message_text=await create_caption(
+                        bot=bot,
+                        face_recognized=face_recognized
+                    ),
                     temperature=1.0,
                     biased=True
-                ) if face_recognized[2] else await greeter(
-                    face_recognized[0],
-                    face_recognized[1],
-                    bot.config.face_classifier.face_min_accepted_matches
                 ),
                 chat_id=message.chat.id,
                 reply_to=message.message_id
@@ -140,19 +143,22 @@ async def greet_user(bot: FakePedro, face_recognized: T.Optional[tuple], message
         )
 
 
-async def create_caption(bot: FakePedro, face_recognized: T.Optional[tuple]) -> T.Optional[str]:
+async def create_caption(
+        bot: FakePedro,
+        face_recognized: T.Optional[FaceResult],
+) -> T.Optional[str]:
     caption = None
 
     if face_recognized:
         caption = await bot.openai.generate_message(
-            message_text=f"diga ao {face_recognized[0]} que ele parece "
-                         f"{face_recognized[2]} nessa foto e dê a ele um conselho sobre isso.",
+            message_text=f"diga ao {face_recognized.face_name} que ele parece "
+                         f"{face_recognized.emotion} nessa foto e dê a ele um conselho sobre isso.",
             temperature=1.0,
             biased=True
-        ) if face_recognized[2] else await greeter(
-            face_recognized[0],
-            face_recognized[1],
-            bot.config.face_classifier.face_min_accepted_matches
+        ) if face_recognized.emotion else await greeter(
+            name=face_recognized.face_name,
+            match_result=face_recognized.match_result,
+            min_accepted_matches=bot.config.face_classifier.face_min_accepted_matches
         )
 
     return caption

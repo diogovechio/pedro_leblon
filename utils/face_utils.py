@@ -9,6 +9,9 @@ from deepface import DeepFace
 
 from PIL import Image, ImageOps
 
+from data_classes.face_data import FaceResult
+
+from data_classes.image_data import FaceCrop
 from pedro_leblon import FakePedro, telegram_logging
 
 
@@ -26,7 +29,7 @@ async def faces_coordinates_detector(image: bytes, min_size: int) -> T.Optional[
         return filtered_by_size
 
 
-async def image_cropper(image: bytes, coords: tuple) -> T.Tuple[bytes, bytes]:
+async def image_cropper(image: bytes, coords: tuple) -> FaceCrop:
     temp_load = f'tmp/{uuid.uuid4()}.tmp'
     with open(temp_load, 'wb') as file:
         file.write(image)
@@ -39,7 +42,11 @@ async def image_cropper(image: bytes, coords: tuple) -> T.Tuple[bytes, bytes]:
     del img
     os.remove(temp_load)
     image_with_alpha_background = await put_face_on_background(image_crop)
-    return image_crop, image_with_alpha_background
+
+    return FaceCrop(
+        original_face=image_crop,
+        face_with_alpha_background=image_with_alpha_background
+    )
 
 async def put_face_on_background(image: bytes, small_face=False) -> bytes:
     background = Image.open("static/background.png")
@@ -139,7 +146,7 @@ async def face_recognizer(
         faces_embeddings: list,
         faces_names: list,
         face_tolerance=0.6
-) -> T.Optional[T.Tuple[str, float, str]]:
+) -> T.Optional[FaceResult]:
     temp_filename = f'tmp/{uuid.uuid4()}.png'
     temp_filename_2 = f'tmp/{uuid.uuid4()}.png'
     with open(temp_filename, 'wb') as file:
@@ -175,7 +182,11 @@ async def face_recognizer(
 
         if valid_result and len(balanced_predict_result):
             result_name: str = max(balanced_predict_result, key=balanced_predict_result.get)
-            data = result_name, balanced_predict_result[result_name], emotion
+            data = FaceResult(
+                face_name=result_name,
+                match_result=balanced_predict_result[result_name],
+                emotion=emotion
+            )
 
     del input_image_embeddings
     os.remove(temp_filename)
