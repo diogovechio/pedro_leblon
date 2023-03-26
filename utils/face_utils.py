@@ -140,7 +140,7 @@ async def put_list_of_faces_on_background(bot: FakePedro, names: T.List[str], sm
     return file_bytes
 
 
-async def face_recognizer(
+async def detect_face(
         crop_image: bytes,
         full_image: bytes,
         faces_embeddings: list,
