@@ -18,5 +18,14 @@ def daily_routines(bot: FakePedro) -> None:
                 document=open(f'commemorations.json', 'rb').read()
             )
         )
+        
+        
+        bot.loop.create_task(
+            bot.send_document(
+                chat_id=8375482,
+                caption=f"Configs backup {bot.datetime_now}",
+                document=open(f'bot_configs.json', 'rb').read()
+            )
+        )
     except Exception as exc:
         bot.loop.create_task(telegram_logging(exc))
