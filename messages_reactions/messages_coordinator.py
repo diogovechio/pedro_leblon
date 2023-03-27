@@ -50,7 +50,12 @@ async def messages_coordinator(
                 )
             )
 
-    elif incoming.edited_message is not None:
+    elif (
+            incoming.edited_message is not None
+            and incoming.edited_message.chat.id not in bot.config.not_internal_chats
+            and incoming.edited_message.edit_date - incoming.edited_message.date < 120
+            and random.random() < bot.config.random_params.words_react_frequency
+    ):
         bot.loop.create_task(
             bot.send_message(
                 message_text=random.choice(MOCK_EDITS),

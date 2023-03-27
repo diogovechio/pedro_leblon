@@ -65,6 +65,7 @@ async def mock_users(
             and bot.sent_news != round(bot.datetime_now.hour / 6)
             and random.random() < bot.config.random_params.words_react_frequency
             and bot.config.mock_messages[user_identified].rss_feed
+            and message.chat.id not in bot.config.not_internal_chats
     ):
         news = [url.link
                 for url in feedparser.parse(bot.config.mock_messages[user_identified].rss_feed).entries]
