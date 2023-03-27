@@ -157,7 +157,7 @@ async def create_caption(
     if face_data:
         caption = await bot.openai.generate_message(
             message_text=f"diga ao {face_data.face_name} que ele parece "
-                         f"{face_data.emotion} nessa foto e comente sobre isso.",
+                         f"{face_data.emotion} nessa foto e dê a ele um conselho sobre isso.",
             temperature=1.0,
             biased=True
         ) if face_data.emotion else await greeter(
