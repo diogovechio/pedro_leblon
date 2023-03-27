@@ -84,6 +84,7 @@ async def image_reactions(
                                     square_png=crop_bytes.face_with_alpha_background
                                 )
 
+
                                 await bot.send_photo(
                                     image=image,
                                     chat_id=message.chat.id,
@@ -134,13 +135,9 @@ async def greet_user(
     with bot.sending_action(message.chat.id, action="typing"):
         bot.loop.create_task(
             bot.send_message(
-                message_text=await bot.openai.generate_message(
-                    message_text=await create_caption(
-                        bot=bot,
-                        face_data=face_recognized
-                    ),
-                    temperature=1.0,
-                    biased=True
+                message_text=await create_caption(
+                    bot=bot,
+                    face_data=face_recognized
                 ),
                 chat_id=message.chat.id,
                 reply_to=message.message_id
@@ -156,9 +153,10 @@ async def create_caption(
 
     if face_data:
         caption = await bot.openai.generate_message(
-            message_text=f"diga ao {face_data.face_name} que ele parece "
-                         f"{face_data.emotion} nessa foto e dê a ele um conselho sobre isso.",
+            message_text=f"diga ao {face_data.face_name} que você achou ele "
+                         f"{face_data.emotion} nessa foto. faça um comentário sobre a foto.",
             temperature=1.0,
+            only_davinci=True,
             biased=True
         ) if face_data.emotion else await greeter(
             name=face_data.face_name,

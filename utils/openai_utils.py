@@ -93,36 +93,38 @@ class OpenAiCompletion:
             prompt: str,
             model: str = "ada",
             only_chatgpt=False,
+            only_davinci=False,
             temperature: int = 0
     ) -> str:
         async with asyncio.Semaphore(self.semaphore):
             if "ada" not in model or only_chatgpt:
-                self.loop.create_task(telegram_logging(f"Using ChatGPT - OpenAI usage: {self.openai_use}"))
+                if not only_davinci:
+                    self.loop.create_task(telegram_logging(f"Using ChatGPT - OpenAI usage: {self.openai_use}"))
 
-                async with self.session.post(
-                        "https://api.openai.com/v1/chat/completions",
-                        headers=self.headers,
-                        json={
-                            "model": "gpt-3.5-turbo",
-                            'messages': [
-                                {"role": "system", "content":
-                                    f"Hoje é dia {date.day} do mês {date.month} do ano {date.year}. "
-                                    f"São {date.hour} horas e {date.minute} minutos."},
-                                {"role": "assistant", "content":
-                                    f"Olá! Meu nome é Pedro. Toda vez que eu não quiser ou achar inadequado responder algo, irei dizer apenas "
-                                    f" isso: WOLOLOLOLOLO."
-                                 },
-                                {"role": "user", "content": prompt}
-                            ],
-                        }
-                ) as chatgpt_request:
-                    response = await chatgpt_request.text()
-                    response_text = json.loads(response)['choices'][0]['message']['content']
+                    async with self.session.post(
+                            "https://api.openai.com/v1/chat/completions",
+                            headers=self.headers,
+                            json={
+                                "model": "gpt-3.5-turbo",
+                                'messages': [
+                                    {"role": "system", "content":
+                                        f"Hoje é dia {date.day} do mês {date.month} do ano {date.year}. "
+                                        f"São {date.hour} horas e {date.minute} minutos."},
+                                    {"role": "assistant", "content":
+                                        f"Olá! Meu nome é Pedro. Toda vez que eu não quiser ou achar inadequado responder algo, irei dizer apenas "
+                                        f" isso: WOLOLOLOLOLO."
+                                     },
+                                    {"role": "user", "content": prompt}
+                                ],
+                            }
+                    ) as chatgpt_request:
+                        response = await chatgpt_request.text()
+                        response_text = json.loads(response)['choices'][0]['message']['content']
 
-                    self.loop.create_task(telegram_logging(f"ChatGPT: {response_text}"))
+                        self.loop.create_task(telegram_logging(f"ChatGPT: {response_text}"))
 
-                    if not any(word in response_text.lower() for word in CHATGPT_BS) or only_chatgpt:
-                        return response_text
+                        if not any(word in response_text.lower() for word in CHATGPT_BS) or only_chatgpt:
+                            return response_text
 
             self.loop.create_task(telegram_logging(f"{model} - OpenAI usage: {self.openai_use}"))
 
@@ -196,6 +198,7 @@ class OpenAiCompletion:
             message_username: T.Optional[str] = "",
             chat="ASD",
             only_chatgpt=False,
+            only_davinci=False,
             biased=True,
             moderate=True,
             temperature=0,
@@ -242,6 +245,7 @@ class OpenAiCompletion:
                         date=datetime_now,
                         prompt=prompt,
                         only_chatgpt=only_chatgpt,
+                        only_davinci=only_davinci,
                         temperature=temperature,
                         model=model
                     ),
