@@ -22,7 +22,7 @@ async def image_reactions(
 
     if image_bytes := await bot.image_downloader(message):
         if faces_coordinates := await faces_coordinates_detector(image_bytes, bot.config.face_classifier.box_min_size):
-            with bot.sending_action(message.chat.id, "upload_photo"):
+            with bot.sending_action(message.chat.id, action="upload_photo"):
                 if method == 'cropper':
                     async def _crop_and_send(img_bytes: bytes, coord: tuple):
                         crop_bytes = await image_cropper(img_bytes, coord)
@@ -131,7 +131,7 @@ async def greet_user(
         face_recognized: T.Optional[FaceResult],
         message: TelegramMessage
 ) -> None:
-    with bot.sending_action(message.chat.id, "typing"):
+    with bot.sending_action(message.chat.id, action="typing"):
         bot.loop.create_task(
             bot.send_message(
                 message_text=await bot.openai.generate_message(
@@ -157,7 +157,7 @@ async def create_caption(
     if face_data:
         caption = await bot.openai.generate_message(
             message_text=f"diga ao {face_data.face_name} que ele parece "
-                         f"{face_data.emotion} nessa foto e dê a ele um conselho sobre isso.",
+                         f"{face_data.emotion} nessa foto e comente sobre isso.",
             temperature=1.0,
             biased=True
         ) if face_data.emotion else await greeter(
@@ -165,5 +165,7 @@ async def create_caption(
             match_result=face_data.match_result,
             min_accepted_matches=bot.config.face_classifier.face_min_accepted_matches
         )
+
+        caption = (caption.lower()).replace('"',"")
 
     return caption

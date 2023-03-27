@@ -9,7 +9,7 @@ from deepface import DeepFace
 
 from PIL import Image, ImageOps
 
-from data_classes.face_data import FaceResult
+from data_classes.image_data import FaceResult
 
 from data_classes.image_data import FaceCrop
 from pedro_leblon import FakePedro, telegram_logging
