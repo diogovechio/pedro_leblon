@@ -232,6 +232,7 @@ async def openai_reactions(
                                 moderate=False,
                                 prompt_inject=None,
                                 destroy_message=destroy_message,
+                                only_chatgpt=True if url_detector else False,
                                 remove_words_list=None,
                             )).split('tldr:')[-1],
                             chat_id=message.chat.id,
