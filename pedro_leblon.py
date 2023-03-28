@@ -214,19 +214,19 @@ class FakePedro:
                 logging.info(f'Message controller task running - {len(self.interacted_updates)} - '
                              f'Next roleta: {self.roleta_hour}')
                 if hasattr(self.messages, 'result'):
-                    for incoming in (entry for entry in self.messages.result
+                    for incoming_update in (entry for entry in self.messages.result
                                      if entry.update_id not in self.interacted_updates):
 
-                        logging.info(incoming)
+                        logging.info(incoming_update)
 
-                        incoming: MessageReceived
+                        incoming_update: MessageReceived
 
-                        if incoming is not None:
+                        if incoming_update is not None:
                             self.loop.create_task(
-                                messages_coordinator(self, incoming)
+                                messages_coordinator(self, incoming_update)
                             )
                             self.loop.create_task(
-                                self._store_messages_info(incoming)
+                                self._store_messages_info(incoming_update)
                             )
 
                 await asyncio.sleep(self.polling_rate)
@@ -235,18 +235,17 @@ class FakePedro:
                 await asyncio.sleep(15)
 
     async def _store_messages_info(self, incoming: MessageReceived):
-        message = incoming.message if incoming.message is not None else incoming.edited_message
+        if message := incoming.message:
+            self.interacted_updates.append(incoming.update_id)
+            self.interacted_messages_with_chat_id.append(f"{message.chat.id}:"
+                                                         f"{message.message_id}")
 
-        self.interacted_updates.append(incoming.update_id)
-        self.interacted_messages_with_chat_id.append(f"{message.chat.id}:"
-                                                     f"{message.message_id}")
+            if message.chat.id not in self.messages_in_memory:
+                self.messages_in_memory[message.chat.id] = MaxSizeList(130)
 
-        if message.chat.id not in self.messages_in_memory:
-            self.messages_in_memory[message.chat.id] = MaxSizeList(120)
-
-        if message.text is not None and len(message.text) > 5:
-            self.messages_in_memory[message.chat.id].append(
-                f"{message.from_.first_name}: '{message.text[0:100]}'")
+            if message.text is not None and len(message.text) > 10:
+                self.messages_in_memory[message.chat.id].append(
+                    f"{message.from_.first_name}: '{message.text[0:90]}'")
 
     async def image_downloader(
             self,
@@ -422,7 +421,10 @@ class FakePedro:
 
     async def is_taking_too_long(self, chat_id: int, user = "", max_loops=3, timeout=10):
         if user:
-            messages = [f"{user.lower()} ja vou te responder", "humanos escrevem mais rápido", "meu cérebro tá devagar hoje", f"só 1 minuto {user.lower()}"]
+            messages = [f"{user.lower()} ja vou te responder",
+                        "humanos escrevem mais rápido",
+                        "meu cérebro tá devagar hoje",
+                        f"só 1 minuto {user.lower()}"]
 
             for _ in range(max_loops):
                 await asyncio.sleep(timeout + int(random.random() * timeout / 5))

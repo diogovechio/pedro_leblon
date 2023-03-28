@@ -119,13 +119,16 @@ async def openai_reactions(
                         "cocão", "cocao").replace(
                         "@", " ")
                     words_list = message_filtered.split(" ")
+
                     recognized_names = []
+
                     for word in words_list:
                         if word in bot.faces_names:
                             recognized_names.append(word)
-                            prompt = prompt.replace(word, "rapaz")
+
                     if len(recognized_names):
-                        background = await put_list_of_faces_on_background(bot, recognized_names, "-s" in message.text.lower())
+                        background = await put_list_of_faces_on_background(
+                            bot, recognized_names, "-s" in message.text.lower())
                         image = await bot.openai.edit_image(text=prompt,square_png=background)
 
                         if image is not None:
@@ -203,13 +206,12 @@ async def openai_reactions(
                         bot.send_message(
                             message_text=await bot.openai.generate_message(
                                 message_username=username,
-                                message_text=f"faça um curto resumo dessa conversa entre amigos:\n{chat}",
+                                message_text=f"faça um curto resumo dessa conversa entre os amigos:\n{chat}",
                                 chat=message.chat.title,
                                 prompt_inject=None,
                                 moderate=False,
                                 biased=False,
                                 only_chatgpt=True,
-                                destroy_message=destroy_message,
                                 remove_words_list=None
                             ),
                             chat_id=message.chat.id,
@@ -225,16 +227,20 @@ async def openai_reactions(
                 else:
                     bot.loop.create_task(
                         bot.send_message(
-                            message_text=(await bot.openai.generate_message(
-                                message_username=username,
-                                message_text=f"faça um resumo do texto a seguir: {input_text}",
-                                chat=message.chat.title,
-                                moderate=False,
-                                prompt_inject=None,
-                                destroy_message=destroy_message,
-                                only_chatgpt=True if url_detector else False,
-                                remove_words_list=None,
-                            )).split('tldr:')[-1],
+                            message_text=(
+                                (
+                                    await bot.openai.generate_message(
+                                        message_username=username,
+                                        message_text=f"faça um resumo do texto a seguir: {input_text}",
+                                        chat=message.chat.title,
+                                        moderate=False,
+                                        prompt_inject=None,
+                                        destroy_message=destroy_message,
+                                        only_chatgpt=True if url_detector else False,
+                                        remove_words_list=None,
+                                    )
+                                ).lower()
+                            ).split('dr:')[-1],
                             chat_id=message.chat.id,
                             reply_to=message.message_id)
                     )

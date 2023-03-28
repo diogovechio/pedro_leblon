@@ -150,47 +150,52 @@ class OpenAiCompletion:
             self,
             text: str
     ) -> T.Optional[bytes]:
-        async with asyncio.Semaphore(self.semaphore):
-            async with self.session.post(
-                    "https://api.openai.com/v1/images/generations",
-                    headers=self.headers,
-                    json={'prompt': text,'n': 1, 'size': "256x256"}
-            ) as openai_request:
-                try:
+        try:
+            self.loop.create_task(telegram_logging(f"generate_image prompt: {text}"))
+
+            async with asyncio.Semaphore(self.semaphore):
+                async with self.session.post(
+                        "https://api.openai.com/v1/images/generations",
+                        headers=self.headers,
+                        json={'prompt': text,'n': 1, 'size': "256x256"}
+                ) as openai_request:
                     async with self.session.get(
                             json.loads(await openai_request.text())['data'][0]['url']
                     ) as image:
                         return await image.content.read()
-                except Exception as exc:
-                    self.loop.create_task(telegram_logging(exc))
-                    return None
+        except Exception as exc:
+            self.loop.create_task(telegram_logging(exc))
+            return None
 
     async def edit_image(
             self,
             text: str,
             square_png: bytes
     ) -> T.Optional[bytes]:
-        async with self.session.post(
-                "https://api.openai.com/v1/images/edits",
-                headers={
-                    "Authorization": f"Bearer {self.api_key}"
-                },
-                data=aiohttp.FormData(
-                    (
-                        ("image", square_png),
-                        ("prompt", text),
-                        ("size", "256x256"),
-                    )
-                )
-        ) as openai_request:
-            try:
-                async with self.session.get(
-                    json.loads(await openai_request.text())['data'][0]['url']
-                ) as image:
-                    return await image.content.read()
-            except Exception as exc:
-                self.loop.create_task(telegram_logging(exc))
-                return None
+        try:
+            self.loop.create_task(telegram_logging(f"edit_image prompt: {text}"))
+
+            async with asyncio.Semaphore(self.semaphore):
+                async with self.session.post(
+                        "https://api.openai.com/v1/images/edits",
+                        headers={
+                            "Authorization": f"Bearer {self.api_key}"
+                        },
+                        data=aiohttp.FormData(
+                            (
+                                ("image", square_png),
+                                ("prompt", text),
+                                ("size", "256x256"),
+                            )
+                        )
+                ) as openai_request:
+                    async with self.session.get(
+                        json.loads(await openai_request.text())['data'][0]['url']
+                    ) as image:
+                        return await image.content.read()
+        except Exception as exc:
+            self.loop.create_task(telegram_logging(exc))
+            return None
 
     async def generate_message(
             self,
@@ -235,10 +240,11 @@ class OpenAiCompletion:
         else:
             prompt = f"{prompt_inject}: {prompt}" if prompt_inject else prompt
 
-        timeout = 480
-        retry_sleep = 2
+        timeout = 360
 
-        for _ in range(3):
+        for i in range(3):
+            retry_sleep = int(2 + random.random() * 5)
+            self.loop.create_task(telegram_logging(f"{i} - {timeout} -  {retry_sleep} - prompt: {prompt}"))
             try:
                 response = await asyncio.wait_for(
                     self._completion(
@@ -262,9 +268,9 @@ class OpenAiCompletion:
 
             except Exception as exc:
                 self.loop.create_task(telegram_logging(exc))
-                timeout /= 2
-                retry_sleep *= 2
-                await asyncio.sleep(int(retry_sleep + random.random() * 2))
+                await asyncio.sleep(retry_sleep)
+
+            timeout /= 2
 
         return "meu cérebro tá fora do ar"
 
