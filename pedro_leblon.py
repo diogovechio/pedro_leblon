@@ -235,8 +235,9 @@ class FakePedro:
                 await asyncio.sleep(15)
 
     async def _store_messages_info(self, incoming: MessageReceived):
+        self.interacted_updates.append(incoming.update_id)
+        
         if message := incoming.message:
-            self.interacted_updates.append(incoming.update_id)
             self.interacted_messages_with_chat_id.append(f"{message.chat.id}:"
                                                          f"{message.message_id}")
 
