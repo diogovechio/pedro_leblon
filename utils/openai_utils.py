@@ -279,7 +279,7 @@ class OpenAiCompletion:
 async def extract_website_paragraph_content(
         url: str,
         session: aiohttp.ClientSession,
-        char_limit = 7000
+        char_limit = 11000
 ) -> str:
     try:
         if "youtube.com/" in url or "https://youtu.be" in url:
