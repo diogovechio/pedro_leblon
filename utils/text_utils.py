@@ -52,7 +52,7 @@ async def youtube_caption_extractor(url: str, char_limit: int) -> str:
     try:
         if "watch?v=" in url and "youtube" in url:
             video_id = url.split("watch?v=")[-1]
-        elif "youtu.be" in url:
+        elif "youtu.be" or "shorts" in url:
             video_id = url.split("/")[-1]
         else:
             return ""
