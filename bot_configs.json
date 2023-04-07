@@ -6,16 +6,16 @@
   },
   "random_params": {
     "random_mock_frequency": 0.03,
-    "words_react_frequency": 0.7,
+    "words_react_frequency": 0.2,
     "mock_drunk_decaptor_frequency": 0.03,
-    "annoy_user_frequency": 0.3
+    "annoy_user_frequency": 0.7
   },
   "openai": {
     "force_model": null,
     "max_tokens": 500,
-    "ada_only_users": ["Eicho"],
-    "davinci_daily_limit": 40,
-    "curie_daily_limit": 50,
+    "ada_only_users": [],
+    "davinci_daily_limit": 70,
+    "curie_daily_limit": 80,
     "dall_e_daily_limit": 2
   },
   "rss_feed": {
@@ -26,7 +26,7 @@
   "telegram_api_semaphore": 5,
   "not_internal_chats": [-632911267],
   "ignore_users": [],
-  "annoy_users": ["nands93"],
+  "annoy_users": [],
   "block_samuel": false,
   "allowed_ids": [
     {
@@ -67,6 +67,27 @@
     }
   ],
   "mock_messages": {
+    "Eicho": {
+      "messages": [
+        "manda nudes",
+        "estou esperando meus nudes"
+      ]
+    },
+    "thommazk": {
+      "messages": [
+        "que tesão",
+        "eu vi um pênis",
+        "imagina o pinto desse moço",
+        "ela gemendo deve ser um tesão que só",
+        "tem gente que compra carro, pq eu não posso comprar minha cadeira?"
+      ]
+    },
+    "thai5a": {
+      "messages": [
+        "grossa",
+        "GROSSA"
+      ]
+    },
     "771960127": {
       "name": "yux",
       "messages": [
@@ -75,7 +96,7 @@
       ]
     },
     "8375482": {
-      "rss_feed": "http://feeds.feedburner.com/ign/all",
+      "rss_feed": "http://feeds.feedburner.com/ign/pc-articles",
       "name": "diogo",
       "messages": [
         "o importante é n trabalhar"
@@ -89,17 +110,17 @@
       ]
     },
     "nands93": {
-      "rss_feed": "http://feeds.feedburner.com/ign/all",
+      "rss_feed": "http://feeds.feedburner.com/PragmatismoPolitico",
       "messages": [
        "Xiiii",
        "xiiiiii",
        "platinei agora",
        "mano",
-       "bostil"
+       "BOSTIL"
       ]
     },
     "cocao": {
-      "rss_feed": "http://feeds.feedburner.com/ign/all",
+      "rss_feed": "http://feeds.feedburner.com/ign/games-all",
       "messages": [
         "eu podia ta soldando",
         "eu adoro um falo",
@@ -109,7 +130,7 @@
       ]
     },
     "kkeyo": {
-      "rss_feed": "http://feeds.feedburner.com/ign/all",
+      "rss_feed": "https://feeds.feedburner.com/IGNPS5Articles",
       "messages": [
         "PC é casa da mãe Joana",
         "só tem gentalha",

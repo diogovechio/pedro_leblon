@@ -3,6 +3,7 @@ import random
 import re
 import typing as T
 from asyncio import get_running_loop
+from bs4 import BeautifulSoup
 
 from pedro_leblon import telegram_logging
 
@@ -47,25 +48,22 @@ async def https_url_extract(text: str) -> str:
 
 
 async def html_paragraph_extractor(text: str) -> str:
-    cleaned_html = re.sub("<[^>]*>", "olololo", text)
-    split_cleaned_html = cleaned_html.split("olololo")
+    soup = BeautifulSoup(text, 'html.parser')
+    if soup.find("article"):
+        tag = soup.article
+    elif soup.find("main"):
+        tag = soup.main
+    elif soup.find("body"):
+        tag = soup.body
+    else:
+        return ""
 
-    split_cleaned_html = [
-        x.strip().replace("\n", "") for x in split_cleaned_html
-        if len(x.strip()) > 0 and "function(" not in x and "{" not in x and "window." not in x]
+    final_text = "\n".join(
+        [text for text in tag.strings
+         if len(text.strip()) > 1]
+    )
 
-    new_split = [""]
-
-    short_len_sequence_block = 4
-    for i, text in enumerate(split_cleaned_html):
-        text = (text.lower()).strip()
-
-        if (len(text) < short_len_sequence_block and len(new_split[-1]) < short_len_sequence_block) or text == new_split[-1]:
-            continue
-        else:
-            new_split.append(text)
-
-    return ". ".join(new_split)
+    return final_text
 
 
 async def message_destroyer(message_text: str) -> str:
