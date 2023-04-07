@@ -112,7 +112,7 @@ class OpenAiCompletion:
                                         f"Hoje é dia {date.day} do mês {date.month} do ano {date.year}. "
                                         f"São {date.hour} horas e {date.minute} minutos."},
                                     {"role": "assistant", "content":
-                                        f"Olá! Meu nome é Pedro. Responderei apenas em português do Brasil a não ser que seja solicitado o contrário. E toda vez que eu não quiser ou achar inadequado responder algo, irei dizer apenas "
+                                        f"Olá! Meu nome é Pedro. Toda vez que eu não quiser ou achar inadequado responder algo, irei dizer apenas "
                                         f" isso: WOLOLOLOLOLO."
                                      },
                                     {"role": "user", "content": prompt}
@@ -292,7 +292,7 @@ async def extract_website_paragraph_content(
                 text = await html_paragraph_extractor(await site.text(), char_limit)
 
         if len(text) >= 10:
-            return text
+            return " em português brasileiro:\n" + text
 
     except Exception as exc:
         get_running_loop().create_task(telegram_logging(exc))
