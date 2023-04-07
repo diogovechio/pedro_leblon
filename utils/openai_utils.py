@@ -11,7 +11,8 @@ import aiohttp
 
 from constants.constants import OPENAI_PROMPTS, CHATGPT_BS
 from utils.logging_utils import telegram_logging
-from utils.text_utils import pre_biased_prompt, message_destroyer, normalize_openai_text, html_paragraph_extractor
+from utils.text_utils import pre_biased_prompt, message_destroyer, normalize_openai_text, html_paragraph_extractor, \
+    youtube_caption_extractor
 
 usage_mapping = {
     "ada": 0.02,
@@ -277,15 +278,22 @@ class OpenAiCompletion:
 
 async def extract_website_paragraph_content(
         url: str,
-        session: aiohttp.ClientSession
+        session: aiohttp.ClientSession,
+        char_limit = 7000
 ) -> str:
     try:
-        headers = {"User-Agent": "Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) "
-                                 "AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"}
-        async with session.get(url, headers=headers) as site:
-            text = (await html_paragraph_extractor(await site.text()))[:11000]
-            if len(text) >= 500 and (200 <= site.status < 300):
-                return text
+        if "youtube.com/" in url or "https://youtu.be" in url:
+            text = await youtube_caption_extractor(url, char_limit)
+
+        else:
+            headers = {"User-Agent": "Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) "
+                                     "AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"}
+            async with session.get(url, headers=headers) as site:
+                text = await html_paragraph_extractor(await site.text(), char_limit)
+
+        if len(text) >= 10:
+            return text
+
     except Exception as exc:
         get_running_loop().create_task(telegram_logging(exc))
 

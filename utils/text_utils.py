@@ -1,4 +1,5 @@
 import logging
+from youtube_transcript_api import YouTubeTranscriptApi
 import random
 import re
 import typing as T
@@ -47,7 +48,29 @@ async def https_url_extract(text: str) -> str:
         return ""
 
 
-async def html_paragraph_extractor(text: str) -> str:
+async def youtube_caption_extractor(url: str, char_limit: int) -> str:
+    try:
+        if "watch?v=" in url and "youtube" in url:
+            video_id = url.split("watch?v=")[-1]
+        elif "youtu.be" in url:
+            video_id = url.split("/")[-1]
+        else:
+            return ""
+
+        a = YouTubeTranscriptApi.get_transcript(video_id, ['pt-BR', 'pt', 'pt-PT', 'en', 'en-US'])
+
+        text = "\n".join([i['text'] for i in a if 'text' in i])
+        if len(text) > char_limit:
+            text = text[:int(char_limit/2)] + text[-int(char_limit/2):]
+
+        return text
+    except Exception as exc:
+        get_running_loop().create_task(telegram_logging(exc))
+
+        return ""
+
+
+async def html_paragraph_extractor(text: str, char_limit: int) -> str:
     soup = BeautifulSoup(text, 'html.parser')
     if soup.find("article"):
         tag = soup.article
@@ -62,6 +85,9 @@ async def html_paragraph_extractor(text: str) -> str:
         [text for text in tag.strings
          if len(text.strip()) > 1]
     )
+
+    if len(text) > char_limit:
+        final_text = final_text[:int(char_limit / 2)] + final_text[-int(char_limit / 2):]
 
     return final_text
 
