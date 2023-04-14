@@ -23,7 +23,7 @@ async def mock_users(
 
     if (
             user_identified
-            and bot.config.mock_messages[user_identified].last_mock_hour != bot.datetime_now.hour
+            and bot.config.mock_messages[user_identified].last_mock_hour != round(bot.datetime_now.hour / 12)
             and random.random() < bot.config.random_params.random_mock_frequency
             and message.chat.id not in bot.config.not_internal_chats
     ):
@@ -32,10 +32,11 @@ async def mock_users(
                 message_text=random.choice(bot.config.mock_messages[user_identified].messages),
                 chat_id=message.chat.id,
                 sleep_time=2 + round(random.random() * 5),
-                reply_to=None),
+                reply_to=None
+            ),
         )
 
-        bot.config.mock_messages[user_identified].last_mock_hour = bot.datetime_now.hour
+        bot.config.mock_messages[user_identified].last_mock_hour = round(bot.datetime_now.hour / 12)
 
     if (
             (message.from_.username in ['nands93'])
