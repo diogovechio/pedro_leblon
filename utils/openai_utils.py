@@ -292,7 +292,7 @@ async def extract_website_paragraph_content(
                 text = await html_paragraph_extractor(await site.text(), char_limit)
 
         if len(text) >= 10:
-            return text
+            return " em português brasileiro:\n" + text
 
     except Exception as exc:
         get_running_loop().create_task(telegram_logging(exc))
