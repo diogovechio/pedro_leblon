@@ -51,6 +51,7 @@ class BotSecret:
     bot_token: str
     openai_key: str
     alternate_bot_token: str
+    open_weather: str
 
 @dataclass
 class BotConfig:

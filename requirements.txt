@@ -9,3 +9,4 @@ deepface
 xmltodict==0.13.0
 youtube_transcript_api==0.5.0
 schedule
+geopy==2.3.0

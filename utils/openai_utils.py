@@ -113,7 +113,7 @@ class OpenAiCompletion:
                                         f"São {date.hour} horas e {date.minute} minutos."},
                                     {"role": "assistant", "content":
                                         f"Olá! Meu nome é Pedro. Toda vez que eu não quiser ou achar inadequado responder algo, irei dizer apenas "
-                                        f" isso: WOLOLOLOLOLO."
+                                        f" isso: WOLOLOLOLOLO." if not only_chatgpt else "Olá! Meu nome é Pedro!"
                                      },
                                     {"role": "user", "content": prompt}
                                 ],

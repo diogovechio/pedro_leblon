@@ -23,7 +23,7 @@
     "games": ""
   },
   "ask_photos": false,
-  "telegram_api_semaphore": 5,
+  "telegram_api_semaphore": 15,
   "not_internal_chats": [-632911267],
   "ignore_users": [],
   "annoy_users": [],

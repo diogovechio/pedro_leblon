@@ -452,7 +452,7 @@ class FakePedro:
         sending = self.loop.create_task(self.send_action(chat_id, action, True))
         timer = self.loop.create_task(self.is_taking_too_long(chat_id=chat_id, user=user))
         try:
-            yield sending, timer
+            yield
         finally:
             sending.cancel()
             timer.cancel()
@@ -463,7 +463,7 @@ if __name__ == '__main__':
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
         secrets_file=SECRETS_FILE,
-        debug_mode=True
+        debug_mode=False
     )
 
     asyncio.run(

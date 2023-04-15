@@ -1,5 +1,32 @@
 SECRETS_FILE = 'secrets.json'
 
+WEATHER_LIST = ["previsao", "previsão", "tempo", "clima"]
+
+WEATHER_PROMPT = "responda as perguntas abaixo de forma enumerada. " \
+                 "caso a informação perguntada não esteja na mensagem, você irá responder apenas isso: 'null'.\n" \
+                 "responda diretamente a pergunta, sem comentários adicionais, " \
+                 "segue o exemplos da estrutura que você deve responder:\n\n" \
+                 "exemplo 1:\n" \
+                 "1 - sim\n" \
+                 "2 - rio de janeiro\n" \
+                 "3 - 5 dias\n\n" \
+                 "exemplo 2:\n" \
+                 "1 - não\n" \
+                 "2 - null\n" \
+                 "3 - null\n\n" \
+                 "exemplo 3:\n" \
+                 "1 - sim\n" \
+                 "2 - null\n" \
+                 "3 - 3 dias\n\n" \
+                 "exemplo 4:\n" \
+                 "1 - sim\n" \
+                 "2 - são paulo\n" \
+                 "3 - null\n\n" \
+                 "segue abaixo as perguntas em relação a mensagem:\n" \
+                 "1 - foi solicitado uma previsão do tempo? - responda apenas 'sim' ou 'não''\n" \
+                 "2 - qual local mencionado na mensagem? - responda apenas o nome do local, por exemplo: 'rio de janeiro' ou 'null'\n" \
+                 "3 - qual período em dias mencionado? - 'responda sempre os número de dias em dígitos, por exemplo: '3 dias'\n"
+
 DRUNK_DECAPTOR_LIST = [
     'vai dormir merda',
     'senhor dono da verdade',
@@ -39,7 +66,9 @@ OPENAI_PROMPTS = {
     'comente': 'comente objetivamente sobre isso:',
     'critique': 'critique o linguajar dessa mensagem:',
     'critique_reformule': 'critique o linguagem dessa mensagem e reformule para uma forma apropriada:',
-    'critique_negativamente': 'comente negativamente em relação a esse tema:'
+    'critique_negativamente': 'comente negativamente em relação a esse tema:',
+    'previsao_tempo': 'resuma essa previsão metereológica, com destaque ao dia atual:',
+    'previsao_tempo_sensacionalista': 'resuma essa previsão metereológica de maneira sensacionalista, sem usar aspas, com destaque ao dia atual:'
 }
 
 BOLSOFF_LIST = [

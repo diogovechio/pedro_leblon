@@ -1,12 +1,14 @@
 import random
+import re
 
-from constants.constants import SWEAR_WORDS, OPENAI_REACT_WORDS, OPENAI_PROMPTS, OPENAI_TRASH_LIST
+from constants.constants import SWEAR_WORDS, OPENAI_REACT_WORDS, OPENAI_PROMPTS, OPENAI_TRASH_LIST, WEATHER_LIST
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
 from utils.face_utils import put_list_of_faces_on_background
 from utils.openai_utils import extract_website_paragraph_content, return_dall_e_limit, list_reducer
 from utils.roleta_utils import get_roletas_from_pavuna, arrombado_classifier
 from utils.text_utils import https_url_extract, command_in
+from utils.weather_utils import weather_prompt, get_forecast
 
 
 async def openai_reactions(
@@ -63,24 +65,67 @@ async def openai_reactions(
 
     if not swear_word_detected:
         if (
-                command_in('pedr', message.text) or command_in('pedro?', message.text, text_end=True)
+                command_in('pedr', message.text) or command_in('pedro', message.text, text_end=True)
         ) and not command_in('/pedro', message.text):
             with bot.sending_action(message.chat.id, action="typing", user=message.from_.first_name):
-                bot.loop.create_task(
-                    bot.send_message(
-                        message_text=await bot.openai.generate_message(
-                            message_username=username,
-                            message_text=input_text,
-                            chat=message.chat.title,
-                            only_chatgpt=True if url_detector else False,
-                            prompt_inject=None if url_detector else OPENAI_PROMPTS['responda'],
-                            biased=False if url_detector else True,
-                            destroy_message=destroy_message,
-                            remove_words_list=['pedro'],
-                        ),
-                        chat_id=message.chat.id,
-                        reply_to=message.message_id)
-                )
+                forecast, city, days = None, None, None
+
+                if (
+                    any(weather_word in message.text.lower() for weather_word in WEATHER_LIST)
+                ):
+                    message_check = await bot.openai.generate_message(
+                                message_username=username,
+                                message_text=await weather_prompt(input_text),
+                                chat=message.chat.title,
+                                only_chatgpt=True,
+                                prompt_inject=None,
+                                biased=False,
+                                destroy_message=destroy_message,
+                                remove_words_list=['pedro'],
+                            )
+                    message_check = message_check.split('\n')
+
+                    forecast = "sim" in message_check[0].lower()
+                    if forecast and len(message_check) > 2:
+                        city_cleaned = message_check[1].split("-")[-1].lower().strip()
+                        city = city_cleaned if "null" != city_cleaned else None
+                        days = re.findall("\d+", message_check[2].split("-")[-1])
+                        if len(days):
+                            days = days[0]
+
+                if forecast:
+                    bot.loop.create_task(
+                        bot.send_message(
+                            message_text=await bot.openai.generate_message(
+                                message_username=username,
+                                message_text=await get_forecast(bot=bot, place=city, days=days),
+                                chat=message.chat.title,
+                                return_raw_text=True,
+                                only_chatgpt=True,
+                                prompt_inject=OPENAI_PROMPTS['previsao_tempo'] if random.random() > 0.3 else OPENAI_PROMPTS['previsao_tempo_sensacionalista'],
+                                biased=False,
+                                destroy_message=destroy_message,
+                                remove_words_list=['pedro'],
+                            ),
+                            chat_id=message.chat.id,
+                            reply_to=message.message_id)
+                    )
+                else:
+                    bot.loop.create_task(
+                        bot.send_message(
+                            message_text=await bot.openai.generate_message(
+                                message_username=username,
+                                message_text=input_text,
+                                chat=message.chat.title,
+                                only_chatgpt=True if url_detector else False,
+                                prompt_inject=None if url_detector else OPENAI_PROMPTS['responda'],
+                                biased=False if url_detector else True,
+                                destroy_message=destroy_message,
+                                remove_words_list=['pedro'],
+                            ),
+                            chat_id=message.chat.id,
+                            reply_to=message.message_id)
+                    )
 
         elif (
                 str(message.from_.id) in bot.config.annoy_users or message.from_.username in bot.config.annoy_users
