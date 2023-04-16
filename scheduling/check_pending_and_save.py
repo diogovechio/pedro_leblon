@@ -51,22 +51,30 @@ def check_agenda_and_save(bot: FakePedro):
                             )
                         )
 
-        new_data = asdict(bot.commemorations)
+        new_agenda_data = asdict(bot.commemorations)
+        user_forecast = json.dumps(bot.config.user_last_forecast)
 
-        for idx, _ in enumerate(new_data['data']):
-            new_data['data'][idx]['created_at'] = str(new_data['data'][idx]['created_at'])
-            new_data['data'][idx]['celebrate_at'] = str(new_data['data'][idx]['celebrate_at'])
-            if new_data['data'][idx]['last_celebration']:
-                new_data['data'][idx]['last_celebration'] = str(new_data['data'][idx]['last_celebration'])
+        for idx, _ in enumerate(new_agenda_data['data']):
+            new_agenda_data['data'][idx]['created_at'] = str(new_agenda_data['data'][idx]['created_at'])
+            new_agenda_data['data'][idx]['celebrate_at'] = str(new_agenda_data['data'][idx]['celebrate_at'])
+            if new_agenda_data['data'][idx]['last_celebration']:
+                new_agenda_data['data'][idx]['last_celebration'] = str(new_agenda_data['data'][idx]['last_celebration'])
 
-        new_json = json.dumps(new_data['data'], indent=4)
+        new_json = json.dumps(new_agenda_data['data'], indent=4)
 
         with open("commemorations_tmp.json", "w") as file:
             file.write(new_json)
 
+        with open("forecast_tmp.json", "w") as file:
+            file.write(user_forecast)
+
         if os.path.exists("commemorations.json"):
             os.remove("commemorations.json")
 
+        if os.path.exists("forecast_users.json"):
+            os.remove("forecast_users.json")
+
         os.rename("commemorations_tmp.json", "commemorations.json")
+        os.rename("forecast_tmp.json", "forecast_users.json")
     except Exception as exc:
         bot.loop.create_task(telegram_logging(exc))

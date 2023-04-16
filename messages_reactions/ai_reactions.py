@@ -64,45 +64,45 @@ async def openai_reactions(
                 )
 
     if not swear_word_detected:
-        if (
-                command_in('pedr', message.text) or command_in('pedro', message.text, text_end=True)
-        ) and not command_in('/pedro', message.text):
-            with bot.sending_action(message.chat.id, action="typing", user=message.from_.first_name):
-                forecast, city, days = None, None, None
+        if any(forecast_word in message.text.lower() for forecast_word in WEATHER_LIST):
+            message_check = await bot.openai.generate_message(
+                message_username=username,
+                message_text=await weather_prompt(input_text),
+                chat=message.chat.title,
+                only_chatgpt=True,
+                prompt_inject=None,
+                biased=False,
+                destroy_message=destroy_message,
+                remove_words_list=['pedro'],
+            )
+            message_check = message_check.split('\n')
 
-                if (
-                    any(weather_word in message.text.lower() for weather_word in WEATHER_LIST)
-                ):
-                    message_check = await bot.openai.generate_message(
-                                message_username=username,
-                                message_text=await weather_prompt(input_text),
-                                chat=message.chat.title,
-                                only_chatgpt=True,
-                                prompt_inject=None,
-                                biased=False,
-                                destroy_message=destroy_message,
-                                remove_words_list=['pedro'],
-                            )
-                    message_check = message_check.split('\n')
+            forecast = "sim" in message_check[0].lower()
 
-                    forecast = "sim" in message_check[0].lower()
-                    if forecast and len(message_check) > 2:
-                        city_cleaned = message_check[1].split("-")[-1].lower().strip()
-                        city = city_cleaned if "null" != city_cleaned else None
-                        days = re.findall("\d+", message_check[2].split("-")[-1])
-                        if len(days):
-                            days = days[0]
+            if forecast and len(message_check) > 2:
+                with bot.sending_action(message.chat.id, action="typing", user=message.from_.first_name):
+                    city_cleaned = message_check[1].split("-")[-1].lower().strip()
+                    city = city_cleaned if "null" != city_cleaned else None
 
-                if forecast:
+                    if city:
+                        bot.config.user_last_forecast[str(message.from_.id)] = city
+                    elif str(message.from_.id) in bot.config.user_last_forecast:
+                        city = bot.config.user_last_forecast[str(message.from_.id)]
+
+                    days = re.findall("\d+", message_check[2].split("-")[-1])
+                    if len(days):
+                        days = days[0]
+
                     bot.loop.create_task(
                         bot.send_message(
                             message_text=await bot.openai.generate_message(
                                 message_username=username,
-                                message_text=await get_forecast(bot=bot, place=city, days=days),
+                                message_text=input_text + await get_forecast(bot=bot, place=city, days=days),
                                 chat=message.chat.title,
                                 return_raw_text=True,
                                 only_chatgpt=True,
-                                prompt_inject=OPENAI_PROMPTS['previsao_tempo'] if random.random() > 0.3 else OPENAI_PROMPTS['previsao_tempo_sensacionalista'],
+                                prompt_inject=OPENAI_PROMPTS['previsao_tempo'] if random.random() > 0.3 else OPENAI_PROMPTS[
+                                    'previsao_tempo_sensacionalista'],
                                 biased=False,
                                 destroy_message=destroy_message,
                                 remove_words_list=['pedro'],
@@ -110,7 +110,13 @@ async def openai_reactions(
                             chat_id=message.chat.id,
                             reply_to=message.message_id)
                     )
-                else:
+
+                    return
+
+        if (
+                command_in('pedr', message.text) or command_in('pedro', message.text, text_end=True)
+        ) and not command_in('/pedro', message.text):
+            with bot.sending_action(message.chat.id, action="typing", user=message.from_.first_name):
                     bot.loop.create_task(
                         bot.send_message(
                             message_text=await bot.openai.generate_message(

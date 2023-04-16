@@ -18,11 +18,11 @@ async def get_forecast(bot: FakePedro, place: T.Optional[str], days: T.Optional[
         place = "russia"
     if not days:
         days = 2
-    elif isinstance(days, int) and days > 5:
-        days = 5
+    elif isinstance(days, int) and days > 7:
+        days = 7
 
     try:
-        forecast = [f"previsão do tempo em {place}"]
+        forecast = [f"previsão do tempo em {place}:"]
 
         local = await wait_for(
             get_lat_lon(place),
@@ -33,25 +33,24 @@ async def get_forecast(bot: FakePedro, place: T.Optional[str], days: T.Optional[
 
         app_id = bot.config.secrets.open_weather
 
-        async with bot.session.get(f"https://api.openweathermap.org/data/2.5/"
-                             f"forecast?cnt={days}&units=metrics&lat={lat}&lon={lon}&lang=pt&appid={app_id}") as req:
+        async with bot.session.get(f"https://api.openweathermap.org/data/3.0/onecall?"
+                                   f"cnt={days}&units=imperial&lat={lat}&lon={lon}&lang=pt&appid={app_id}") as req:
             resp = json.loads(await req.text())
 
-            if 'list' in resp and isinstance(resp['list'], list):
-                for i, x in enumerate(resp['list']):
-                    date = x['dt_txt'].split(" ")[0]
+            if 'daily' in resp and isinstance(resp['daily'], list):
+                for i, x in enumerate(resp['daily'][:int(days)]):
                     if i == 0:
-                        day = f"Hoje, {date}: "
+                        day = f"Hoje: "
                     elif i == 1:
-                        day = f"Amanhã, {date}: "
+                        day = f"Amanhã: "
                     else:
-                        day = f"{date}: "
+                        day = f"{i + 1} dias depois de amanhã: "
 
                     forecast.append(
-                        f"{day}predominantemente {x['weather'][0]['description']}, temperatura em {round(x['main']['temp'] / 10)}c°, "
-                        f"máxima de {round(x['main']['temp_max'] / 10)} e "
-                        f"mínima de {round(x['main']['temp_min'] / 10)}c°, "
-                        f"sensação térmica de {round(x['main']['feels_like'] / 10)}c°")
+                        f"{day}predominantemente {x['weather'][0]['description']}, temperatura em {f_to_c(x['temp']['day'])}c°, "
+                        f"máxima de {f_to_c(x['temp']['max'])} e "
+                        f"mínima de {f_to_c(x['temp']['min'])}c°, "
+                        f"sensação térmica de {f_to_c(x['feels_like']['day'])}c°")
 
             return "\n".join(forecast)
 
@@ -67,3 +66,7 @@ async def get_lat_lon(place: str) -> tuple:
     location = geolocator.geocode(place)
 
     return location.latitude, location.longitude
+
+
+def f_to_c(value: int) -> int:
+    return int((value - 32) * 5 / 9)

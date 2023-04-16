@@ -65,6 +65,7 @@ class BotConfig:
     allowed_ids: T.List[UserID]
     mock_messages: T.Dict[str, MockMessage]
     block_samuel: bool
+    user_last_forecast: T.Dict[str, str] = Field(default_factory=dict)
     not_internal_chats: T.List[int] = Field(default_factory=list)
     ignore_users: T.List[str] = Field(default_factory=list)
     annoy_users: T.List[str] = Field(default_factory=list)
