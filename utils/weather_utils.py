@@ -1,6 +1,7 @@
 import json
 import typing as T
 from asyncio import get_running_loop, wait_for
+from datetime import datetime
 
 from constants.constants import WEATHER_PROMPT
 
@@ -9,6 +10,18 @@ from geopy.geocoders import Nominatim
 from pedro_leblon import FakePedro
 from utils.logging_utils import telegram_logging
 
+
+WEEKDAYS = [
+    "segunda-feira",
+    "terça-feira",
+    "quarta-feira",
+    "quinta-feira",
+    "sexta-feira",
+    "sábado",
+    "domingo"
+]
+
+datetime.fromtimestamp(1681740000).weekday()
 
 async def weather_prompt(message: str) -> str:
     return f"dado a seguinte mensagem:\n\n'{message}'\n\n{WEATHER_PROMPT}"
@@ -22,7 +35,7 @@ async def get_forecast(bot: FakePedro, place: T.Optional[str], days: T.Optional[
         days = 7
 
     try:
-        forecast = [f"previsão do tempo em {place}:"]
+        forecast = ["\n\n"]
 
         local = await wait_for(
             get_lat_lon(place),
@@ -39,15 +52,14 @@ async def get_forecast(bot: FakePedro, place: T.Optional[str], days: T.Optional[
 
             if 'daily' in resp and isinstance(resp['daily'], list):
                 for i, x in enumerate(resp['daily'][:int(days)]):
+                    day = WEEKDAYS[datetime.fromtimestamp(x['dt']).weekday()]
                     if i == 0:
-                        day = f"Hoje: "
-                    elif i == 1:
-                        day = f"Amanhã: "
-                    else:
-                        day = f"{i + 1} dias depois de amanhã: "
+                        day = f"hoje, {day}"
+                    if i == 1:
+                        day = f"amanhã, {day}"
 
                     forecast.append(
-                        f"{day}predominantemente {x['weather'][0]['description']}, temperatura em {f_to_c(x['temp']['day'])}c°, "
+                        f"{day}: predominantemente {x['weather'][0]['description']}, temperatura em {f_to_c(x['temp']['day'])}c°, "
                         f"máxima de {f_to_c(x['temp']['max'])} e "
                         f"mínima de {f_to_c(x['temp']['min'])}c°, "
                         f"sensação térmica de {f_to_c(x['feels_like']['day'])}c°")
@@ -57,7 +69,7 @@ async def get_forecast(bot: FakePedro, place: T.Optional[str], days: T.Optional[
     except Exception as exc:
         get_running_loop().create_task(telegram_logging(exc))
 
-    return "muito frio no japão"
+    return "não há uma previsão do tempo. diga que você não conseguiu encontrar o local."
 
 
 async def get_lat_lon(place: str) -> tuple:

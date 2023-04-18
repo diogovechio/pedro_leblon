@@ -101,7 +101,7 @@ async def openai_reactions(
                                 chat=message.chat.title,
                                 return_raw_text=True,
                                 only_chatgpt=True,
-                                prompt_inject=OPENAI_PROMPTS['previsao_tempo'] if random.random() > 0.3 else OPENAI_PROMPTS[
+                                prompt_inject=OPENAI_PROMPTS['previsao_tempo'] if random.random() > 0.05 else OPENAI_PROMPTS[
                                     'previsao_tempo_sensacionalista'],
                                 biased=False,
                                 destroy_message=destroy_message,

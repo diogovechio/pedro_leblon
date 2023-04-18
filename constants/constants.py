@@ -67,14 +67,10 @@ OPENAI_PROMPTS = {
     'critique': 'critique o linguajar dessa mensagem:',
     'critique_reformule': 'critique o linguagem dessa mensagem e reformule para uma forma apropriada:',
     'critique_negativamente': 'comente negativamente em relação a esse tema:',
-    'previsao_tempo': 'use emoji 🔥 para indicar temperaturas acima de 31 graus. emoji de 🌧 para indicar chuva. '
-                      'emoji de ⛈ para indicar tempestade. emoji de ☀️ para indicar sol. '
-                      'emoji de 🌥 para indicar sol entre nuvens. emoji de ☁️ para indicar tempo nublado. '
-                      'agora resuma em 3 frases essa previsão metereológica:',
-    'previsao_tempo_sensacionalista': 'use emoji 🔥 para indicar temperaturas acima de 25 graus. '
-                                      'emoji de 🌧 para indicar chuva. emoji de ⛈ para indicar tempestade. '
-                                      'emoji de ☀️ para indicar sol. emoji de 🌥 para indicar sol entre nuvens. '
-                                      'emoji de ☁️ para indicar tempo nublado. '
+    'previsao_tempo': 'faça um curto resumo, de no máximo 4 frases, da previsão do tempo a seguir.'
+                      'use emojis 🔥, 🌧, ☀️ ou ☁️ para representar as condições climáticas de cada dia. '
+                      'pule duas linhas entre cada frase. finalize dizendo que sua fonte é o openweather:',
+    'previsao_tempo_sensacionalista': 'use emojis 🔥🌧☀️☁️ representando cada condição climática. '
                                       'agora resuma essa previsão metereológica de maneira sensacionalista, '
                                       'sem usar aspas:'
 }
