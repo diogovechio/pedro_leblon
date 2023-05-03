@@ -35,14 +35,17 @@ async def get_forecast(bot: FakePedro, place: T.Optional[str], days: T.Optional[
         days = 7
 
     try:
-        forecast = ["\n\n"]
+        forecast = [f"\nprevisão do tempo em {place}:"]
 
-        local = await wait_for(
-            get_lat_lon(place),
-            timeout=300
-        )
+        for _ in range(3):
+            local = await wait_for(
+                get_lat_lon(place),
+                timeout=450
+            )
 
-        lat, lon = local
+            if isinstance(local, tuple):
+                lat, lon = local
+                break
 
         app_id = bot.config.secrets.open_weather
 
@@ -81,4 +84,4 @@ async def get_lat_lon(place: str) -> tuple:
 
 
 def f_to_c(value: int) -> int:
-    return int((value - 32) * 5 / 9)
+    return round((value - 32) * 5 / 9)

@@ -30,13 +30,6 @@ async def openai_reactions(
             session=bot.session
         )
 
-        bot.loop.create_task(
-            bot.send_message(
-                message_text=url_content,
-                chat_id=8375482
-            )
-        )
-
         input_text = input_text.replace(url_detector, url_content)
 
     if swear_word_detected := any(
@@ -101,7 +94,7 @@ async def openai_reactions(
                                 chat=message.chat.title,
                                 return_raw_text=True,
                                 only_chatgpt=True,
-                                prompt_inject=OPENAI_PROMPTS['previsao_tempo'] if random.random() > 0.05 else OPENAI_PROMPTS[
+                                prompt_inject=OPENAI_PROMPTS['previsao_tempo'] if random.random() > 0.1 else OPENAI_PROMPTS[
                                     'previsao_tempo_sensacionalista'],
                                 biased=False,
                                 destroy_message=destroy_message,

@@ -2,7 +2,7 @@ import os
 import random
 import uuid
 import typing as T
-from asyncio import get_running_loop
+from asyncio import get_running_loop, wait_for
 
 import face_recognition
 from deepface import DeepFace
@@ -157,7 +157,15 @@ async def detect_face(
     input_image_embeddings = face_recognition.face_encodings(face_recognition.load_image_file(temp_filename))
     data = None
 
-    emotion = await face_emotion(temp_filename)
+    try:
+        emotion = await wait_for(
+            face_emotion(temp_filename),
+            timeout=15
+        )
+    except Exception as exc:
+        get_running_loop().create_task(telegram_logging(exc))
+        emotion = None
+
     if not emotion:
         with open(temp_filename_2, 'wb') as file:
             file.write(full_image)
@@ -202,6 +210,7 @@ async def detect_face(
 async def face_emotion(img_path: str) -> str:
     emotion = ''
     try:
-        emotion = DeepFace.analyze(img_path=img_path, actions="emotion")[0]['dominant_emotion']
+        # emotion = DeepFace.analyze(img_path=img_path, actions="emotion")[0]['dominant_emotion']
+        emotion = random.choice(["irritado", "neutro", "feliz", "bonito", "otimista"])
     finally:
         return emotion

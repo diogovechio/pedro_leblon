@@ -1,6 +1,5 @@
 import asyncio
 import datetime
-import logging
 import random
 import typing as T
 
@@ -235,13 +234,13 @@ class OpenAiCompletion:
         is_flagged, moderation_results = await self.is_flagged(prompt)
 
         if is_flagged and moderate:
-            prompt = f"critique o @{message_username} por ele ter enviado uma mensagem com conteúdo de" \
+            prompt = f"critique o @{message_username} por ele ter enviado uma mensagem com conteúdo de " \
                      f"{' ,'.join([key for key, value in moderation_results['results'][0]['categories'].items() if value])}. " \
                      f"diga que ele pode ser banido de {chat}."
         else:
             prompt = f"{prompt_inject}: {prompt}" if prompt_inject else prompt
 
-        timeout = 360
+        timeout = 240
 
         for i in range(3):
             retry_sleep = int(2 + random.random() * 5)
