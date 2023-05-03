@@ -1,19 +1,21 @@
+import asyncio
+import multiprocessing.managers
 import os
 import random
 import uuid
 import typing as T
 from asyncio import get_running_loop, wait_for
+from multiprocessing import Process, Manager
 
 import face_recognition
 from deepface import DeepFace
-
 from PIL import Image, ImageOps
 
 from data_classes.image_data import FaceResult
-
 from data_classes.image_data import FaceCrop
 from pedro_leblon import FakePedro, telegram_logging
 
+responses_dict = {}
 
 async def faces_coordinates_detector(image: bytes, min_size: int) -> T.Optional[T.List[T.Tuple]]:
     temp_filename = f'tmp/{uuid.uuid4()}.tmp'
@@ -160,7 +162,7 @@ async def detect_face(
     try:
         emotion = await wait_for(
             face_emotion(temp_filename),
-            timeout=15
+            timeout=60
         )
     except Exception as exc:
         get_running_loop().create_task(telegram_logging(exc))
@@ -210,7 +212,29 @@ async def detect_face(
 async def face_emotion(img_path: str) -> str:
     emotion = ''
     try:
-        # emotion = DeepFace.analyze(img_path=img_path, actions="emotion")[0]['dominant_emotion']
-        emotion = random.choice(["irritado", "neutro", "feliz", "bonito", "otimista"])
+        manager = Manager()
+        return_dict = manager.dict()
+
+        _id = str(uuid.uuid4())
+
+        process = Process(target=_emotion, args=(img_path, _id, return_dict,))
+        process.start()
+
+        for _ in range(5):
+            if _id in return_dict:
+                emotion = return_dict[_id]
+                del return_dict[_id]
+                break
+            await asyncio.sleep(5)
+
     finally:
         return emotion
+
+
+def _emotion(img_path: str, uid: str, return_dict: dict):
+    try:
+        emotion = DeepFace.analyze(img_path=img_path, actions="emotion")[0]['dominant_emotion']
+        return_dict[uid] = emotion
+    except:
+        return_dict[uid] = ""
+
