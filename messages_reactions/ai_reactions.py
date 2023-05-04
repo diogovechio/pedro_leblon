@@ -397,3 +397,23 @@ async def openai_reactions(
                         sleep_time=1 + (round(random.random()) * 5),
                         reply_to=message.message_id)
                 )
+        elif (
+                bot.mocked_hour != bot.datetime_now.hour and message.chat.id not in bot.config.not_internal_chats
+                and random.random() < bot.config.random_params.words_react_frequency
+        ):
+            with bot.sending_action(message.chat.id, action="typing"):
+                chat = "\n".join(bot.messages_in_memory[message.chat.id][-15:])
+                bot.loop.create_task(
+                    bot.send_message(
+                        message_text=await bot.openai.generate_message(
+                            message_username='.',
+                            message_text=chat,
+                            chat=message.chat.title,
+                            only_davinci=True,
+                            biased=True,
+                        ),
+                        chat_id=message.chat.id,
+                        reply_to=message.message_id)
+                )
+
+                bot.mocked_hour = bot.datetime_now.hour
