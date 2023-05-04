@@ -107,8 +107,6 @@ async def message_destroyer(message_text: str) -> str:
 
 async def pre_biased_prompt(prompt_text: str) -> str:
     additional_text = ''
-    if 'pedro' in prompt_text:
-        additional_text = 'assumindo que o seu próprio nome é pedro, '
     if 'bolsonaro' in prompt_text:
         additional_text += "assumindo que o governo bolsonaro é péssimo, "
     if 'lula' in prompt_text:
@@ -134,15 +132,19 @@ async def pre_biased_prompt(prompt_text: str) -> str:
     if 'keyo' in prompt_text:
         additional_text += "assumindo que o keyo é rica e odeia gentalha, "
     if 'samuel' in prompt_text or ' sam' in prompt_text or 'sam ' in prompt_text:
-        additional_text += "assumindo que o verdadeiro nome do samuel é samuelgames, "
+        additional_text += "assumindo que o samuel se chama samuelgames e é uma narcisista, "
     if 'nando' in prompt_text or 'nands93' in prompt_text:
         additional_text += "assumindo que o nando devia arrumar um emprego, "
     if 'renato' in prompt_text or 'renfd' in prompt_text:
         additional_text += "assumindo que o renato é um bolsominion homofóbico, "
     if 'decaptor' in prompt_text:
         additional_text += "assumindo que o decaptor é um macho orgulhoso, "
+    if 'andré' in prompt_text or 'andre' in prompt_text:
+        additional_text += "assumindo que o decaptor é um macho orgulhoso, "
     if 'cocão' in prompt_text or 'cocao' in prompt_text:
         additional_text += "assumindo que o cocão gosta muito de glamour, "
+    if 'michael' in prompt_text:
+        additional_text += "assumindo que o michael gosta muito de glamour, "
     if len(additional_text):
         return f"{additional_text}, {prompt_text}"
     return prompt_text

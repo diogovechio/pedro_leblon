@@ -8,7 +8,7 @@
         "for_chat": 8375482,
         "message": "",
         "anniversary": "@diogovechio",
-        "last_celebration": "2023-04-17 21:56:44.411615"
+        "last_celebration": "2023-04-17 00:00:07.668337"
     },
     {
         "id": "28e5d162-b699-4b0d-bb17-e92ea3256254",
@@ -19,7 +19,7 @@
         "for_chat": -1001369599178,
         "message": "",
         "anniversary": "@diogovechio",
-        "last_celebration": "2023-04-17 21:56:44.411615"
+        "last_celebration": "2023-04-17 00:00:07.668337"
     },
     {
         "id": "39c218a6-e010-4161-a956-1addc5a77f25",
@@ -30,7 +30,7 @@
         "for_chat": -423330801,
         "message": "",
         "anniversary": "diogo",
-        "last_celebration": "2023-04-17 21:56:44.411615"
+        "last_celebration": "2023-04-17 00:00:07.668337"
     },
     {
         "id": "a2c0bfaf-e744-46ef-86a2-6e5695815f15",
@@ -44,17 +44,6 @@
         "last_celebration": null
     },
     {
-        "id": "034fe8bf-5085-4fb9-84b2-071fda68113f",
-        "every_year": true,
-        "created_by": 8375482,
-        "created_at": "2022-12-28 00:16:57.975489",
-        "celebrate_at": "2022-12-29 00:00:00",
-        "for_chat": 8375482,
-        "message": "",
-        "anniversary": "teste",
-        "last_celebration": null
-    },
-    {
         "id": "a821fc4f-9735-49f5-b64b-61532330eda0",
         "every_year": true,
         "created_by": 856468528,
@@ -63,28 +52,6 @@
         "for_chat": -1001369599178,
         "message": "",
         "anniversary": "@renanolf",
-        "last_celebration": null
-    },
-    {
-        "id": "a4ed876d-559d-4061-a677-ffdb8aa7b0cd",
-        "every_year": true,
-        "created_by": 8375482,
-        "created_at": "2022-12-28 08:18:43.951609",
-        "celebrate_at": "2022-01-15 00:00:00",
-        "for_chat": 8375482,
-        "message": "",
-        "anniversary": "abestado",
-        "last_celebration": null
-    },
-    {
-        "id": "55b08f17-75a0-4177-bce6-9ad83f4fb8cd",
-        "every_year": true,
-        "created_by": 8375482,
-        "created_at": "2022-12-28 08:33:43.269932",
-        "celebrate_at": "2022-12-29 00:00:00",
-        "for_chat": 8375482,
-        "message": "",
-        "anniversary": "otavio rodrigues da gb",
         "last_celebration": null
     },
     {
@@ -118,7 +85,7 @@
         "for_chat": -632911267,
         "message": "",
         "anniversary": "verificar o volume do mongo do gt",
-        "last_celebration": null
+        "last_celebration": "2023-05-01 00:00:09.083905"
     },
     {
         "id": "99f5d621-28ec-4f4f-a860-7e87dbfbaf17",
@@ -129,7 +96,7 @@
         "for_chat": -1001369599178,
         "message": "",
         "anniversary": "@cocao",
-        "last_celebration": "2023-02-07 19:29:20.556322"
+        "last_celebration": "2023-02-07 00:00:04.731123"
     },
     {
         "id": "b7073f3b-4593-4a70-8758-ca204af9cddd",
@@ -154,91 +121,168 @@
         "last_celebration": null
     },
     {
-        "id": "de60b82e-bc6b-4f60-8541-89758ac0c285",
-        "every_year": false,
-        "created_by": 8375482,
-        "created_at": "2022-12-28 19:47:33.668263",
-        "celebrate_at": "2022-12-29 00:00:00",
-        "for_chat": 8375482,
-        "message": "amanh\u00e3 \u00e9 dia de ver se essa merda t\u00e1 funcionando direito",
-        "anniversary": "",
-        "last_celebration": null
-    },
-    {
-        "id": "c4aa8c44-7262-44cc-bcde-ee8aa377b313",
-        "every_year": false,
-        "created_by": 8375482,
-        "created_at": "2022-12-28 19:47:50.061696",
-        "celebrate_at": "2022-12-29 00:00:00",
-        "for_chat": -1001369599178,
-        "message": "amanh\u00e3 \u00e9 dia de ver se essa merda t\u00e1 funcionando direito",
-        "anniversary": "",
-        "last_celebration": null
-    },
-    {
-        "id": "9d89eb5e-5f48-429d-be4f-b1a5186a7fab",
-        "every_year": false,
-        "created_by": 8375482,
-        "created_at": "2022-12-28 19:48:17.079230",
-        "celebrate_at": "2022-12-28 00:00:00",
-        "for_chat": 8375482,
-        "message": "hoje \u00e9 dia de ver se essa merda t\u00e1 funcionando direito",
-        "anniversary": "",
-        "last_celebration": "2022-12-28 17:04:14.894336"
-    },
-    {
-        "id": "acc5425b-3362-4982-aeee-36012ecdbdee",
+        "id": "6d40bec0-a454-403a-8019-05ff0cad3e8f",
         "every_year": true,
         "created_by": 8375482,
-        "created_at": "2022-12-28 19:53:48.059601",
-        "celebrate_at": "2022-12-28 00:00:00",
-        "for_chat": 8375482,
-        "message": "blabps teste",
+        "created_at": "2022-12-28 20:33:12.392967",
+        "celebrate_at": "2022-12-29 00:00:00",
+        "for_chat": -632911267,
+        "message": "testando a agendinha",
         "anniversary": "",
-        "last_celebration": "2022-12-28 17:04:14.894336"
+        "last_celebration": "2022-12-29 00:00:08.250246"
     },
     {
-        "id": "a94f86af-ee10-4c97-8f9e-dbb10af0094e",
+        "id": "07168db3-da5b-425b-88d3-f3cdbdbd3c71",
         "every_year": true,
         "created_by": 8375482,
-        "created_at": "2022-12-28 19:54:30.260781",
-        "celebrate_at": "2022-12-27 00:00:00",
-        "for_chat": 8375482,
+        "created_at": "2022-12-28 21:12:38.187711",
+        "celebrate_at": "2022-12-29 00:00:00",
+        "for_chat": -423330801,
+        "message": "vsf manuel",
+        "anniversary": "",
+        "last_celebration": "2022-12-29 00:00:08.250246"
+    },
+    {
+        "id": "c2a3fe7a-9ea7-4aad-8e7a-d5c4d1a2921c",
+        "every_year": false,
+        "created_by": 8375482,
+        "created_at": "2022-12-28 21:15:32.602947",
+        "celebrate_at": "2022-12-28 00:00:00",
+        "for_chat": -632911267,
+        "message": "isso aqui ele provavelmente vai notificar agora",
+        "anniversary": "",
+        "last_celebration": "2022-12-28 21:15:41.252333"
+    },
+    {
+        "id": "bd3dd74c-a253-43c2-85ef-bd54ac8425a9",
+        "every_year": true,
+        "created_by": 8375482,
+        "created_at": "2022-12-28 21:17:47.912288",
+        "celebrate_at": "2022-04-17 00:00:00",
+        "for_chat": -632911267,
         "message": "",
-        "anniversary": "bvlablal",
+        "anniversary": "diogo",
+        "last_celebration": "2023-04-17 00:00:07.668337"
+    },
+    {
+        "id": "952844fe-f2de-4087-b98d-789c956420ce",
+        "every_year": true,
+        "created_by": 8375482,
+        "created_at": "2022-12-28 21:20:23.951998",
+        "celebrate_at": "2022-04-22 00:00:00",
+        "for_chat": -632911267,
+        "message": "",
+        "anniversary": "@yurisbv",
+        "last_celebration": "2023-04-22 00:00:05.565018"
+    },
+    {
+        "id": "d01eada6-b0d3-4db6-a47e-3eb3b92c8a0d",
+        "every_year": false,
+        "created_by": 8375482,
+        "created_at": "2022-12-28 21:21:22.441768",
+        "celebrate_at": "2022-12-29 00:00:00",
+        "for_chat": -632911267,
+        "message": "vamos ver se notifica amanh\u00e3 isso aqui",
+        "anniversary": "",
+        "last_celebration": "2022-12-29 00:00:08.250246"
+    },
+    {
+        "id": "42931dd7-2b22-407e-975a-549b68537424",
+        "every_year": false,
+        "created_by": 8375482,
+        "created_at": "2022-12-29 08:01:02.827691",
+        "celebrate_at": "2024-01-01 00:00:00",
+        "for_chat": -423330801,
+        "message": "feliz anivers\u00e1rio de 1 ano sem bolsonaro",
+        "anniversary": "",
         "last_celebration": null
     },
     {
-        "id": "acd2e8d4-15fd-4e5c-9c91-c80f7992ee99",
-        "every_year": true,
+        "id": "81e1ebb9-8d7f-4ad0-bb75-09049065f1ac",
+        "every_year": false,
         "created_by": 8375482,
-        "created_at": "2022-12-28 19:55:20.000958",
-        "celebrate_at": "2022-12-28 00:00:00",
-        "for_chat": 8375482,
-        "message": "qualquer coisa",
+        "created_at": "2022-12-29 08:01:55.301149",
+        "celebrate_at": "2024-01-01 00:00:00",
+        "for_chat": -1001369599178,
+        "message": "feliz anivers\u00e1rio de 1 ano sem bolsonaro",
         "anniversary": "",
-        "last_celebration": "2022-12-28 17:04:14.894336"
+        "last_celebration": null
     },
     {
-        "id": "fd7a3963-4036-4a69-ac7b-e032938c39ff",
-        "every_year": true,
+        "id": "3098b83a-ca59-468a-8c91-241cef5f9661",
+        "every_year": false,
         "created_by": 8375482,
-        "created_at": "2022-12-28 17:04:09.656977",
-        "celebrate_at": "2022-12-28 00:00:00",
+        "created_at": "2023-01-10 21:17:05.823868",
+        "celebrate_at": "2023-01-11 00:00:00",
         "for_chat": 8375482,
-        "message": "qualquer coisa",
+        "message": "teste",
         "anniversary": "",
-        "last_celebration": "2022-12-28 17:04:14.894336"
+        "last_celebration": "2023-01-11 00:00:09.231907"
     },
     {
-        "id": "6ffca4af-c0d1-44a2-968f-a2be1dd32f6f",
+        "id": "5ec239a0-6f0a-490c-a567-486e061f829f",
+        "every_year": false,
+        "created_by": 8375482,
+        "created_at": "2023-01-15 15:42:20.896811",
+        "celebrate_at": "2023-02-22 00:00:00",
+        "for_chat": 8375482,
+        "message": "cirurgia da remo\u00e7\u00e3o da verruga no dia 24",
+        "anniversary": "",
+        "last_celebration": "2023-02-22 00:00:04.952631"
+    },
+    {
+        "id": "43e4decb-63de-4902-b57c-e322b96ffc3f",
         "every_year": true,
         "created_by": 8375482,
-        "created_at": "2022-12-28 17:06:42.785632",
-        "celebrate_at": "2022-12-28 00:00:00",
-        "for_chat": 8375482,
-        "message": "asdasda sd",
+        "created_at": "2023-03-25 11:55:27.313630",
+        "celebrate_at": "2023-04-04 00:00:00",
+        "for_chat": -1001369599178,
+        "message": "",
+        "anniversary": "@eicho",
+        "last_celebration": "2023-04-04 00:00:01.442327"
+    },
+    {
+        "id": "7b94a0fa-d259-4cb2-9b94-1838f89c8839",
+        "every_year": true,
+        "created_by": 8375482,
+        "created_at": "2023-03-25 11:56:42.678812",
+        "celebrate_at": "2023-04-09 00:00:00",
+        "for_chat": -1001369599178,
+        "message": "",
+        "anniversary": "@kkeyo",
+        "last_celebration": "2023-04-09 00:00:06.857241"
+    },
+    {
+        "id": "24143e74-b32f-4926-91bd-2002aa08aef8",
+        "every_year": true,
+        "created_by": 8375482,
+        "created_at": "2023-03-25 12:12:18.435267",
+        "celebrate_at": "2023-07-28 00:00:00",
+        "for_chat": -423330801,
+        "message": "",
+        "anniversary": "@staltz",
+        "last_celebration": null
+    },
+    {
+        "id": "6becc970-721b-41cf-a540-acec77538eae",
+        "every_year": true,
+        "created_by": 8375482,
+        "created_at": "2023-05-02 16:14:18.293642",
+        "celebrate_at": "2023-06-01 00:00:00",
+        "for_chat": -632911267,
+        "message": "lembrar de preencher a planilha de volumetria",
         "anniversary": "",
-        "last_celebration": "2022-12-28 17:06:45.134326"
+        "last_celebration": null
+    },
+    {
+        "id": "2bf8429d-5947-43f5-bc53-31797e26c15f",
+        "every_year": true,
+        "created_by": 8375482,
+        "created_at": "2023-05-02 16:15:23.291919",
+        "celebrate_at": "2023-05-06 00:00:00",
+        "for_chat": -632911267,
+        "message": "lembrar de implementar um recurso para repetir lembretes todo mes",
+        "anniversary": "",
+        "last_celebration": null
     }
 ]

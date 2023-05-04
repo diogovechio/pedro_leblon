@@ -107,20 +107,20 @@ async def openai_reactions(
                     return
 
         if (
-                command_in('pedr', message.text) or command_in('pedro', message.text, text_end=True)
+                command_in('pedr', message.text) or command_in('pedro', message.text, text_end=True) or "ペドロ" in message.text
         ) and not command_in('/pedro', message.text):
             with bot.sending_action(message.chat.id, action="typing", user=message.from_.first_name):
                     bot.loop.create_task(
                         bot.send_message(
                             message_text=await bot.openai.generate_message(
-                                message_username=username,
+                                message_username=message.from_.first_name,
                                 message_text=input_text,
                                 chat=message.chat.title,
                                 only_chatgpt=True if url_detector else False,
                                 prompt_inject=None if url_detector else OPENAI_PROMPTS['responda'],
                                 biased=False if url_detector else True,
                                 destroy_message=destroy_message,
-                                remove_words_list=['pedro'],
+                                remove_words_list=None,
                             ),
                             chat_id=message.chat.id,
                             reply_to=message.message_id)

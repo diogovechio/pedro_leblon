@@ -122,11 +122,14 @@ class OpenAiCompletion:
                         response_text = json.loads(response)['choices'][0]['message']['content']
 
                         self.loop.create_task(telegram_logging(f"ChatGPT: {response_text}"))
+                        self.loop.create_task(telegram_logging(prompt))
 
                         if not any(word in response_text.lower() for word in CHATGPT_BS) or only_chatgpt:
                             return response_text
 
             self.loop.create_task(telegram_logging(f"{model} - OpenAI usage: {self.openai_use}"))
+
+            prompt = f"{prompt}\nPedro:"
 
             async with self.session.post(
                     "https://api.openai.com/v1/completions",
@@ -142,6 +145,7 @@ class OpenAiCompletion:
                     }
             ) as openai_request:
                 response_text = json.loads(await openai_request.text())['choices'][0]['text']
+                self.loop.create_task(telegram_logging(prompt))
                 self.loop.create_task(telegram_logging(f"{model}: {response_text}"))
 
                 return response_text
@@ -228,8 +232,8 @@ class OpenAiCompletion:
             prompt = await message_destroyer(message_text)
         else:
             model = await self._model_selector(message_username)
-
-            prompt = (await pre_biased_prompt(message_text) if biased else message_text)
+            prompt = f"\n\n{message_username.lower()}: {message_text}"
+            prompt = (await pre_biased_prompt(prompt) if biased else message_text)
 
         is_flagged, moderation_results = await self.is_flagged(prompt)
 
