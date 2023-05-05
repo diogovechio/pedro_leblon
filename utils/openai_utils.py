@@ -96,6 +96,8 @@ class OpenAiCompletion:
             only_davinci=False,
             temperature: int = 0
     ) -> str:
+        prompt = f"{prompt}\nPedro:"
+
         async with asyncio.Semaphore(self.semaphore):
             if "ada" not in model or only_chatgpt:
                 if not only_davinci:
@@ -128,8 +130,6 @@ class OpenAiCompletion:
                             return response_text
 
             self.loop.create_task(telegram_logging(f"{model} - OpenAI usage: {self.openai_use}"))
-
-            prompt = f"{prompt}\nPedro:"
 
             async with self.session.post(
                     "https://api.openai.com/v1/completions",

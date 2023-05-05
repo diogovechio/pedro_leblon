@@ -402,7 +402,7 @@ async def openai_reactions(
                 and random.random() < bot.config.random_params.words_react_frequency
         ):
             with bot.sending_action(message.chat.id, action="typing"):
-                chat = "\n".join(bot.messages_in_memory[message.chat.id][-15:])
+                chat = "\n".join(bot.messages_in_memory[message.chat.id][-20:])
                 bot.loop.create_task(
                     bot.send_message(
                         message_text=await bot.openai.generate_message(
