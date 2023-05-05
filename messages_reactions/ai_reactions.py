@@ -108,7 +108,7 @@ async def openai_reactions(
 
         if message.reply_to_message and message.reply_to_message.from_ and message.reply_to_message.from_.username == "pedroleblonbot":
             with bot.sending_action(message.chat.id, action="typing"):
-                chat = "\n".join(bot.messages_in_memory[message.chat.id][-25:])
+                chat = "\n".join(bot.messages_in_memory[message.chat.id][-25:-1])
                 prompt_text = f"{chat}\n{message.from_.first_name}:{message.text}"
 
                 bot.loop.create_task(
@@ -131,7 +131,7 @@ async def openai_reactions(
                 command_in('pedr', message.text) or command_in('pedro', message.text, text_end=True)
                 or "ペドロ" in message.text or int(message.chat.id) > 0
         ) and not command_in('/pedro', message.text):
-            chat = "\n".join([message[:30] for message in bot.messages_in_memory[message.chat.id][-25:]])
+            chat = "\n".join([message[:60] for message in bot.messages_in_memory[message.chat.id][-20:-1]])
             prompt_text = f"{chat}\n{message.from_.first_name}: {input_text}"
 
             with bot.sending_action(message.chat.id, action="typing", user=message.from_.first_name):
