@@ -109,32 +109,37 @@ async def openai_reactions(
         if message.reply_to_message and message.reply_to_message.from_ and message.reply_to_message.from_.username == "pedroleblonbot":
             with bot.sending_action(message.chat.id, action="typing"):
                 chat = "\n".join(bot.messages_in_memory[message.chat.id][-25:])
-                chat = f"{chat}\n{message.from_.first_name}:{message.text}"
+                prompt_text = f"{chat}\n{message.from_.first_name}:{message.text}"
+
                 bot.loop.create_task(
                     bot.send_message(
                         message_text=await bot.openai.generate_message(
                             message_username='.',
-                            message_text=chat,
+                            message_text=prompt_text,
                             chat=message.chat.title,
                             prompt_inject='considere que você é o "pedro", abaixo é uma conversa entre você e '
                                           'seus amigos, comente algum dos assuntos criando uma curta resposta '
                                           'para "pedro" no final: ',
                             only_chatgpt=True,
-                            biased=False,
+                            biased=True,
                         ),
                         chat_id=message.chat.id,
                     )
                 )
 
         elif (
-                command_in('pedr', message.text) or command_in('pedro', message.text, text_end=True) or "ペドロ" in message.text or int(message.chat.id) > 0
+                command_in('pedr', message.text) or command_in('pedro', message.text, text_end=True)
+                or "ペドロ" in message.text or int(message.chat.id) > 0
         ) and not command_in('/pedro', message.text):
+            chat = "\n".join([message[:30] for message in bot.messages_in_memory[message.chat.id][-25:]])
+            prompt_text = f"{chat}\n{message.from_.first_name}: {input_text}"
+
             with bot.sending_action(message.chat.id, action="typing", user=message.from_.first_name):
                     bot.loop.create_task(
                         bot.send_message(
                             message_text=await bot.openai.generate_message(
                                 message_username=message.from_.first_name,
-                                message_text=input_text,
+                                message_text=prompt_text,
                                 chat=message.chat.title,
                                 only_chatgpt=True if url_detector else False,
                                 prompt_inject=None if url_detector else OPENAI_PROMPTS['responda'],
@@ -436,7 +441,7 @@ async def openai_reactions(
                                           'seus amigos, comente algum dos assuntos criando uma curta resposta '
                                           'para "pedro" no final: ',
                             only_chatgpt=True,
-                            biased=False,
+                            biased=True,
                         ),
                         chat_id=message.chat.id,
                     )
