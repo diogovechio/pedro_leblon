@@ -409,8 +409,8 @@ async def openai_reactions(
                             message_username='.',
                             message_text=chat,
                             chat=message.chat.title,
-                            only_davinci=True,
-                            biased=True,
+                            prompt_inject="continue a conversa a seguir: ",
+                            biased=False,
                         ),
                         chat_id=message.chat.id,
                     )
