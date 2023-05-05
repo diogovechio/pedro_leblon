@@ -413,7 +413,7 @@ async def openai_reactions(
                             biased=True,
                         ),
                         chat_id=message.chat.id,
-                        reply_to=message.message_id)
+                    )
                 )
 
                 bot.mocked_hour = bot.datetime_now.hour
