@@ -408,6 +408,8 @@ class FakePedro:
                 ) as resp:
                     logging.info(resp.status)
                     if 200 <= resp.status < 300:
+                        self.messages_in_memory[chat_id].append(
+                            f"Pedro: {message_text[0:90]}")
                         break
                     parse_mode = fallback_parse_modes.pop() if len(fallback_parse_modes) else ""
 
