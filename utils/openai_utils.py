@@ -96,7 +96,7 @@ class OpenAiCompletion:
             only_davinci=False,
             temperature: int = 0
     ) -> str:
-        prompt = f"{prompt}\nPedro:"
+        prompt = f"{prompt}\npedro:"
 
         async with asyncio.Semaphore(self.semaphore):
             if "ada" not in model or only_chatgpt:
