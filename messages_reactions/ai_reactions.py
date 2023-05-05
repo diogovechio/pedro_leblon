@@ -106,8 +106,28 @@ async def openai_reactions(
 
                     return
 
-        if (
-                command_in('pedr', message.text) or command_in('pedro', message.text, text_end=True) or "ペドロ" in message.text
+        if message.reply_to_message and message.reply_to_message.from_ and message.reply_to_message.from_.username == "pedroleblonbot":
+            with bot.sending_action(message.chat.id, action="typing"):
+                chat = "\n".join(bot.messages_in_memory[message.chat.id][-25:])
+                chat = f"{chat}\n{message.from_.first_name}:{message.text}"
+                bot.loop.create_task(
+                    bot.send_message(
+                        message_text=await bot.openai.generate_message(
+                            message_username='.',
+                            message_text=chat,
+                            chat=message.chat.title,
+                            prompt_inject='considere que você é o "pedro", abaixo é uma conversa entre você e '
+                                          'seus amigos, comente algum dos assuntos criando uma curta resposta '
+                                          'para "pedro" no final: ',
+                            only_chatgpt=True,
+                            biased=False,
+                        ),
+                        chat_id=message.chat.id,
+                    )
+                )
+
+        elif (
+                command_in('pedr', message.text) or command_in('pedro', message.text, text_end=True) or "ペドロ" in message.text or int(message.chat.id) > 0
         ) and not command_in('/pedro', message.text):
             with bot.sending_action(message.chat.id, action="typing", user=message.from_.first_name):
                     bot.loop.create_task(
@@ -400,6 +420,7 @@ async def openai_reactions(
         elif (
                 bot.mocked_hour != bot.datetime_now.hour
                 and random.random() < bot.config.random_params.words_react_frequency
+                and message.chat.id not in bot.config.not_internal_chats
         ):
             bot.mocked_hour = bot.datetime_now.hour
 

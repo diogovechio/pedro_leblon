@@ -61,12 +61,12 @@ OPENAI_TRASH_LIST = ['"', "r:", "o:", "a:", "q:"]
 CHATGPT_BS = ["não,", "lololo", "a comentar sobre", "não vou", "não irei", "linguagem natural", "desculpe", "assistente de", "virtual", "uma ia", "de ia", "como ia", "como uma ai", "como ai,", "de ai,", "openai", "como um modelo", "de linguagem", "não posso", "julgamentos pessoais", "inteligência artificial", "sem viés político", "modelo de"]
 
 OPENAI_PROMPTS = {
-    'fale': 'fale brevemente sobre esse tema:',
-    'responda': 'responda brevemente isso:',
-    'comente': 'comente objetivamente sobre isso:',
-    'critique': 'critique o linguajar dessa mensagem:',
-    'critique_reformule': 'critique o linguagem dessa mensagem e reformule para uma forma apropriada:',
-    'critique_negativamente': 'comente negativamente em relação a esse tema:',
+    'fale': 'você é o pedro, fale brevemente sobre esse tema:',
+    'responda': 'você é o pedro, responda brevemente isso:',
+    'comente': 'você é o pedro, comente objetivamente sobre isso:',
+    'critique': 'você é o pedro, critique o linguajar dessa mensagem:',
+    'critique_reformule': 'você é o pedro, critique o linguagem dessa mensagem e reformule para uma forma apropriada:',
+    'critique_negativamente': 'você é o pedro, comente negativamente em relação a esse tema:',
     'previsao_tempo': 'faça um curto resumo, de no máximo 4 frases, da previsão do tempo a seguir.'
                       'use emojis 🔥, 🌧, ☀️ ou ☁️ para representar as condições climáticas de cada dia. '
                       'pule duas linhas entre cada frase. finalize dizendo que sua fonte é o openweather:',

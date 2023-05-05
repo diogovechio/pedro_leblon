@@ -214,7 +214,7 @@ class OpenAiCompletion:
             prompt_inject: T.Optional[str] = None,
             return_raw_text: bool = False,
             destroy_message: bool = False,
-            remove_words_list=None,
+            remove_words_list=None
     ) -> str:
         datetime_now = datetime.datetime.utcnow() - datetime.timedelta(hours=3)
 
