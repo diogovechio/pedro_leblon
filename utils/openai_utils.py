@@ -235,7 +235,7 @@ class OpenAiCompletion:
             prompt = await message_destroyer(message_text)
         else:
             model = await self._model_selector(message_username)
-            prompt = f"\n\n{message_username.lower()}: {message_text}"
+            prompt = f"\n\n{message_text}"
             prompt = (await pre_biased_prompt(prompt) if biased else message_text)
 
         is_flagged, moderation_results = await self.is_flagged(prompt)
@@ -251,7 +251,6 @@ class OpenAiCompletion:
 
         for i in range(3):
             retry_sleep = int(2 + random.random() * 5)
-            self.loop.create_task(telegram_logging(f"{i} - {timeout} -  {retry_sleep} - prompt: {prompt}"))
             try:
                 response = await asyncio.wait_for(
                     self._completion(

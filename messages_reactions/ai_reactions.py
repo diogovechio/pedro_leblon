@@ -22,7 +22,7 @@ async def openai_reactions(
     destroy_message = bot.config.block_samuel and from_samuel
 
     if message.reply_to_message and message.reply_to_message.text:
-        input_text += ' : ' + message.reply_to_message.text
+        input_text += ' : ' + message.reply_to_message.from_.first_name + " disse isso : " + message.reply_to_message.text
 
     if url_detector := await https_url_extract(input_text):
         url_content = await extract_website_paragraph_content(
@@ -107,35 +107,10 @@ async def openai_reactions(
                     return
 
         if (
-                message.reply_to_message and message.reply_to_message.from_
-                and message.reply_to_message.from_.username == "pedroleblonbot"
-        ):
-            with bot.sending_action(message.chat.id, action="typing"):
-                chat = "\n".join(bot.messages_in_memory[message.chat.id][-25:-1])
-                prompt_text = f"{chat}\n{message.from_.first_name}:{message.text}"
-
-                bot.loop.create_task(
-                    bot.send_message(
-                        message_text=await bot.openai.generate_message(
-                            message_username='.',
-                            message_text=prompt_text,
-                            chat=message.chat.title,
-                            prompt_inject='considere que você é o "pedro", abaixo é uma conversa entre você e '
-                                          'seus amigos, comente algum dos assuntos criando uma curta resposta '
-                                          'para "pedro" no final: ',
-                            only_chatgpt=True,
-                            moderate=False,
-                            biased=True,
-                        ),
-                        chat_id=message.chat.id,
-                    )
-                )
-
-        elif (
                 command_in('pedr', message.text) or command_in('pedro', message.text, text_end=True)
                 or "ペドロ" in message.text or int(message.chat.id) > 0
         ) and not command_in('/pedro', message.text):
-            chat = "\n".join([message[:60] for message in bot.messages_in_memory[message.chat.id][-20:-1]])
+            chat = "\n".join([message for message in bot.messages_in_memory[message.chat.id][-6:]])
             prompt_text = f"{chat}\n{message.from_.first_name}: {input_text}"
 
             with bot.sending_action(message.chat.id, action="typing", user=message.from_.first_name):
@@ -153,7 +128,8 @@ async def openai_reactions(
                                 remove_words_list=None,
                             ),
                             chat_id=message.chat.id,
-                            reply_to=message.message_id)
+                            reply_to=message.message_id
+                        )
                     )
 
         elif (
@@ -427,12 +403,36 @@ async def openai_reactions(
                         sleep_time=1 + (round(random.random()) * 5),
                         reply_to=message.message_id)
                 )
+
         elif (
-                bot.mocked_hour != bot.datetime_now.hour
-                and random.random() < bot.config.random_params.words_react_frequency
+                message.reply_to_message and message.reply_to_message.from_
+                and message.reply_to_message.from_.username == "pedroleblonbot"
+        ):
+            with bot.sending_action(message.chat.id, action="typing"):
+                chat = "\n".join(bot.messages_in_memory[message.chat.id][-15:])
+                prompt_text = f"{chat}\n{message.from_.first_name}: {message.text}"
+
+                bot.loop.create_task(
+                    bot.send_message(
+                        message_text=await bot.openai.generate_message(
+                            message_username='.',
+                            message_text=prompt_text,
+                            chat=message.chat.title,
+                            prompt_inject=OPENAI_PROMPTS['responda'],
+                            only_chatgpt=True,
+                            moderate=False,
+                            biased=True,
+                        ),
+                        chat_id=message.chat.id,
+                    )
+                )
+
+        elif (
+                bot.random_talk != round(bot.datetime_now.hour / 6)
+                and random.random() < bot.config.random_params.random_mock_frequency
                 and message.chat.id not in bot.config.not_internal_chats
         ):
-            bot.mocked_hour = bot.datetime_now.hour
+            bot.random_talk = round(bot.datetime_now.hour / 6)
 
             with bot.sending_action(message.chat.id, action="typing"):
                 chat = "\n".join(bot.messages_in_memory[message.chat.id][-25:])

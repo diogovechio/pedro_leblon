@@ -106,20 +106,20 @@ async def mock_users(
 
         if 'lol' in message.text.lower() and random.random(
 
-        ) < bot.config.random_params.words_react_frequency and not bot.mocked_today:
+        ) < bot.config.random_params.words_react_frequency and not bot.kardashian_gif != round(bot.datetime_now.hour / 8):
             bot.loop.create_task(
                 bot.send_video(
                     video=open(f'gifs/kardashian_lol.mp4', 'rb').read(),
                     chat_id=message.chat.id,
                     reply_to=None)
             )
-            bot.mocked_today = True
+            bot.kardashian_gif = round(bot.datetime_now.hour / 8)
 
-        if any(word in message.text.lower() for word in DECAPTOR_DISAPPOINTS) and not bot.mocked_today:
+        if any(word in message.text.lower() for word in DECAPTOR_DISAPPOINTS) and not bot.kardashian_gif != round(bot.datetime_now.hour / 8):
             bot.loop.create_task(
                 bot.send_video(
                     video=open(f'gifs/kardashian_disappointed.mp4', 'rb').read(),
                     chat_id=message.chat.id,
                     reply_to=message.message_id),
             )
-            bot.mocked_today = True
+            bot.kardashian_gif = round(bot.datetime_now.hour / 8)

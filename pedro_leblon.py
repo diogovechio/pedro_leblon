@@ -79,10 +79,12 @@ class FakePedro:
         self.asked_for_photo = 0
 
         self.mocked_hour = 0
+        self.random_talk = 0
+        self.kardashian_gif = 0
         self.mocked_today = False
         self.sent_news = 0
 
-        self.roleta_hour = 13
+        self.roleta_hour = 4
         self.last_roleta_day = 0
 
         self.openai: T.Optional[OpenAiCompletion] = None
@@ -465,7 +467,7 @@ if __name__ == '__main__':
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
         secrets_file=SECRETS_FILE,
-        debug_mode=True
+        debug_mode=False
     )
 
     asyncio.run(
