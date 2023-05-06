@@ -420,7 +420,6 @@ async def openai_reactions(
                             message_text=prompt_text,
                             chat=message.chat.title,
                             prompt_inject=OPENAI_PROMPTS['responda'],
-                            only_chatgpt=True,
                             moderate=False,
                             biased=True,
                         ),
