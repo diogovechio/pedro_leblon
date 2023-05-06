@@ -6,17 +6,19 @@ import math
 
 from constants.constants import BOLSOFF_LIST, ANNUAL_DATE_PATTERN, ONCE_DATE_PATTERN
 from data_classes.commemorations import Commemoration
-from data_classes.received_message import TelegramMessage
+from data_classes.react_data import ReactData
 from messages_reactions.utils.date_utils import display_time
-from pedro_leblon import FakePedro
 from utils.text_utils import command_in
 
 
 async def bot_commands(
-        bot: FakePedro,
-        message: TelegramMessage,
-        from_samuel: bool
+        data: ReactData
 ) -> None:
+    #Todo: organizar a bagunça
+    message = data.message
+    bot = data.bot
+    from_samuel = data.from_samuel
+
     message_split = message.text.lower().split(' ')
 
     if command_in('/andrebebado', message.text) and message.from_.username != 'decaptor' and not from_samuel:

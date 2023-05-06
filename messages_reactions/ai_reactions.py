@@ -2,452 +2,500 @@ import random
 import re
 
 from constants.constants import SWEAR_WORDS, OPENAI_REACT_WORDS, OPENAI_PROMPTS, OPENAI_TRASH_LIST, WEATHER_LIST
-from data_classes.received_message import TelegramMessage
-from pedro_leblon import FakePedro
+from data_classes.react_data import ReactData
 from utils.face_utils import put_list_of_faces_on_background
-from utils.openai_utils import extract_website_paragraph_content, return_dall_e_limit, list_reducer
+from utils.openai_utils import return_dall_e_limit
 from utils.roleta_utils import get_roletas_from_pavuna, arrombado_classifier
-from utils.text_utils import https_url_extract, command_in
+from utils.text_utils import command_in
 from utils.weather_utils import weather_prompt, get_forecast
 
 
 async def openai_reactions(
-        bot: FakePedro,
-        message: TelegramMessage,
-        from_samuel: bool
+        data: ReactData
 ) -> None:
-    input_text = message.text
-
-    username = message.from_.username if message.from_.username else message.from_.first_name
-    destroy_message = bot.config.block_samuel and from_samuel
-
-    if message.reply_to_message and message.reply_to_message.text:
-        input_text += ' : ' + message.reply_to_message.from_.first_name + " disse isso : " + message.reply_to_message.text
-
-    if url_detector := await https_url_extract(input_text):
-        url_content = await extract_website_paragraph_content(
-            url=url_detector,
-            session=bot.session
-        )
-
-        input_text = input_text.replace(url_detector, url_content)
-
     if swear_word_detected := any(
-            block_word in message.text.lower() for block_word in SWEAR_WORDS
-    ) and not url_detector and bot.mocked_hour != bot.datetime_now.hour:
-        if random.random() < bot.config.random_params.words_react_frequency or 'pedr' in message.text.lower():
-            with bot.sending_action(message.chat.id, action="typing"):
-                bot.mocked_hour = bot.datetime_now.hour
-
-                bot.loop.create_task(
-                    bot.send_message(
-                        message_text=await bot.openai.generate_message(
-                            message_username=username,
-                            message_text=input_text,
-                            chat=message.chat.title,
-                            prompt_inject=OPENAI_PROMPTS['critique'] if round(
-                                random.random()) else OPENAI_PROMPTS['critique_reformule'],
-                            remove_words_list=['pedro'],
-                            temperature=1.0,
-                            destroy_message=destroy_message,
-                        ),
-                        chat_id=message.chat.id,
-                        sleep_time=1 + (round(random.random()) * 4),
-                        reply_to=message.message_id)
-                )
+            block_word in data.message.text.lower() for block_word in SWEAR_WORDS
+    ) and not data.url_detector and data.bot.mocked_hour != data.bot.datetime_now.hour:
+        await _complain_swear_word(data=data)
 
     if not swear_word_detected:
-        if any(forecast_word in message.text.lower() for forecast_word in WEATHER_LIST):
-            message_check = await bot.openai.generate_message(
-                message_username=username,
-                message_text=await weather_prompt(input_text),
-                chat=message.chat.title,
-                only_chatgpt=True,
-                prompt_inject=None,
-                biased=False,
-                destroy_message=destroy_message,
-                remove_words_list=['pedro'],
-            )
-            message_check = message_check.split('\n')
-
-            forecast = "sim" in message_check[0].lower()
-
-            if forecast and len(message_check) > 2:
-                with bot.sending_action(message.chat.id, action="typing", user=message.from_.first_name):
-                    city_cleaned = message_check[1].split("-")[-1].lower().strip()
-                    city = city_cleaned if "null" != city_cleaned else None
-
-                    if city:
-                        bot.config.user_last_forecast[str(message.from_.id)] = city
-                    elif str(message.from_.id) in bot.config.user_last_forecast:
-                        city = bot.config.user_last_forecast[str(message.from_.id)]
-
-                    days = re.findall("\d+", message_check[2].split("-")[-1])
-                    if len(days):
-                        days = days[0]
-
-                    bot.loop.create_task(
-                        bot.send_message(
-                            message_text=await bot.openai.generate_message(
-                                message_username=username,
-                                message_text=input_text + await get_forecast(bot=bot, place=city, days=days),
-                                chat=message.chat.title,
-                                return_raw_text=True,
-                                only_chatgpt=True,
-                                prompt_inject=OPENAI_PROMPTS['previsao_tempo'] if random.random() > 0.1 else OPENAI_PROMPTS[
-                                    'previsao_tempo_sensacionalista'],
-                                biased=False,
-                                destroy_message=destroy_message,
-                                remove_words_list=['pedro'],
-                            ),
-                            chat_id=message.chat.id,
-                            reply_to=message.message_id)
-                    )
-
-                    return
+        if any(forecast_word in data.message.text.lower() for forecast_word in WEATHER_LIST):
+            if await _forecast_detect(data=data):
+                return
 
         if (
-                command_in('pedr', message.text) or command_in('pedro', message.text, text_end=True)
-                or "ペドロ" in message.text or int(message.chat.id) > 0
-        ) and not command_in('/pedro', message.text):
-            chat = "\n".join([message for message in bot.messages_in_memory[message.chat.id][-6:]])
-            prompt_text = f"{chat}\n{message.from_.first_name}: {input_text}"
-
-            with bot.sending_action(message.chat.id, action="typing", user=message.from_.first_name):
-                    bot.loop.create_task(
-                        bot.send_message(
-                            message_text=await bot.openai.generate_message(
-                                message_username=message.from_.first_name,
-                                message_text=prompt_text,
-                                chat=message.chat.title,
-                                only_chatgpt=True if url_detector else False,
-                                prompt_inject=None if url_detector else OPENAI_PROMPTS['responda'],
-                                biased=False if url_detector else True,
-                                destroy_message=destroy_message,
-                                moderate=False,
-                                remove_words_list=None,
-                            ),
-                            chat_id=message.chat.id,
-                            reply_to=message.message_id
-                        )
-                    )
+                command_in('pedr', data.message.text)
+                or command_in('pedro', data.message.text, text_end=True)
+                or "ペドロ" in data.message.text
+                or int(data.message.chat.id) > 0
+        ) and not command_in('/pedro', data.message.text):
+            await _regular_pedro_react(data=data)
 
         elif (
-                str(message.from_.id) in bot.config.annoy_users or message.from_.username in bot.config.annoy_users
-        ) and random.random() < bot.config.random_params.annoy_user_frequency:
-            bot.loop.create_task(bot.send_action(chat_id=message.chat.id, action="typing"))
+                str(data.message.from_.id) in data.bot.config.annoy_users
+                or data.message.from_.username in data.bot.config.annoy_users
+        ) and random.random() < data.bot.config.random_params.annoy_user_frequency:
+            await _annoy_persona_non_grata(data=data)
+
+        elif command_in('/imag', data.message.text):
+            await _generate_image_react(data=data)
+
+        elif command_in("/pedro", data.message.text):
+            await _boring_pedro_react(data=data)
+
+        elif command_in("/tldr", data.message.text):
+            await _tldr(data)
+
+        elif (
+                command_in("/critique", data.message.text) or
+                command_in("/elogie", data.message.text) or
+                command_in("/simpatize", data.message.text)
+        ):
+            await _critic_or_praise(data=data)
+
+        elif any(
+                react_word in data.message.text.lower() for react_word in OPENAI_REACT_WORDS
+        ) and random.random() < data.bot.config.random_params.words_react_frequency and not data.url_detector:
+            await _react_to_words(data=data)
+
+        elif (
+                data.message.reply_to_message and data.message.reply_to_message.from_
+                and data.message.reply_to_message.from_.username == "pedroleblonbot"
+        ):
+            await _react_to_be_on_reply(data=data)
+
+        elif (
+                data.bot.random_talk != round(data.bot.datetime_now.hour / 6)
+                and random.random() < data.bot.config.random_params.random_mock_frequency
+                and data.message.chat.id not in data.bot.config.not_internal_chats
+        ):
+            await _random_conversation_react(data=data)
+
+
+async def _complain_swear_word(data: ReactData) -> None:
+    bot = data.bot
+
+    if random.random() < bot.config.random_params.words_react_frequency or 'pedr' in data.message.text.lower():
+        with bot.sending_action(data.message.chat.id, action="typing"):
+            bot.mocked_hour = bot.datetime_now.hour
 
             bot.loop.create_task(
                 bot.send_message(
                     message_text=await bot.openai.generate_message(
-                        message_username=username,
-                        chat=message.chat.title,
-                        message_text=f"O {message.from_.first_name} disse: {input_text}",
-                        prompt_inject=OPENAI_PROMPTS['critique_negativamente'],
-                        destroy_message=False
+                        message_username=data.username,
+                        message_text=data.input_text,
+                        chat=data.message.chat.title,
+                        prompt_inject=OPENAI_PROMPTS['critique'] if round(
+                            random.random()) else OPENAI_PROMPTS['critique_reformule'],
+                        remove_words_list=['pedro'],
+                        temperature=1.0,
                     ),
-                    chat_id=message.chat.id,
-                    reply_to=message.message_id)
+                    chat_id=data.message.chat.id,
+                    sleep_time=1 + (round(random.random()) * 4),
+                    reply_to=data.message.message_id)
             )
 
-        elif command_in('/imag', message.text):
-            with bot.sending_action(message.chat.id, user=message.from_.first_name, action="upload_photo"):
-                feedback = await return_dall_e_limit(
-                    id_to_count=message.from_.id,
-                    limit_per_user=bot.config.openai.dall_e_daily_limit,
-                    dall_uses_list=bot.dall_e_uses_today
-                )
 
-                prompt = input_text[6:]
+async def _forecast_detect(data: ReactData) -> bool:
+    bot = data.bot
 
-                if bot.dall_e_uses_today.count(message.from_.id) < bot.config.openai.dall_e_daily_limit:
-                    message_filtered = message.text.lower().replace(
-                        ",", " ").replace(
-                        ".", " ").replace(
-                        "!"," ").replace(
-                        "?", " ").replace(
-                        "cocão", "cocao").replace(
-                        "@", " ")
-                    words_list = message_filtered.split(" ")
+    message_check = await bot.openai.generate_message(
+        message_username=data.username,
+        message_text=await weather_prompt(data.input_text),
+        chat=data.message.chat.title,
+        only_chatgpt=True,
+        prompt_inject=None,
+        biased=False,
+        remove_words_list=['pedro'],
+    )
+    message_check = message_check.split('\n')
 
-                    recognized_names = []
+    forecast = "sim" in message_check[0].lower()
 
-                    for word in words_list:
-                        if word in bot.faces_names:
-                            recognized_names.append(word)
+    if forecast and len(message_check) > 2:
+        with bot.sending_action(data.message.chat.id, action="typing", user=data.message.from_.first_name):
+            city_cleaned = message_check[1].split("-")[-1].lower().strip()
+            city = city_cleaned if "null" != city_cleaned else None
 
-                    if len(recognized_names):
-                        background = await put_list_of_faces_on_background(
-                            bot, recognized_names, "-s" in message.text.lower())
-                        image = await bot.openai.edit_image(text=prompt,square_png=background)
+            if city:
+                bot.config.user_last_forecast[str(data.message.from_.id)] = city
+            elif str(data.message.from_.id) in bot.config.user_last_forecast:
+                city = bot.config.user_last_forecast[str(data.message.from_.id)]
 
-                        if image is not None:
-                            bot.dall_e_uses_today.append(message.from_.id)
-                            bot.loop.create_task(
-                                bot.send_photo(
-                                    image=image,
-                                    caption=feedback,
-                                    chat_id=message.chat.id,
-                                    reply_to=message.message_id)
-                            )
-                        else:
-                            bot.loop.create_task(
-                                bot.send_message(
-                                    message_text=f"veio nada",
-                                    chat_id=message.chat.id,
-                                    reply_to=message.message_id
-                                )
-                            )
-                    else:
-                        image = await bot.openai.generate_image(text=input_text[6:])
+            days = re.findall("\d+", message_check[2].split("-")[-1])
+            if len(days):
+                days = days[0]
 
-                        if image is not None:
-                            bot.dall_e_uses_today.append(message.from_.id)
-                            bot.loop.create_task(
-                                bot.send_photo(
-                                    image=image,
-                                    caption=feedback,
-                                    chat_id=message.chat.id,
-                                    reply_to=message.message_id)
-                            )
-                        else:
-                            bot.loop.create_task(
-                                bot.send_message(
-                                    message_text=f"veio nada",
-                                    chat_id=message.chat.id,
-                                    reply_to=message.message_id
-                                )
-                            )
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=await bot.openai.generate_message(
+                        message_username=data.username,
+                        message_text=data.input_text + await get_forecast(bot=bot, place=city, days=days),
+                        chat=data.message.chat.title,
+                        return_raw_text=True,
+                        only_chatgpt=True,
+                        prompt_inject=OPENAI_PROMPTS['previsao_tempo'] if random.random() > 0.1 else OPENAI_PROMPTS[
+                            'previsao_tempo_sensacionalista'],
+                        biased=False,
+                        remove_words_list=['pedro'],
+                    ),
+                    chat_id=data.message.chat.id,
+                    reply_to=data.message.message_id)
+            )
 
+            return True
+
+    return False
+
+
+async def _regular_pedro_react(data: ReactData) -> None:
+    bot = data.bot
+
+    chat = "\n".join([message for message in bot.messages_in_memory[data.message.chat.id][-6:]])
+    prompt_text = f"{chat}\n{data.message.from_.first_name}: {data.input_text}"
+
+    with bot.sending_action(data.message.chat.id, action="typing", user=data.message.from_.first_name):
+        bot.loop.create_task(
+            bot.send_message(
+                message_text=await bot.openai.generate_message(
+                    message_username=data.message.from_.first_name,
+                    message_text=prompt_text,
+                    chat=data.message.chat.title,
+                    only_chatgpt=True if data.url_detector else False,
+                    prompt_inject=None if data.url_detector else OPENAI_PROMPTS['responda'],
+                    biased=False if data.url_detector else True,
+                    moderate=False,
+                    remove_words_list=None,
+                ),
+                chat_id=data.message.chat.id,
+                reply_to=data.message.message_id
+            )
+        )
+
+
+async def _annoy_persona_non_grata(data: ReactData) -> None:
+    bot = data.bot
+
+    bot.loop.create_task(bot.send_action(chat_id=data.message.chat.id, action="typing"))
+
+    bot.loop.create_task(
+        bot.send_message(
+            message_text=await bot.openai.generate_message(
+                message_username=data.username,
+                chat=data.message.chat.title,
+                message_text=f"O {data.message.from_.first_name} disse: {data.input_text}",
+                prompt_inject=OPENAI_PROMPTS['critique_negativamente'],
+                destroy_message=False
+            ),
+            chat_id=data.message.chat.id,
+            reply_to=data.message.message_id)
+    )
+
+
+async def _generate_image_react(data: ReactData) -> None:
+    bot = data.bot
+
+    with bot.sending_action(data.message.chat.id, user=data.message.from_.first_name, action="upload_photo"):
+        feedback = await return_dall_e_limit(
+            id_to_count=data.message.from_.id,
+            limit_per_user=bot.config.openai.dall_e_daily_limit,
+            dall_uses_list=bot.dall_e_uses_today
+        )
+
+        prompt = data.input_text[6:]
+
+        if bot.dall_e_uses_today.count(data.message.from_.id) < bot.config.openai.dall_e_daily_limit:
+            message_filtered = data.message.text.lower().replace(
+                ",", " ").replace(
+                ".", " ").replace(
+                "!", " ").replace(
+                "?", " ").replace(
+                "cocão", "cocao").replace(
+                "@", " ")
+            words_list = message_filtered.split(" ")
+
+            recognized_names = []
+
+            for word in words_list:
+                if word in bot.faces_names:
+                    recognized_names.append(word)
+
+            if len(recognized_names):
+                background = await put_list_of_faces_on_background(
+                    bot, recognized_names, "-s" in data.message.text.lower())
+                image = await bot.openai.edit_image(text=prompt, square_png=background)
+
+                if image is not None:
+                    bot.dall_e_uses_today.append(data.message.from_.id)
+                    bot.loop.create_task(
+                        bot.send_photo(
+                            image=image,
+                            caption=feedback,
+                            chat_id=data.message.chat.id,
+                            reply_to=data.message.message_id)
+                    )
                 else:
                     bot.loop.create_task(
                         bot.send_message(
-                            message_text=f"{message.from_.first_name} você já gerou {bot.config.openai.dall_e_daily_limit} imagens hoje, agora só amanhã",
-                            chat_id=message.chat.id,
-                            reply_to=message.message_id
+                            message_text=f"veio nada",
+                            chat_id=data.message.chat.id,
+                            reply_to=data.message.message_id
+                        )
+                    )
+            else:
+                image = await bot.openai.generate_image(text=data.input_text[6:])
+
+                if image is not None:
+                    bot.dall_e_uses_today.append(data.message.from_.id)
+                    bot.loop.create_task(
+                        bot.send_photo(
+                            image=image,
+                            caption=feedback,
+                            chat_id=data.message.chat.id,
+                            reply_to=data.message.message_id)
+                    )
+                else:
+                    bot.loop.create_task(
+                        bot.send_message(
+                            message_text=f"veio nada",
+                            chat_id=data.message.chat.id,
+                            reply_to=data.message.message_id
                         )
                     )
 
-        elif command_in("/pedro", message.text):
-            with bot.sending_action(message.chat.id, user=message.from_.first_name, action="typing"):
-                bot.loop.create_task(
-                    bot.send_message(
-                        message_text=await bot.openai.generate_message(
-                            message_username=username,
-                            message_text=input_text,
-                            chat=message.chat.title,
-                            prompt_inject=None,
-                            only_chatgpt=True,
-                            biased=False,
-                            destroy_message=destroy_message,
-                            remove_words_list=['/pedro'],
-                            return_raw_text=True,
-                        ),
-                        chat_id=message.chat.id,
-                        reply_to=message.message_id)
+        else:
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=f"{data.message.from_.first_name} você já gerou {bot.config.openai.dall_e_daily_limit} "
+                                 f"imagens hoje, agora só amanhã",
+                    chat_id=data.message.chat.id,
+                    reply_to=data.message.message_id
                 )
+            )
 
-        elif command_in("/tldr", message.text):
-            with bot.sending_action(message.chat.id, user=message.from_.first_name, action="typing"):
-                if ":" not in input_text:
-                   chat = "\n".join(bot.messages_in_memory[message.chat.id]) + "."
 
-                   bot.loop.create_task(
-                        bot.send_message(
-                            message_text=await bot.openai.generate_message(
-                                message_username=username,
-                                message_text=f"faça um curto resumo dessa conversa entre os amigos:\n{chat}",
-                                chat=message.chat.title,
-                                prompt_inject=None,
+async def _boring_pedro_react(data: ReactData) -> None:
+    bot = data.bot
+
+    with bot.sending_action(data.message.chat.id, user=data.message.from_.first_name, action="typing"):
+        bot.loop.create_task(
+            bot.send_message(
+                message_text=await bot.openai.generate_message(
+                    message_username=data.username,
+                    message_text=data.input_text,
+                    chat=data.message.chat.title,
+                    prompt_inject=None,
+                    only_chatgpt=True,
+                    biased=False,
+                    destroy_message=data.destroy_message,
+                    remove_words_list=['/pedro'],
+                    return_raw_text=True,
+                ),
+                chat_id=data.message.chat.id,
+                reply_to=data.message.message_id)
+        )
+
+
+async def _tldr(data: ReactData) -> None:
+    bot = data.bot
+
+    with bot.sending_action(data.message.chat.id, user=data.message.from_.first_name, action="typing"):
+        if ":" not in data.input_text:
+            chat = "\n".join(bot.messages_in_memory[data.message.chat.id]) + "."
+
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=await bot.openai.generate_message(
+                        message_username=data.username,
+                        message_text=f"faça um curto resumo dessa conversa entre os amigos:\n{chat}",
+                        chat=data.message.chat.title,
+                        prompt_inject=None,
+                        moderate=False,
+                        biased=False,
+                        only_chatgpt=True,
+                        remove_words_list=None
+                    ),
+                    chat_id=data.chat.id,
+                    reply_to=data.message.message_id)
+            )
+
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=chat[:3500],
+                    chat_id=8375482
+                )
+            )
+        else:
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=(
+                        (
+                            await bot.openai.generate_message(
+                                message_username=data.username,
+                                message_text=f"faça um resumo do texto a seguir: {data.input_text}",
+                                chat=data.message.chat.title,
                                 moderate=False,
-                                biased=False,
-                                only_chatgpt=True,
-                                remove_words_list=None
-                            ),
-                            chat_id=message.chat.id,
-                            reply_to=message.message_id)
-                    )
+                                prompt_inject=None,
+                                only_chatgpt=True if data.url_detector else False,
+                                remove_words_list=None,
+                            )
+                        ).lower()
+                    ).split('dr:')[-1],
+                    chat_id=data.message.chat.id,
+                    reply_to=data.message.message_id)
+            )
 
-                   bot.loop.create_task(
-                        bot.send_message(
-                            message_text=chat[:3500],
-                            chat_id=8375482
-                        )
-                    )
-                else:
-                    bot.loop.create_task(
-                        bot.send_message(
-                            message_text=(
-                                (
-                                    await bot.openai.generate_message(
-                                        message_username=username,
-                                        message_text=f"faça um resumo do texto a seguir: {input_text}",
-                                        chat=message.chat.title,
-                                        moderate=False,
-                                        prompt_inject=None,
-                                        destroy_message=destroy_message,
-                                        only_chatgpt=True if url_detector else False,
-                                        remove_words_list=None,
-                                    )
-                                ).lower()
-                            ).split('dr:')[-1],
-                            chat_id=message.chat.id,
-                            reply_to=message.message_id)
-                    )
 
-        elif (
-                command_in("/critique", message.text) or
-                command_in("/elogie", message.text) or
-                command_in("/simpatize", message.text)
-        ):
-            with bot.sending_action(message.chat.id, action="typing"):
-                roleta_from_pavuna = None
+async def _critic_or_praise(data: ReactData) -> None:
+    bot = data.bot
 
-                if message.reply_to_message and message.reply_to_message.text:
-                    arrombado = message.reply_to_message.from_.first_name
+    with bot.sending_action(data.message.chat.id, action="typing"):
+        roleta_from_pavuna = None
 
-                    if command_in("/critique", message.text):
-                        prompt = f"{'dê uma bronca em' if round(random.random()) else 'xingue o'} {arrombado} por ter dito isso: " \
-                                 f"'{message.reply_to_message.text}'"
+        if data.message.reply_to_message and data.message.reply_to_message.text:
+            arrombado = data.message.reply_to_message.from_.first_name
 
-                    elif command_in("/elogie", message.text):
-                        prompt = f"{'elogie o' if round(random.random()) else 'parabenize o'} {arrombado} por ter dito isso: " \
-                                 f"'{message.reply_to_message.text}'"
+            if command_in("/critique", data.message.text):
+                prompt = f"{'dê uma bronca em' if round(random.random()) else 'xingue o'} {arrombado} por ter dito isso: " \
+                         f"'{data.message.reply_to_message.text}'"
 
-                    else:
-                        prompt = f"simpatize com {arrombado} por estar nessa situação: '{message.reply_to_message.text}'"
+            elif command_in("/elogie", data.message.text):
+                prompt = f"{'elogie o' if round(random.random()) else 'parabenize o'} {arrombado} por ter dito isso: " \
+                         f"'{data.message.reply_to_message.text}'"
 
-                    reply_to = message.reply_to_message.message_id
+            else:
+                prompt = f"simpatize com {arrombado} por estar nessa situação: '{data.message.reply_to_message.text}'"
 
-                else:
-                    roleta_from_pavuna = random.choice(await get_roletas_from_pavuna(bot, 25))
-                    arrombado = arrombado_classifier(roleta_from_pavuna)
+            reply_to = data.message.reply_to_message.message_id
 
-                    if command_in("/critique", message.text):
-                        prompt = f"{'dê uma bronca em' if round(random.random()) else 'xingue o'} {arrombado} por ter dito isso: " \
-                                 f"'{roleta_from_pavuna['text']}'"
+        else:
+            roleta_from_pavuna = random.choice(await get_roletas_from_pavuna(bot, 25))
+            arrombado = arrombado_classifier(roleta_from_pavuna)
 
-                    elif command_in("/elogie", message.text):
-                        prompt = f"{'elogie o' if round(random.random()) else 'parabenize o'} {arrombado} por ter dito isso: " \
-                                 f"'{roleta_from_pavuna['text']}'"
+            if command_in("/critique", data.message.text):
+                prompt = f"{'dê uma bronca em' if round(random.random()) else 'xingue o'} {arrombado} por ter dito isso: " \
+                         f"'{roleta_from_pavuna['text']}'"
 
-                    else:
-                        prompt = f"simpatize com {arrombado} por estar nessa situação: '{roleta_from_pavuna['text']}'"
+            elif command_in("/elogie", data.message.text):
+                prompt = f"{'elogie o' if round(random.random()) else 'parabenize o'} {arrombado} por ter dito isso: " \
+                         f"'{roleta_from_pavuna['text']}'"
 
-                    reply_to = message.message_id + 1
+            else:
+                prompt = f"simpatize com {arrombado} por estar nessa situação: '{roleta_from_pavuna['text']}'"
 
-                status_code_from_pavuna = 0
-                if roleta_from_pavuna:
-                    status_code_from_pavuna = await bot.forward_message(
-                        target_chat_id=message.chat.id,
-                        from_chat_id=roleta_from_pavuna['from_chat_id'],
-                        message_id=roleta_from_pavuna['message_id'],
-                        replace_token=bot.config.secrets.alternate_bot_token
-                    )
+            reply_to = data.message.message_id + 1
 
-                openai_text = await bot.openai.generate_message(
-                    message_username=username,
-                    message_text=prompt,
-                    chat=message.chat.title,
-                    destroy_message=destroy_message,
-                    moderate=False if "/critique" in message.text.lower()[0:9] else True,
-                    prompt_inject="O",
-                    temperature=1.0,
-                    remove_words_list=['asd']
+        status_code_from_pavuna = 0
+        if roleta_from_pavuna:
+            status_code_from_pavuna = await bot.forward_message(
+                target_chat_id=data.message.chat.id,
+                from_chat_id=roleta_from_pavuna['from_chat_id'],
+                message_id=roleta_from_pavuna['message_id'],
+                replace_token=bot.config.secrets.alternate_bot_token
+            )
+
+        openai_text = await bot.openai.generate_message(
+            message_username=data.username,
+            message_text=prompt,
+            chat=data.message.chat.title,
+            destroy_message=data.destroy_message,
+            moderate=False if "/critique" in data.message.text.lower()[0:9] else True,
+            prompt_inject="O",
+            temperature=1.0,
+            remove_words_list=['asd']
+        )
+        message_text = openai_text.lower()
+
+        for x in OPENAI_TRASH_LIST:
+            message_text = message_text.replace(x, "")
+
+        if arrombado.lower() not in message_text:
+            message_text = f"{arrombado}, {message_text}"
+
+        if random.random() < 0.25:
+            message_text = message_text.upper()
+
+        if roleta_from_pavuna:
+            if status_code_from_pavuna >= 300:
+                message_text = f"'{roleta_from_pavuna['text']}'\n\n{message_text}"
+
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=message_text,
+                    chat_id=data.message.chat.id,
+                    reply_to=reply_to
                 )
-                message_text = openai_text.lower()
-
-                for x in OPENAI_TRASH_LIST:
-                    message_text = message_text.replace(x, "")
-
-                if arrombado.lower() not in message_text:
-                    message_text = f"{arrombado}, {message_text}"
-
-                if random.random() < 0.25:
-                    message_text = message_text.upper()
-
-                if roleta_from_pavuna:
-                    if status_code_from_pavuna >= 300:
-                        message_text = f"'{roleta_from_pavuna['text']}'\n\n{message_text}"
-
-                    bot.loop.create_task(
-                        bot.send_message(
-                            message_text=message_text,
-                            chat_id=message.chat.id,
-                            reply_to=reply_to
-                        )
-                    )
-                else:
-                    bot.loop.create_task(
-                        bot.send_message(
-                            message_text=message_text,
-                            chat_id=message.chat.id,
-                            reply_to=reply_to
-                        )
-                    )
-
-        elif any(
-                react_word in message.text.lower() for react_word in OPENAI_REACT_WORDS
-        ) and random.random() < bot.config.random_params.words_react_frequency and not url_detector:
-            with bot.sending_action(message.chat.id, action="typing"):
-                bot.loop.create_task(
-                    bot.send_message(
-                        message_text=await bot.openai.generate_message(
-                            message_username=username,
-                            message_text=input_text,
-                            chat=message.chat.title,
-                            prompt_inject=OPENAI_PROMPTS['fale'],
-                            destroy_message=destroy_message,
-                        ),
-                        chat_id=message.chat.id,
-                        sleep_time=1 + (round(random.random()) * 5),
-                        reply_to=message.message_id)
+            )
+        else:
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=message_text,
+                    chat_id=data.message.chat.id,
+                    reply_to=reply_to
                 )
+            )
 
-        elif (
-                message.reply_to_message and message.reply_to_message.from_
-                and message.reply_to_message.from_.username == "pedroleblonbot"
-        ):
-            with bot.sending_action(message.chat.id, action="typing"):
-                chat = "\n".join(bot.messages_in_memory[message.chat.id][-15:])
-                insert_pedro_msg = f"{chat}\npedro: {message.reply_to_message.text}"
-                prompt_text = f"{insert_pedro_msg}\n{message.from_.first_name}: {message.text}"
 
-                bot.loop.create_task(
-                    bot.send_message(
-                        message_text=await bot.openai.generate_message(
-                            message_username='.',
-                            message_text=prompt_text,
-                            chat=message.chat.title,
-                            prompt_inject=OPENAI_PROMPTS['responda'],
-                            moderate=False,
-                            biased=True,
-                        ),
-                        chat_id=message.chat.id,
-                    )
-                )
+async def _react_to_words(data: ReactData) -> None:
+    bot = data.bot
 
-        elif (
-                bot.random_talk != round(bot.datetime_now.hour / 6)
-                and random.random() < bot.config.random_params.random_mock_frequency
-                and message.chat.id not in bot.config.not_internal_chats
-        ):
-            bot.random_talk = round(bot.datetime_now.hour / 6)
+    with bot.sending_action(data.message.chat.id, action="typing"):
+        bot.loop.create_task(
+            bot.send_message(
+                message_text=await bot.openai.generate_message(
+                    message_username=data.username,
+                    message_text=data.input_text,
+                    chat=data.message.chat.title,
+                    prompt_inject=OPENAI_PROMPTS['fale'],
+                ),
+                chat_id=data.message.chat.id,
+                sleep_time=1 + (round(random.random()) * 5),
+                reply_to=data.message.message_id)
+        )
 
-            with bot.sending_action(message.chat.id, action="typing"):
-                chat = "\n".join(bot.messages_in_memory[message.chat.id][-25:])
-                bot.loop.create_task(
-                    bot.send_message(
-                        message_text=await bot.openai.generate_message(
-                            message_username='.',
-                            message_text=chat,
-                            chat=message.chat.title,
-                            prompt_inject='considere que você é o "pedro", abaixo é uma conversa entre você e '
-                                          'seus amigos, comente algum dos assuntos criando uma curta resposta '
-                                          'para "pedro" no final: ',
-                            only_chatgpt=True,
-                            biased=True,
-                        ),
-                        chat_id=message.chat.id,
-                    )
-                )
+
+async def _react_to_be_on_reply(data: ReactData) -> None:
+    bot = data.bot
+
+    with bot.sending_action(data.message.chat.id, action="typing"):
+        chat = "\n".join(bot.messages_in_memory[data.message.chat.id][-15:])
+        insert_pedro_msg = f"{chat}\npedro: {data.message.reply_to_message.text}"
+        prompt_text = f"{insert_pedro_msg}\n{data.message.from_.first_name}: {data.message.text}"
+
+        bot.loop.create_task(
+            bot.send_message(
+                message_text=await bot.openai.generate_message(
+                    message_username='.',
+                    message_text=prompt_text,
+                    chat=data.message.chat.title,
+                    prompt_inject=OPENAI_PROMPTS['responda'],
+                    moderate=False,
+                    biased=True,
+                ),
+                chat_id=data.message.chat.id,
+            )
+        )
+
+
+async def _random_conversation_react(data: ReactData) -> None:
+    bot = data.bot
+
+    bot.random_talk = round(data.bot.datetime_now.hour / 6)
+
+    with bot.sending_action(data.message.chat.id, action="typing"):
+        chat = "\n".join(data.bot.messages_in_memory[data.message.chat.id][-25:])
+        bot.loop.create_task(
+            bot.send_message(
+                message_text=await bot.openai.generate_message(
+                    message_username='.',
+                    message_text=chat,
+                    chat=data.message.chat.title,
+                    prompt_inject='considere que você é o "pedro", abaixo é uma conversa entre você e '
+                                  'seus amigos, comente algum dos assuntos criando uma curta resposta '
+                                  'para "pedro" no final: ',
+                    only_chatgpt=True,
+                    biased=True,
+                ),
+                chat_id=data.message.chat.id,
+            )
+        )

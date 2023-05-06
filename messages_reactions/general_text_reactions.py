@@ -3,56 +3,57 @@ import random
 import feedparser
 
 from constants.constants import ASK_PHOTOS, SWEAR_WORDS
+from data_classes.react_data import ReactData
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
 from utils.roleta_utils import get_roletas_from_pavuna
 
 
 async def words_reactions(
-        bot: FakePedro,
-        message: TelegramMessage
+        data: ReactData
 ) -> None:
+    #Todo: organizar a bagunça
     if (
             (
-            message.text.lower() in ['oi', 'bom dia', 'boa noite', 'adeus', 'kk'] or (
+            data.message.text.lower() in ['oi', 'bom dia', 'boa noite', 'adeus', 'kk'] or (
                 len(
                     set(
-                        list(message.text.lower())
+                        list(data.message.text.lower())
                         )
-                    ) <= 2 and len(message.text) > 2
-                and random.random() < bot.config.random_params.random_mock_frequency
+                    ) <= 2 and len(data.message.text) > 2
+                and random.random() < data.bot.config.random_params.random_mock_frequency
             )
-            ) and message.chat.id not in bot.config.not_internal_chats
+            ) and data.message.chat.id not in data.bot.config.not_internal_chats
     ):
-        bot.loop.create_task(
-            bot.send_message(
-                message_text=message.text,
-                chat_id=message.chat.id)
+        data.bot.loop.create_task(
+            data.bot.send_message(
+                message_text=data.message.text,
+                chat_id=data.message.chat.id)
         )
 
     if any(
-            swear_word in message.text.lower() for swear_word in SWEAR_WORDS
+            swear_word in data.message.text.lower() for swear_word in SWEAR_WORDS
     ):
         if (
-                random.random() < bot.config.random_params.words_react_frequency
-                and message.chat.id not in bot.config.not_internal_chats
+                random.random() < data.bot.config.random_params.words_react_frequency
+                and data.message.chat.id not in data.bot.config.not_internal_chats
         ):
-            bot.loop.create_task(
-                bot.send_message(
-                    message_text=(random.choice(await get_roletas_from_pavuna(bot)))['text'].lower(),
-                    chat_id=message.chat.id,
+            data.bot.loop.create_task(
+                data.bot.send_message(
+                    message_text=(random.choice(await get_roletas_from_pavuna(data.bot)))['text'].lower(),
+                    chat_id=data.message.chat.id,
                     sleep_time=2 + round(random.random() * 5)
                 )
             )
 
     if (
-            bot.config.ask_photos and any(word in message.text.lower() for word in ASK_PHOTOS)
-            and random.random() < bot.config.random_params.words_react_frequency
-            and message.chat.id not in bot.config.not_internal_chats
+            data.bot.config.ask_photos and any(word in data.message.text.lower() for word in ASK_PHOTOS)
+            and random.random() < data.bot.config.random_params.words_react_frequency
+            and data.message.chat.id not in data.bot.config.not_internal_chats
     ):
-        if bot.asked_for_photo != round(bot.datetime_now.hour / 8):
+        if data.bot.asked_for_photo != round(data.bot.datetime_now.hour / 8):
 
-            embeddings_count = {key: bot.faces_names.count(key) for key in bot.faces_names}
+            embeddings_count = {key: data.bot.faces_names.count(key) for key in data.bot.faces_names}
 
             low_photo_count = [key for key, value in embeddings_count.items() if
                                value == embeddings_count[min(embeddings_count, key=embeddings_count.get)]]
@@ -60,32 +61,32 @@ async def words_reactions(
             high_photo_count = [key for key, value in embeddings_count.items() if
                                 value == embeddings_count[max(embeddings_count, key=embeddings_count.get)]]
 
-            bot.loop.create_task(
-                bot.send_message(
-                    f"{message.from_.first_name.lower()} manda uma foto do "
+            data.bot.loop.create_task(
+                data.bot.send_message(
+                    f"{data.message.from_.first_name.lower()} manda uma foto do "
                     f"{random.choice(low_photo_count)} {'aí rapidão' if round(random.random()) else 'aí'}, "
                     f"eu ainda nao coheço ele tanto quanto o {random.choice(high_photo_count)}",
-                    chat_id=message.chat.id,
+                    chat_id=data.message.chat.id,
                     sleep_time=2 + round(random.random() * 5),
-                    reply_to=message.message_id)
+                    reply_to=data.message.message_id)
             )
 
-            bot.asked_for_photo = round(bot.datetime_now.hour / 8)
+            data.bot.asked_for_photo = round(data.bot.datetime_now.hour / 8)
 
     if (
-            random.random() < bot.config.random_params.words_react_frequency
-            and bot.config.rss_feed.games != ""
-            and bot.sent_news != round(bot.datetime_now.hour / 6)
-            and message.chat.id not in bot.config.not_internal_chats
+            random.random() < data.bot.config.random_params.words_react_frequency
+            and data.bot.config.rss_feed.games != ""
+            and data.bot.sent_news != round(data.bot.datetime_now.hour / 6)
+            and data.message.chat.id not in data.bot.config.not_internal_chats
     ):
-        bot.loop.create_task(
-            bot.send_message(
+        data.bot.loop.create_task(
+            data.bot.send_message(
                 message_text=random.choice(
-                    [url.link for url in feedparser.parse(bot.config.rss_feed.games).entries]
+                    [url.link for url in feedparser.parse(data.bot.config.rss_feed.games).entries]
                 ),
-                chat_id=message.chat.id,
+                chat_id=data.message.chat.id,
                 sleep_time=30 + (random.random() * 60)
             )
         )
 
-        bot.sent_news = round(bot.datetime_now.hour / 6)
+        data.bot.sent_news = round(data.bot.datetime_now.hour / 6)

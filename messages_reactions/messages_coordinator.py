@@ -2,7 +2,8 @@ import asyncio
 import random
 
 from constants.constants import MOCK_EDITS
-from data_classes.received_message import MessageReceived
+from data_classes.react_data import ReactData
+from data_classes.received_message import MessageReceived, TelegramMessage
 from messages_reactions.mock_users import mock_users
 from pedro_leblon import FakePedro
 from messages_reactions.ai_reactions import openai_reactions
@@ -10,6 +11,9 @@ from messages_reactions.bot_commands import bot_commands
 from messages_reactions.general_text_reactions import words_reactions
 from messages_reactions.image_reactions import image_reactions
 from utils.logging_utils import telegram_logging
+from utils.openai_utils import extract_website_paragraph_content
+from utils.text_utils import https_url_extract
+
 
 async def messages_coordinator(
         bot: FakePedro,
@@ -18,8 +22,13 @@ async def messages_coordinator(
     if incoming.message is not None:
         message = incoming.message
 
-        from_samuel = message.from_.is_premium
         from_debug_chats = message.chat.id in (-20341310, 8375482)
+
+        react_data = await _pre_processor(
+            bot=bot,
+            message=message,
+            from_samuel=message.from_.is_premium
+        )
 
         if message.chat.id in bot.allowed_list:
             if str(message.from_.id) not in bot.config.ignore_users or message.from_.username not in bot.config.ignore_users:
@@ -28,7 +37,7 @@ async def messages_coordinator(
                         image_reactions(
                             bot=bot,
                             message=message,
-                            method='cropper' if from_samuel or from_debug_chats else 'face_classifier',
+                            method='cropper' if react_data.from_samuel or from_debug_chats else 'face_classifier',
                             always_send_crop=from_debug_chats
                         )
                     )
@@ -37,10 +46,10 @@ async def messages_coordinator(
                     message.text = message.caption if message.caption else message.text
 
                     await asyncio.gather(
-                        openai_reactions(bot=bot, message=message, from_samuel=from_samuel),
-                        words_reactions(bot=bot, message=message),
-                        bot_commands(bot=bot, message=message, from_samuel=from_samuel),
-                        mock_users(bot=bot, message=message, from_samuel=from_samuel, from_debug_chats=from_debug_chats),
+                        openai_reactions(data=react_data),
+                        words_reactions(data=react_data),
+                        bot_commands(data=react_data),
+                        mock_users(data=react_data),
                     )
 
         elif not bot.debug_mode:
@@ -65,3 +74,35 @@ async def messages_coordinator(
         )
 
         bot.loop.create_task(telegram_logging(str(incoming)))
+
+
+async def _pre_processor(
+        bot: FakePedro,
+        from_samuel: bool,
+        message: TelegramMessage
+) -> ReactData:
+    input_text = message.text
+
+    username = message.from_.username if message.from_.username else message.from_.first_name
+    destroy_message = bot.config.block_samuel and from_samuel
+
+    if message.reply_to_message and message.reply_to_message.text:
+        input_text += ' : ' + message.reply_to_message.from_.first_name + " disse isso : " + message.reply_to_message.text
+
+    if url_detector := await https_url_extract(input_text):
+        url_content = await extract_website_paragraph_content(
+            url=url_detector,
+            session=bot.session
+        )
+
+        input_text = input_text.replace(url_detector, url_content)
+
+    return ReactData(
+        bot=bot,
+        message=message,
+        from_samuel=from_samuel,
+        username=username,
+        input_text=input_text,
+        url_detector=url_detector,
+        destroy_message=destroy_message,
+    )

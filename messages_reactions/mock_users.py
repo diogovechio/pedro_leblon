@@ -3,17 +3,17 @@ import random
 import feedparser
 
 from constants.constants import NEWS_WORD_LIST, DRUNK_DECAPTOR_LIST, DECAPTOR_DISAPPOINTS
-from data_classes.received_message import TelegramMessage
-from pedro_leblon import FakePedro
+from data_classes.react_data import ReactData
 from utils.text_utils import message_miguxer
 
 
 async def mock_users(
-        bot: FakePedro,
-        message: TelegramMessage,
-        from_samuel: bool,
-        from_debug_chats: bool
+        data: ReactData
 ) -> None:
+    #Todo: organizar a bagunça
+    message = data.message
+    bot = data.bot
+
     user_identified = None
 
     if message.from_.username in bot.config.mock_messages:
