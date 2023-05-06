@@ -410,7 +410,8 @@ async def openai_reactions(
         ):
             with bot.sending_action(message.chat.id, action="typing"):
                 chat = "\n".join(bot.messages_in_memory[message.chat.id][-15:])
-                prompt_text = f"{chat}\n{message.from_.first_name}: {message.text}"
+                insert_pedro_msg = f"{chat}\npedro: {message.reply_to_message.text}"
+                prompt_text = f"{insert_pedro_msg}\n{message.from_.first_name}: {message.text}"
 
                 bot.loop.create_task(
                     bot.send_message(
