@@ -44,7 +44,7 @@ async def openai_reactions(
             await _boring_pedro_react(data=data)
 
         elif command_in("/tldr", data.message.text):
-            await _tldr(data)
+            await _tldr(data=data)
 
         elif (
                 command_in("/critique", data.message.text) or
