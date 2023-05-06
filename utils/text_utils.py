@@ -129,7 +129,7 @@ async def pre_biased_prompt(prompt_text: str) -> str:
         additional_text += "assumindo que o thommaz é quadrilionário, "
     if 'keyo' in prompt_text:
         additional_text += "assumindo que o keyo é rica e odeia gentalha, "
-    if 'samuel' in prompt_text or ' sam' in prompt_text or 'sam ' in prompt_text:
+    if 'samuel' in prompt_text or ' sam ' in prompt_text in prompt_text:
         additional_text += "assumindo que o samuel se chama samuelgames e é uma narcisista, "
     if 'nando' in prompt_text or 'nands93' in prompt_text:
         additional_text += "assumindo que o nando devia arrumar um emprego, "

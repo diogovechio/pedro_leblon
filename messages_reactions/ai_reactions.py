@@ -19,7 +19,7 @@ async def openai_reactions(
     input_text = message.text
 
     username = message.from_.username if message.from_.username else message.from_.first_name
-    destroy_message = True if bot.config.block_samuel and from_samuel else False
+    destroy_message = bot.config.block_samuel and from_samuel
 
     if message.reply_to_message and message.reply_to_message.text:
         input_text += ' : ' + message.reply_to_message.text
@@ -106,7 +106,10 @@ async def openai_reactions(
 
                     return
 
-        if message.reply_to_message and message.reply_to_message.from_ and message.reply_to_message.from_.username == "pedroleblonbot":
+        if (
+                message.reply_to_message and message.reply_to_message.from_
+                and message.reply_to_message.from_.username == "pedroleblonbot"
+        ):
             with bot.sending_action(message.chat.id, action="typing"):
                 chat = "\n".join(bot.messages_in_memory[message.chat.id][-25:-1])
                 prompt_text = f"{chat}\n{message.from_.first_name}:{message.text}"
@@ -121,6 +124,7 @@ async def openai_reactions(
                                           'seus amigos, comente algum dos assuntos criando uma curta resposta '
                                           'para "pedro" no final: ',
                             only_chatgpt=True,
+                            moderate=False,
                             biased=True,
                         ),
                         chat_id=message.chat.id,
@@ -145,6 +149,7 @@ async def openai_reactions(
                                 prompt_inject=None if url_detector else OPENAI_PROMPTS['responda'],
                                 biased=False if url_detector else True,
                                 destroy_message=destroy_message,
+                                moderate=False,
                                 remove_words_list=None,
                             ),
                             chat_id=message.chat.id,

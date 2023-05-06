@@ -237,4 +237,3 @@ def _emotion(img_path: str, uid: str, return_dict: dict):
         return_dict[uid] = emotion
     except:
         return_dict[uid] = ""
-

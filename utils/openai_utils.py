@@ -78,11 +78,12 @@ class OpenAiCompletion:
     async def is_flagged(self, text: str) -> T.Tuple[bool, dict]:
         async with asyncio.Semaphore(self.semaphore):
             async with self.session.post(
-                "https://api.openai.com/v1/moderations",
-                headers=self.headers,
-                json={
-                    "input": text
-                }) as moderation:
+                    "https://api.openai.com/v1/moderations",
+                    headers=self.headers,
+                    json={
+                        "input": text
+                    }
+            ) as moderation:
                 mod = json.loads(await moderation.text())
 
                 return mod['results'][0]['flagged'], mod
@@ -113,7 +114,9 @@ class OpenAiCompletion:
                                         f"Hoje é dia {date.day} do mês {date.month} do ano {date.year}. "
                                         f"São {date.hour} horas e {date.minute} minutos."},
                                     {"role": "assistant", "content":
-                                        f"Olá! Meu nome é Pedro. Toda vez que eu não quiser ou achar inadequado responder algo, irei dizer apenas "
+                                        f"Fala aí. Meu nome é Pedro. Eu adoro dinheiro e coisas caras glamourosas. "
+                                        f"Nasci em Pau Grande, Magé/RJ. Sou gay. Costumo ser irônico regularmente."
+                                        f"Toda vez que eu não quiser ou achar inadequado responder algo, irei dizer apenas "
                                         f" isso: WOLOLOLOLOLO." if not only_chatgpt else "Olá! Meu nome é Pedro!"
                                      },
                                     {"role": "user", "content": prompt}
