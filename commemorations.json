@@ -1,7 +1,7 @@
 [
     {
         "id": "a706a850-3fae-4795-be19-eed32f842c6d",
-        "every_year": true,
+        "frequency": "annual",
         "created_by": 8375482,
         "created_at": "2022-12-27 20:41:53.669562",
         "celebrate_at": "2022-04-17 00:00:00",
@@ -12,7 +12,7 @@
     },
     {
         "id": "28e5d162-b699-4b0d-bb17-e92ea3256254",
-        "every_year": true,
+        "frequency": "annual",
         "created_by": 8375482,
         "created_at": "2022-12-27 23:47:25.638226",
         "celebrate_at": "2022-04-17 00:00:00",
@@ -23,7 +23,7 @@
     },
     {
         "id": "39c218a6-e010-4161-a956-1addc5a77f25",
-        "every_year": true,
+        "frequency": "annual",
         "created_by": 8375482,
         "created_at": "2022-12-27 23:53:15.145008",
         "celebrate_at": "2022-04-17 00:00:00",
@@ -34,7 +34,7 @@
     },
     {
         "id": "a2c0bfaf-e744-46ef-86a2-6e5695815f15",
-        "every_year": true,
+        "frequency": "annual",
         "created_by": 29311071,
         "created_at": "2022-12-28 00:04:51.504443",
         "celebrate_at": "2022-10-27 00:00:00",
@@ -45,7 +45,7 @@
     },
     {
         "id": "a821fc4f-9735-49f5-b64b-61532330eda0",
-        "every_year": true,
+        "frequency": "annual",
         "created_by": 856468528,
         "created_at": "2022-12-28 01:11:33.048339",
         "celebrate_at": "2022-10-15 00:00:00",
@@ -56,7 +56,7 @@
     },
     {
         "id": "3fcaf0fa-364f-4e5a-b49b-7a172186903a",
-        "every_year": true,
+        "frequency": "annual",
         "created_by": 8375482,
         "created_at": "2022-12-28 08:54:07.247904",
         "celebrate_at": "2022-10-27 00:00:00",
@@ -67,7 +67,7 @@
     },
     {
         "id": "0231c162-bedc-471b-bcee-adfa73ab8425",
-        "every_year": true,
+        "frequency": "annual",
         "created_by": 8375482,
         "created_at": "2022-12-28 08:54:56.030608",
         "celebrate_at": "2022-10-27 00:00:00",
@@ -78,7 +78,7 @@
     },
     {
         "id": "ccf2a663-2c72-4081-af7a-db1d24c69008",
-        "every_year": true,
+        "frequency": "annual",
         "created_by": 8375482,
         "created_at": "2022-12-28 10:59:11.347823",
         "celebrate_at": "2022-05-01 00:00:00",
@@ -89,7 +89,7 @@
     },
     {
         "id": "99f5d621-28ec-4f4f-a860-7e87dbfbaf17",
-        "every_year": true,
+        "frequency": "annual",
         "created_by": 93181222,
         "created_at": "2022-12-28 14:57:24.538067",
         "celebrate_at": "2022-02-07 00:00:00",
@@ -100,7 +100,7 @@
     },
     {
         "id": "b7073f3b-4593-4a70-8758-ca204af9cddd",
-        "every_year": true,
+        "frequency": "annual",
         "created_by": 8375482,
         "created_at": "2022-12-28 15:38:35.543086",
         "celebrate_at": "2022-08-10 00:00:00",
@@ -111,7 +111,7 @@
     },
     {
         "id": "69a75124-2876-4e15-b208-e8e5c3989f65",
-        "every_year": true,
+        "frequency": "annual",
         "created_by": 34152058,
         "created_at": "2022-12-28 15:42:29.605097",
         "celebrate_at": "2022-11-24 00:00:00",
@@ -122,7 +122,7 @@
     },
     {
         "id": "6d40bec0-a454-403a-8019-05ff0cad3e8f",
-        "every_year": true,
+        "frequency": "annual",
         "created_by": 8375482,
         "created_at": "2022-12-28 20:33:12.392967",
         "celebrate_at": "2022-12-29 00:00:00",
@@ -133,7 +133,7 @@
     },
     {
         "id": "07168db3-da5b-425b-88d3-f3cdbdbd3c71",
-        "every_year": true,
+        "frequency": "annual",
         "created_by": 8375482,
         "created_at": "2022-12-28 21:12:38.187711",
         "celebrate_at": "2022-12-29 00:00:00",
@@ -144,7 +144,7 @@
     },
     {
         "id": "c2a3fe7a-9ea7-4aad-8e7a-d5c4d1a2921c",
-        "every_year": false,
+        "frequency": "once",
         "created_by": 8375482,
         "created_at": "2022-12-28 21:15:32.602947",
         "celebrate_at": "2022-12-28 00:00:00",
@@ -155,7 +155,7 @@
     },
     {
         "id": "bd3dd74c-a253-43c2-85ef-bd54ac8425a9",
-        "every_year": true,
+        "frequency": "annual",
         "created_by": 8375482,
         "created_at": "2022-12-28 21:17:47.912288",
         "celebrate_at": "2022-04-17 00:00:00",
@@ -166,7 +166,7 @@
     },
     {
         "id": "952844fe-f2de-4087-b98d-789c956420ce",
-        "every_year": true,
+        "frequency": "annual",
         "created_by": 8375482,
         "created_at": "2022-12-28 21:20:23.951998",
         "celebrate_at": "2022-04-22 00:00:00",
@@ -177,7 +177,7 @@
     },
     {
         "id": "d01eada6-b0d3-4db6-a47e-3eb3b92c8a0d",
-        "every_year": false,
+        "frequency": "once",
         "created_by": 8375482,
         "created_at": "2022-12-28 21:21:22.441768",
         "celebrate_at": "2022-12-29 00:00:00",
@@ -188,7 +188,7 @@
     },
     {
         "id": "42931dd7-2b22-407e-975a-549b68537424",
-        "every_year": false,
+        "frequency": "once",
         "created_by": 8375482,
         "created_at": "2022-12-29 08:01:02.827691",
         "celebrate_at": "2024-01-01 00:00:00",
@@ -199,7 +199,7 @@
     },
     {
         "id": "81e1ebb9-8d7f-4ad0-bb75-09049065f1ac",
-        "every_year": false,
+        "frequency": "once",
         "created_by": 8375482,
         "created_at": "2022-12-29 08:01:55.301149",
         "celebrate_at": "2024-01-01 00:00:00",
@@ -210,7 +210,7 @@
     },
     {
         "id": "3098b83a-ca59-468a-8c91-241cef5f9661",
-        "every_year": false,
+        "frequency": "once",
         "created_by": 8375482,
         "created_at": "2023-01-10 21:17:05.823868",
         "celebrate_at": "2023-01-11 00:00:00",
@@ -221,7 +221,7 @@
     },
     {
         "id": "5ec239a0-6f0a-490c-a567-486e061f829f",
-        "every_year": false,
+        "frequency": "once",
         "created_by": 8375482,
         "created_at": "2023-01-15 15:42:20.896811",
         "celebrate_at": "2023-02-22 00:00:00",
@@ -232,7 +232,7 @@
     },
     {
         "id": "43e4decb-63de-4902-b57c-e322b96ffc3f",
-        "every_year": true,
+        "frequency": "annual",
         "created_by": 8375482,
         "created_at": "2023-03-25 11:55:27.313630",
         "celebrate_at": "2023-04-04 00:00:00",
@@ -243,7 +243,7 @@
     },
     {
         "id": "7b94a0fa-d259-4cb2-9b94-1838f89c8839",
-        "every_year": true,
+        "frequency": "annual",
         "created_by": 8375482,
         "created_at": "2023-03-25 11:56:42.678812",
         "celebrate_at": "2023-04-09 00:00:00",
@@ -254,7 +254,7 @@
     },
     {
         "id": "24143e74-b32f-4926-91bd-2002aa08aef8",
-        "every_year": true,
+        "frequency": "annual",
         "created_by": 8375482,
         "created_at": "2023-03-25 12:12:18.435267",
         "celebrate_at": "2023-07-28 00:00:00",
@@ -265,7 +265,7 @@
     },
     {
         "id": "6becc970-721b-41cf-a540-acec77538eae",
-        "every_year": true,
+        "frequency": "annual",
         "created_by": 8375482,
         "created_at": "2023-05-02 16:14:18.293642",
         "celebrate_at": "2023-06-01 00:00:00",
@@ -276,13 +276,13 @@
     },
     {
         "id": "2bf8429d-5947-43f5-bc53-31797e26c15f",
-        "every_year": true,
+        "frequency": "annual",
         "created_by": 8375482,
         "created_at": "2023-05-02 16:15:23.291919",
         "celebrate_at": "2023-05-06 00:00:00",
         "for_chat": -632911267,
         "message": "lembrar de implementar um recurso para repetir lembretes todo mes",
         "anniversary": "",
-        "last_celebration": "2023-05-06 13:21:01.507262"
+        "last_celebration": "2023-05-06 19:13:21.628600"
     }
 ]

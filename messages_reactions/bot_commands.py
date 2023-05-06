@@ -127,6 +127,8 @@ async def bot_commands(
 
         if re.fullmatch(ANNUAL_DATE_PATTERN, message_split[-1]):
             frequency = 'annual'
+        elif len(message_split[-1]) == 2 and 0 < int(message_split[-1]) < 32:
+            frequency = 'monthly'
         elif re.fullmatch(ONCE_DATE_PATTERN, message_split[-1]):
             frequency = 'once'
 
@@ -134,8 +136,10 @@ async def bot_commands(
             bot.loop.create_task(
                 bot.send_message(
                     message_text=f"exemplo pra agendar:\n"
-                                 f"\n<b>Exemplo 1 (anual): </b>/agendar hoje é dia de asd caralho 29/12"
+                                 f"\n<b>Exemplo 1 (anual): </b>/agendar hoje é dia de 29/12"
                                  f"\n<b>Exemplo 2 (uma vez): </b>/agendar me lembra de sei la 29/12/2023"
+                                 f"\n<b>Exemplo 3 (mensal): </b>/agendar me lembra disso 05 "
+                                 f"(obs.: 31 será sempre considerado o último dia do mês)"
                     ,
                     chat_id=message.chat.id,
                     reply_to=message.message_id,
@@ -146,15 +150,17 @@ async def bot_commands(
         else:
             if frequency == "annual":
                 celebration = datetime.strptime(f"{message_split[-1]}/{bot.datetime_now.year}", "%d/%m/%Y")
-            else:
+            elif frequency == "once":
                 celebration = datetime.strptime(f"{message_split[-1]}", "%d/%m/%Y")
+            elif frequency == "monthly":
+                celebration = datetime.strptime(f"{message_split[-1]}/{bot.datetime_now.month}/{bot.datetime_now.year}", "%d/%m/%Y")
 
             text = message.text.lower().replace(message_split[-1], '').replace(message_split[0], '').strip()
 
             bot.commemorations.data.append(
                 Commemoration(
                     id=str(uuid.uuid4()),
-                    every_year=frequency == 'annual',
+                    frequency=frequency,
                     created_by=message.from_.id,
                     created_at=str(bot.datetime_now),
                     celebrate_at=str(celebration),
@@ -178,9 +184,9 @@ async def bot_commands(
 
         agenda = [
                     f"<b>{entry.id}</b>\n"
-                    f"<b>Data:</b> {entry.celebrate_at.day}/{entry.celebrate_at.month}{'/' + str(entry.celebrate_at.year) if not entry.every_year else ''}\n"
+                    f"<b>Data:</b> {entry.celebrate_at.day}{'/' + str(entry.celebrate_at.month) if not entry.frequency in ['monthly'] else ''}{'/' + str(entry.celebrate_at.year) if not entry.frequency in ['annual', 'monthly'] else ''}\n"
                     f"<b>Lembrete:</b> {entry.message if not entry.anniversary else 'Aniversário de ' + entry.anniversary.replace('@', '@ ')}\n"
-                    f"<b>Repete todo ano:</b> {entry.every_year}\n"
+                    f"<b>Frequência:</b> {entry.frequency}\n"
                     f"<b>{message.from_.first_name} autorizado a deletar:</b> {entry.created_by == message.from_.id}"
                     for entry in bot.commemorations.data
                     if entry.for_chat == message.chat.id

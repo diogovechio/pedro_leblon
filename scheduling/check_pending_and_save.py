@@ -1,5 +1,4 @@
-from datetime import datetime
-import logging
+from datetime import datetime, timedelta
 from dataclasses import asdict
 
 from pedro_leblon import FakePedro, telegram_logging
@@ -11,45 +10,65 @@ def check_agenda_and_save(bot: FakePedro):
     try:
         today = bot.datetime_now
 
-        day = today.day
+        day =  today.day
         month = today.month
         year = today.year
 
         for entry in bot.commemorations.data:
             string_date = str(entry.celebrate_at).split(' ')[0]
-            date = datetime.strptime(string_date, "%Y-%m-%d")
 
-            if date.day == day and date.month == month and (
-                    (
-                            not entry.every_year and date.year == year
-                    )
-                    or entry.every_year
-            ):
-                if entry.last_celebration is None or entry.last_celebration.year != year:
-                    entry.last_celebration = bot.datetime_now
+            if entry.frequency == "monthly":
+                date = datetime.strptime(string_date, "%Y-%m-%d")
 
-                    if entry.anniversary:
-                        bot.loop.create_task(
-                            bot.send_message(
-                                message_text=f"feliz aniversário {entry.anniversary}\n{entry.message}".upper(),
-                                chat_id=entry.for_chat
-                            )
-                        )
+                if str(date.day) == "31":
+                    next_month = date.replace(day=28) + timedelta(days=4)
+                    date = next_month - timedelta(days=next_month.day)
 
-                        bot.loop.create_task(
-                            bot.send_video(
-                                video=open(f'gifs/birthday0.mp4', 'rb').read(),
-                                chat_id=entry.for_chat
-                            )
-                        )
+                if date.day == day:
+                    if entry.last_celebration is None or entry.last_celebration.day != day:
+                        entry.last_celebration = bot.datetime_now
 
-                    else:
                         bot.loop.create_task(
                             bot.send_message(
                                 message_text=entry.message,
                                 chat_id=entry.for_chat
                             )
                         )
+
+            else:
+                date = datetime.strptime(string_date, "%Y-%m-%d")
+
+                if date.day == day and date.month == month and (
+                        (
+                                not entry.frequency == "annual" and date.year == year
+                        )
+                        or entry.frequency == "annual"
+                ):
+                    if entry.last_celebration is None or entry.last_celebration.year != year:
+                        entry.last_celebration = bot.datetime_now
+
+                        if entry.anniversary:
+                            bot.loop.create_task(
+                                bot.send_message(
+                                    message_text=f"feliz aniversário {entry.anniversary}\n{entry.message}".upper(),
+                                    chat_id=entry.for_chat
+                                )
+                            )
+
+                            bot.loop.create_task(
+                                bot.send_video(
+                                    video=open(f'gifs/birthday0.mp4', 'rb').read(),
+                                    chat_id=entry.for_chat
+                                )
+                            )
+
+                        else:
+                            bot.loop.create_task(
+                                bot.send_message(
+                                    message_text=entry.message,
+                                    chat_id=entry.for_chat
+                                )
+                            )
 
         new_agenda_data = asdict(bot.commemorations)
         user_forecast = json.dumps(bot.config.user_last_forecast)

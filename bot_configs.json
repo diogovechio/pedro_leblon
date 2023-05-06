@@ -8,7 +8,7 @@
     "random_mock_frequency": 0.03,
     "words_react_frequency": 0.2,
     "mock_drunk_decaptor_frequency": 0.03,
-    "annoy_user_frequency": 0.7
+    "annoy_user_frequency": 0.3
   },
   "openai": {
     "force_model": null,
@@ -23,12 +23,14 @@
     "games": ""
   },
   "ask_photos": false,
-  "telegram_api_semaphore": 15,
+  "telegram_api_semaphore": 5,
   "not_internal_chats": [-632911267],
   "ignore_users": [],
   "annoy_users": [],
   "block_samuel": false,
   "allowed_ids": [
+{"name": "kkeyo",
+"id": 29311071},
     {
       "name": "Pedro Debug",
       "id": -704277411
@@ -85,7 +87,8 @@
     "thai5a": {
       "messages": [
         "grossa",
-        "GROSSA"
+        "GROSSA",
+	"miga"
       ]
     },
     "771960127": {
@@ -96,7 +99,7 @@
       ]
     },
     "8375482": {
-      "rss_feed": "http://feeds.feedburner.com/ign/pc-articles",
+      "rss_feed": "",
       "name": "diogo",
       "messages": [
         "o importante é n trabalhar"
@@ -110,7 +113,7 @@
       ]
     },
     "nands93": {
-      "rss_feed": "http://feeds.feedburner.com/PragmatismoPolitico",
+      "rss_feed": "",
       "messages": [
        "Xiiii",
        "xiiiiii",
@@ -120,7 +123,7 @@
       ]
     },
     "cocao": {
-      "rss_feed": "http://feeds.feedburner.com/ign/games-all",
+      "rss_feed": "",
       "messages": [
         "eu podia ta soldando",
         "eu adoro um falo",
@@ -130,7 +133,7 @@
       ]
     },
     "kkeyo": {
-      "rss_feed": "https://feeds.feedburner.com/IGNPS5Articles",
+      "rss_feed": "",
       "messages": [
         "PC é casa da mãe Joana",
         "só tem gentalha",

@@ -8,7 +8,7 @@ import typing as T
 @dataclass
 class Commemoration:
     id: str
-    every_year: bool
+    frequency: str
     created_by: int
     created_at: datetime
     celebrate_at: datetime
