@@ -68,7 +68,7 @@ async def openai_reactions(
             await _react_to_be_on_reply(data=data)
 
         elif (
-                data.bot.random_talk != round(data.bot.datetime_now.hour / 6)
+                data.bot.random_talk != round(data.bot.datetime_now.hour / 8)
                 and random.random() < data.bot.config.random_params.random_mock_frequency
                 and data.message.chat.id not in data.bot.config.not_internal_chats
         ):
@@ -483,7 +483,7 @@ async def _react_to_be_on_reply(data: ReactData) -> None:
 async def _random_conversation_react(data: ReactData) -> None:
     bot = data.bot
 
-    bot.random_talk = round(data.bot.datetime_now.hour / 6)
+    bot.random_talk = round(data.bot.datetime_now.hour / 8)
 
     with bot.sending_action(data.message.chat.id, action="typing"):
         chat = "\n".join(data.bot.messages_in_memory[data.message.chat.id][-25:])
