@@ -31,7 +31,7 @@ async def openai_reactions(
 
         if (
                 command_in('pedr', data.message.text)
-                or command_in('pedro', data.message.text, text_end=True)
+                or command_in('pedro?', data.message.text, text_end=True)
                 or "ペドロ" in data.message.text
                 or int(data.message.chat.id) > 0
         ) and not command_in('/pedro', data.message.text) and not pedro_on_reply:
@@ -154,7 +154,7 @@ async def _forecast_detect(data: ReactData) -> bool:
 async def _regular_pedro_react(data: ReactData) -> None:
     bot = data.bot
 
-    chat = "\n".join([message for message in bot.messages_in_memory[data.message.chat.id][-6:]])
+    chat = "\n".join([message for message in bot.messages_in_memory[data.message.chat.id][-7:-1]])
     prompt_text = f"{chat}\n{data.message.from_.first_name}: {data.input_text}"
 
     with bot.sending_action(data.message.chat.id, action="typing", user=data.message.from_.first_name):
