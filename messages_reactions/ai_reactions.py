@@ -13,6 +13,12 @@ from utils.weather_utils import weather_prompt, get_forecast
 async def openai_reactions(
         data: ReactData
 ) -> None:
+    pedro_on_reply = (
+            data.message.reply_to_message and data.message.reply_to_message.from_
+            and data.message.reply_to_message.from_.username == "pedroleblonbot"
+    )
+
+
     if swear_word_detected := any(
             block_word in data.message.text.lower() for block_word in SWEAR_WORDS
     ) and not data.url_detector and data.bot.mocked_hour != data.bot.datetime_now.hour:
@@ -28,7 +34,7 @@ async def openai_reactions(
                 or command_in('pedro', data.message.text, text_end=True)
                 or "ペドロ" in data.message.text
                 or int(data.message.chat.id) > 0
-        ) and not command_in('/pedro', data.message.text):
+        ) and not command_in('/pedro', data.message.text) and not pedro_on_reply:
             await _regular_pedro_react(data=data)
 
         elif (
@@ -58,10 +64,7 @@ async def openai_reactions(
         ) and random.random() < data.bot.config.random_params.words_react_frequency and not data.url_detector:
             await _react_to_words(data=data)
 
-        elif (
-                data.message.reply_to_message and data.message.reply_to_message.from_
-                and data.message.reply_to_message.from_.username == "pedroleblonbot"
-        ):
+        elif pedro_on_reply:
             await _react_to_be_on_reply(data=data)
 
         elif (
