@@ -318,7 +318,7 @@ async def _tldr(data: ReactData) -> None:
                         only_chatgpt=True,
                         remove_words_list=None
                     ),
-                    chat_id=data.chat.id,
+                    chat_id=data.message.chat.id,
                     reply_to=data.message.message_id)
             )
 
