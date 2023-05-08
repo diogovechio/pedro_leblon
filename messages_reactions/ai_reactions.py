@@ -64,7 +64,9 @@ async def openai_reactions(
         ) and random.random() < data.bot.config.random_params.words_react_frequency and not data.url_detector:
             await _react_to_words(data=data)
 
-        elif pedro_on_reply:
+        elif pedro_on_reply and (
+            len(data.message.text.split(" ")) > 1 or "@" not in data.message.text[0]
+        ):
             await _react_to_be_on_reply(data=data)
 
         elif (
