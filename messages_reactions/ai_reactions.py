@@ -494,7 +494,7 @@ async def _random_conversation_react(data: ReactData) -> None:
             bot.send_message(
                 message_text=await bot.openai.generate_message(
                     message_username='.',
-                    message_text=chat,
+                    message_text=f"{chat}\npedro:",
                     chat=data.message.chat.title,
                     prompt_inject='considere que você é o "pedro", abaixo é uma conversa entre você e '
                                   'seus amigos, comente algum dos assuntos criando uma curta resposta '
