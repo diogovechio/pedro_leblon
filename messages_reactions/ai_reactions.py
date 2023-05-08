@@ -157,14 +157,14 @@ async def _regular_pedro_react(data: ReactData) -> None:
     bot = data.bot
 
     chat = "\n".join([message for message in bot.messages_in_memory[data.message.chat.id][-7:-1]])
-    prompt_text = f"{chat}\n{data.message.from_.first_name}: {data.input_text}"
+    prompt_text = f"{chat}\n{data.message.from_.first_name}: {data.input_text}\n"
 
     with bot.sending_action(data.message.chat.id, action="typing", user=data.message.from_.first_name):
         bot.loop.create_task(
             bot.send_message(
                 message_text=await bot.openai.generate_message(
                     message_username=data.message.from_.first_name,
-                    message_text=prompt_text,
+                    message_text=f'{prompt_text}\npedro:',
                     chat=data.message.chat.title,
                     only_chatgpt=True if data.url_detector else False,
                     prompt_inject=None if data.url_detector else OPENAI_PROMPTS['responda'],
@@ -188,7 +188,8 @@ async def _annoy_persona_non_grata(data: ReactData) -> None:
             message_text=await bot.openai.generate_message(
                 message_username=data.username,
                 chat=data.message.chat.title,
-                message_text=f"O {data.message.from_.first_name} disse: {data.input_text}",
+                message_text=f"O {data.message.from_.first_name} disse: {data.input_text}.\n"
+                             f"pedro:",
                 prompt_inject=OPENAI_PROMPTS['critique_negativamente'],
                 destroy_message=False
             ),
@@ -471,7 +472,7 @@ async def _react_to_be_on_reply(data: ReactData) -> None:
             bot.send_message(
                 message_text=await bot.openai.generate_message(
                     message_username='.',
-                    message_text=prompt_text,
+                    message_text=f"{prompt_text}\npedro:",
                     chat=data.message.chat.title,
                     prompt_inject=OPENAI_PROMPTS['responda'],
                     moderate=False,

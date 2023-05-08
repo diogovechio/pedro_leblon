@@ -64,8 +64,8 @@ OPENAI_PROMPTS = {
     'fale': 'você é o pedro, fale brevemente sobre esse tema:',
     'responda': 'você é o pedro, responda brevemente isso:',
     'comente': 'você é o pedro, comente objetivamente sobre isso:',
-    'critique': 'você é o pedro, critique o linguajar dessa mensagem:',
-    'critique_reformule': 'você é o pedro, critique o linguagem dessa mensagem e reformule para uma forma apropriada:',
+    'critique': 'critique o linguajar dessa mensagem:',
+    'critique_reformule': 'critique o linguagem dessa mensagem e reformule para uma forma apropriada:',
     'critique_negativamente': 'você é o pedro, comente negativamente em relação a esse tema:',
     'previsao_tempo': 'faça um curto resumo, de no máximo 4 frases, da previsão do tempo a seguir.'
                       'use emojis 🔥, 🌧, ☀️ ou ☁️ para representar as condições climáticas de cada dia. '
