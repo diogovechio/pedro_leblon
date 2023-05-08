@@ -87,7 +87,7 @@ async def _pre_processor(
     destroy_message = bot.config.block_samuel and from_samuel
 
     if message.reply_to_message and message.reply_to_message.text:
-        input_text += ' : ' + message.reply_to_message.from_.first_name + " disse isso : " + message.reply_to_message.text
+        input_text += " : " + message.reply_to_message.text
 
     if url_detector := await https_url_extract(input_text):
         url_content = await extract_website_paragraph_content(
