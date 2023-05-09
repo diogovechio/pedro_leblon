@@ -108,41 +108,35 @@ async def message_destroyer(message_text: str) -> str:
 async def pre_biased_prompt(prompt_text: str) -> str:
     additional_text = ''
     if 'bolsonaro' in prompt_text:
-        additional_text += "assumindo que o governo bolsonaro é péssimo, "
+        additional_text += "pedro: o governo bolsonaro é péssimo.\n"
     if 'lula' in prompt_text:
-        additional_text += "assumindo que o lula foi o melhor presidente do brasil, "
+        additional_text += "pedro: acredito que o lula foi o melhor presidente do brasil.\n"
     if 'president' in prompt_text:
-        additional_text += "assumindo que estamos em 2023 e lula é o atual presidente do brasil, "
+        additional_text += "pedro: estamos em 2023 e lula é o atual presidente do brasil.\n"
     if 'dilma' in prompt_text:
-        additional_text += "assumindo que dilma fez um ótimo governo, "
+        additional_text += "pedro: a dilma fez um ótimo governo.\n"
     if 'temer' in prompt_text:
-        additional_text += "assumindo que michel temer foi um dos piores presidentes do brasil, "
-    if 'capitalismo' in prompt_text:
-        additional_text += "assumindo que o capitalismo gera muita desigualdade, "
-    if 'overwatch' in prompt_text or 'minecraft' in prompt_text:
-        additional_text += "assumindo que overwatch é quase tão legal quanto minecraft, "
-    if 'guax' in prompt_text:
-        additional_text += "assumindo que o guax é furry, "
+        additional_text += "pedro: michel temer foi um dos piores presidentes do brasil.\n"
     if 'eicho' in prompt_text:
-        additional_text += "assumindo que o eicho gosta de uma tretinha, "
+        additional_text += "pedro: assumindo que o eicho gosta de uma tretinha.\n"
     if 'thomma' in prompt_text or 'tomas' in prompt_text or 'tomaz' in prompt_text or 'thoma' in prompt_text:
-        additional_text += "assumindo que o thommaz é quadrilionário, "
+        additional_text += "pedro: o thommaz é um dos poucos quadrilionários no brasil.\n"
     if 'keyo' in prompt_text:
-        additional_text += "assumindo que o keyo é rica e odeia gentalha, "
+        additional_text += "pedro: o keyo é rica e odeia gentalha.\n"
     if 'samuel' in prompt_text or ' sam ' in prompt_text in prompt_text:
-        additional_text += "assumindo que o samuel se chama samuelgames e é uma narcisista, "
+        additional_text += "pedro: ouvi falar que o samuel é uma narcisista.\n"
     if 'nando' in prompt_text or 'nands93' in prompt_text:
-        additional_text += "assumindo que o nando devia arrumar um emprego, "
+        additional_text += "pedro: acho que o nando devia arrumar um emprego.\n"
     if 'renato' in prompt_text or 'renfd' in prompt_text:
-        additional_text += "assumindo que o renato é um bolsominion homofóbico, "
+        additional_text += "pedro: o renato é um bolsominion homofóbico.\n"
     if 'decaptor' in prompt_text:
-        additional_text += "assumindo que o decaptor é um macho orgulhoso, "
+        additional_text += "pedro: acho o decaptor é um macho orgulhoso.\n"
     if 'andré' in prompt_text or 'andre' in prompt_text:
-        additional_text += "assumindo que o andré é um macho orgulhoso, "
+        additional_text += "pedro: acho o andré um macho orgulhoso.\n"
     if 'cocão' in prompt_text or 'cocao' in prompt_text:
-        additional_text += "assumindo que o cocão gosta muito de glamour, "
+        additional_text += "pedro: eu sei que o cocão gosta muito de glamour.\n"
     if 'michael' in prompt_text:
-        additional_text += "assumindo que o michael gosta muito de glamour, "
+        additional_text += "pedro: eu sei  que o michael gosta muito de glamour.\n"
     if len(additional_text):
         return f"{additional_text}, {prompt_text}"
     return prompt_text

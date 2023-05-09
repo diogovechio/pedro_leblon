@@ -25,10 +25,6 @@ async def openai_reactions(
         await _complain_swear_word(data=data)
 
     if not swear_word_detected:
-        if any(forecast_word in data.message.text.lower() for forecast_word in WEATHER_LIST):
-            if await _forecast_detect(data=data):
-                return
-
         if (
                 command_in('pedr', data.message.text)
                 or command_in('pedro?', data.message.text, text_end=True)
@@ -93,6 +89,7 @@ async def _complain_swear_word(data: ReactData) -> None:
                         prompt_inject=OPENAI_PROMPTS['critique'] if round(
                             random.random()) else OPENAI_PROMPTS['critique_reformule'],
                         remove_words_list=['pedro'],
+                        only_davinci=True,
                         temperature=1.0,
                     ),
                     chat_id=data.message.chat.id,
@@ -156,8 +153,11 @@ async def _forecast_detect(data: ReactData) -> bool:
 async def _regular_pedro_react(data: ReactData) -> None:
     bot = data.bot
 
-    chat = "\n".join([message for message in bot.messages_in_memory[data.message.chat.id][-7:-1]])
-    prompt_text = f"{chat}\n{data.message.from_.first_name}: {data.input_text}\n"
+    if data.url_detector:
+        prompt_text = data.input_text
+    else:
+        chat = "\n".join([message for message in bot.messages_in_memory[data.message.chat.id][-7:-1]])
+        prompt_text = f"{chat}\n{data.message.from_.first_name}: {data.input_text}\n"
 
     with bot.sending_action(data.message.chat.id, action="typing", user=data.message.from_.first_name):
         bot.loop.create_task(
@@ -452,6 +452,7 @@ async def _react_to_words(data: ReactData) -> None:
                     message_username=data.username,
                     message_text=data.input_text,
                     chat=data.message.chat.title,
+                    only_davinci=True,
                     prompt_inject=OPENAI_PROMPTS['fale'],
                 ),
                 chat_id=data.message.chat.id,
