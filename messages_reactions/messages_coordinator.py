@@ -81,6 +81,7 @@ async def _pre_processor(
         from_samuel: bool,
         message: TelegramMessage
 ) -> ReactData:
+    url_detector = ""
     input_text = message.text
 
     username = message.from_.username if message.from_.username else message.from_.first_name
@@ -89,13 +90,14 @@ async def _pre_processor(
     if message.reply_to_message and message.reply_to_message.text:
         input_text += " : " + message.reply_to_message.text
 
-    if url_detector := await https_url_extract(input_text):
-        url_content = await extract_website_paragraph_content(
-            url=url_detector,
-            session=bot.session
-        )
+    if input_text is not None:
+        if url_detector := await https_url_extract(input_text):
+            url_content = await extract_website_paragraph_content(
+                url=url_detector,
+                session=bot.session
+            )
 
-        input_text = input_text.replace(url_detector, url_content)
+            input_text = input_text.replace(url_detector, url_content)
 
     return ReactData(
         bot=bot,

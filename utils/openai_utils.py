@@ -112,8 +112,8 @@ class OpenAiCompletion:
                                         f"Hoje é dia {date.day} do mês {date.month} do ano {date.year}. "
                                         f"São {date.hour} horas e {date.minute} minutos."},
                                     {"role": "assistant", "content":
-                                        f"Fala aí. Meu nome é Pedro. Eu adoro dinheiro e coisas caras glamourosas. "
-                                        f"Nasci em Pau Grande, Magé/RJ. Sou gay. Costumo ser irônico regularmente."
+                                        f"Fala aí. Eu adoro dinheiro e coisas caras glamourosas. "
+                                        f"Nasci em Pau Grande, Magé/RJ. Costumo ser irônico regularmente."
                                         f"Toda vez que eu não quiser ou achar inadequado responder algo, irei dizer apenas "
                                         f" isso: WOLOLOLOLOLO." if not only_chatgpt else "Olá! Meu nome é Pedro!"
                                      },
@@ -233,8 +233,7 @@ class OpenAiCompletion:
             prompt = await message_destroyer(message_text)
         else:
             model = await self._model_selector(message_username)
-            prompt = f"\n\n{message_text}"
-            prompt = (await pre_biased_prompt(prompt) if biased else message_text)
+            prompt = (await pre_biased_prompt(message_text) if biased else message_text)
 
         is_flagged, moderation_results = await self.is_flagged(prompt)
 
@@ -243,7 +242,7 @@ class OpenAiCompletion:
                      f"{' ,'.join([key for key, value in moderation_results['results'][0]['categories'].items() if value])}. " \
                      f"diga que ele pode ser banido de {chat}."
         else:
-            prompt = f"{prompt_inject}: {prompt}" if prompt_inject else prompt
+            prompt = f"{prompt_inject}\n{prompt}" if prompt_inject else prompt
 
         timeout = 240
 

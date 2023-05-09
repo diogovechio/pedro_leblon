@@ -157,14 +157,14 @@ async def _regular_pedro_react(data: ReactData) -> None:
         prompt_text = data.input_text
     else:
         chat = "\n".join([message for message in bot.messages_in_memory[data.message.chat.id][-7:-1]])
-        prompt_text = f"{chat}\n{data.message.from_.first_name}: {data.input_text}\n"
+        prompt_text = f"{chat}\n{data.message.from_.first_name}: {data.input_text}\npedro:"
 
     with bot.sending_action(data.message.chat.id, action="typing", user=data.message.from_.first_name):
         bot.loop.create_task(
             bot.send_message(
                 message_text=await bot.openai.generate_message(
                     message_username=data.message.from_.first_name,
-                    message_text=f'{prompt_text}\npedro:',
+                    message_text=prompt_text,
                     chat=data.message.chat.title,
                     only_chatgpt=True if data.url_detector else False,
                     prompt_inject=None if data.url_detector else OPENAI_PROMPTS['responda'],

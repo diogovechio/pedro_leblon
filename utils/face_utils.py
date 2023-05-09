@@ -217,15 +217,17 @@ async def face_emotion(img_path: str) -> str:
 
         _id = str(uuid.uuid4())
 
-        process = Process(target=_emotion, args=(img_path, _id, return_dict,))
-        process.start()
+        Process(
+            target=_emotion,
+            args=(img_path, _id, return_dict,)
+        ).start()
 
-        for _ in range(5):
+        for _ in range(25):
             if _id in return_dict:
                 emotion = return_dict[_id]
                 del return_dict[_id]
                 break
-            await asyncio.sleep(5)
+            await asyncio.sleep(1)
 
     finally:
         return emotion

@@ -166,17 +166,16 @@ class FakePedro:
                     self.alpha_faces_files.extend(filenames)
                     break
 
-                if not self.debug_mode:
-                    for file in self.faces_files:
-                        embeddings = face_recognition.face_encodings(
-                            face_recognition.load_image_file(f"{self.face_images_path}/{file}")
-                        )
-                        if len(embeddings):
-                            self.faces_names.append(file[:-7])
-                            self.face_embeddings.append(embeddings[0])
-                            logging.info(f"Loaded embeddings for {file}")
-                        else:
-                            logging.critical(f'NO EMBEDDINGS FOR {file}')
+                for file in self.faces_files:
+                    embeddings = face_recognition.face_encodings(
+                        face_recognition.load_image_file(f"{self.face_images_path}/{file}")
+                    )
+                    if len(embeddings):
+                        self.faces_names.append(file[:-7])
+                        self.face_embeddings.append(embeddings[0])
+                        logging.info(f"Loaded embeddings for {file}")
+                    else:
+                        logging.critical(f'NO EMBEDDINGS FOR {file}')
 
         logging.info('Loading finished')
 
@@ -477,7 +476,7 @@ if __name__ == '__main__':
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
         secrets_file=SECRETS_FILE,
-        debug_mode=False
+        debug_mode=True
     )
 
     asyncio.run(

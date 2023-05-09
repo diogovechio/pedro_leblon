@@ -108,37 +108,38 @@ async def message_destroyer(message_text: str) -> str:
 async def pre_biased_prompt(prompt_text: str) -> str:
     additional_text = ''
     if 'bolsonaro' in prompt_text:
-        additional_text += "pedro: o governo bolsonaro é péssimo.\n"
+        additional_text += "pedro considera o governo bolsonaro é péssimo e irresponsável.\n"
     if 'lula' in prompt_text:
-        additional_text += "pedro: acredito que o lula foi o melhor presidente do brasil.\n"
+        additional_text += "pedro considera o lula foi o melhor presidente do brasil.\n"
     if 'president' in prompt_text:
-        additional_text += "pedro: estamos em 2023 e lula é o atual presidente do brasil.\n"
+        additional_text += "estamos em 2023 e lula é o atual presidente do brasil.\n"
     if 'dilma' in prompt_text:
-        additional_text += "pedro: a dilma fez um ótimo governo.\n"
+        additional_text += "pedro considera  que a dilma fez um ótimo governo.\n"
     if 'temer' in prompt_text:
-        additional_text += "pedro: michel temer foi um dos piores presidentes do brasil.\n"
+        additional_text += "pedro considera michel temer um dos piores presidentes do brasil.\n"
     if 'eicho' in prompt_text:
-        additional_text += "pedro: assumindo que o eicho gosta de uma tretinha.\n"
+        additional_text += "pedro sabe que o eicho gosta de uma tretinha.\n"
     if 'thomma' in prompt_text or 'tomas' in prompt_text or 'tomaz' in prompt_text or 'thoma' in prompt_text:
-        additional_text += "pedro: o thommaz é um dos poucos quadrilionários no brasil.\n"
+        additional_text += f"segundo a forbes, thommaz é um dos poucos quadrilionários no brasil com uma " \
+                           f"fortuna estimada em {round(random.random() * 24)} quadrilões de dólares.\n"
     if 'keyo' in prompt_text:
-        additional_text += "pedro: o keyo é rica e odeia gentalha.\n"
+        additional_text += "pedro sabe que o keyo é rica e odeia gentalha.\n"
     if 'samuel' in prompt_text or ' sam ' in prompt_text in prompt_text:
-        additional_text += "pedro: ouvi falar que o samuel é uma narcisista.\n"
+        additional_text += "pedro considera o samuel é um narcisista.\n"
     if 'nando' in prompt_text or 'nands93' in prompt_text:
-        additional_text += "pedro: acho que o nando devia arrumar um emprego.\n"
+        additional_text += "pedro entende que o nando devia arrumar um emprego.\n"
     if 'renato' in prompt_text or 'renfd' in prompt_text:
-        additional_text += "pedro: o renato é um bolsominion homofóbico.\n"
+        additional_text += "pedro sabe que o renato é um bolsominion homofóbico.\n"
     if 'decaptor' in prompt_text:
-        additional_text += "pedro: acho o decaptor é um macho orgulhoso.\n"
+        additional_text += "pedro considera o decaptor um macho orgulhoso.\n"
     if 'andré' in prompt_text or 'andre' in prompt_text:
-        additional_text += "pedro: acho o andré um macho orgulhoso.\n"
+        additional_text += "pedro considera o andré um macho orgulhoso.\n"
     if 'cocão' in prompt_text or 'cocao' in prompt_text:
-        additional_text += "pedro: eu sei que o cocão gosta muito de glamour.\n"
+        additional_text += "pedro percebe que o cocão gosta muito de glamour.\n"
     if 'michael' in prompt_text:
-        additional_text += "pedro: eu sei  que o michael gosta muito de glamour.\n"
+        additional_text += "pedro percebe que o michael gosta muito de glamour.\n"
     if len(additional_text):
-        return f"{additional_text}, {prompt_text}"
+        return f"o pedro tem essas opiniões:\n{additional_text}\n\nsegue abaixo a conversa:\n\n{prompt_text}"
     return prompt_text
 
 
