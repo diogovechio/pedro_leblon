@@ -208,6 +208,20 @@ async def bot_commands(
                     parse_mode="HTML"
                 )
             )
+    elif command_in('/del', message.text) and message.reply_to_message and message.from_.username == 'diogovechio':
+        bot.loop.create_task(
+            bot.delete_message(
+                chat_id=message.chat.id,
+                message_id=message.reply_to_message.message_id
+            )
+        )
+
+        bot.loop.create_task(
+            bot.delete_message(
+                chat_id=message.chat.id,
+                message_id=message.message_id
+            )
+        )
 
     elif command_in('/delete', message.text):
         msg_id = message.text.split(' ')

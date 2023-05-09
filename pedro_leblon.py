@@ -424,6 +424,16 @@ class FakePedro:
         ) as resp:
             logging.info(resp.status)
 
+    async def delete_message(self, chat_id: int, message_id=int) -> None:
+        async with self.session.post(
+                f"{self.api_route}/deleteMessage".replace('\n', ''),
+                json={
+                    "chat_id": chat_id,
+                    "message_id": message_id
+                }
+        ) as resp:
+            logging.info(resp.status)
+
     async def is_taking_too_long(self, chat_id: int, user = "", max_loops=3, timeout=10):
         if user:
             messages = [f"{user.lower()} ja vou te responder",
@@ -467,7 +477,7 @@ if __name__ == '__main__':
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
         secrets_file=SECRETS_FILE,
-        debug_mode=True
+        debug_mode=False
     )
 
     asyncio.run(
