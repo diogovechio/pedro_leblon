@@ -153,7 +153,7 @@ async def create_caption(
 
     if face_data:
         caption = await bot.openai.generate_message(
-            message_text=f"considerando que você é o pedro, diga ao {face_data.face_name} que você achou ele "
+            full_text=f"considerando que você é o pedro, diga ao {face_data.face_name} que você achou ele "
                          f"{face_data.emotion} nessa foto. faça um comentário sobre a foto.\n\npedro:",
             temperature=1.0,
             biased=True

@@ -40,7 +40,7 @@ async def send_roleta(bot: FakePedro) -> None:
                 bot.send_message(
                     message_text=(
                         await bot.openai.generate_message(
-                            message_text=f"repita essa frase e em seguinte dê a sua conclusão: "
+                            full_text=f"repita essa frase e em seguinte dê a sua conclusão: "
                                          f"'{random.choice(roleta_list)['text']}'",
                         )
                     ).upper(),

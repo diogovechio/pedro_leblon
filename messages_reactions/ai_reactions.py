@@ -84,7 +84,7 @@ async def _complain_swear_word(data: ReactData) -> None:
                 bot.send_message(
                     message_text=await bot.openai.generate_message(
                         message_username=data.username,
-                        message_text=data.input_text,
+                        full_text=data.input_text,
                         chat=data.message.chat.title,
                         prompt_inject=OPENAI_PROMPTS['critique'] if round(
                             random.random()) else OPENAI_PROMPTS['critique_reformule'],
@@ -103,7 +103,7 @@ async def _forecast_detect(data: ReactData) -> bool:
 
     message_check = await bot.openai.generate_message(
         message_username=data.username,
-        message_text=await weather_prompt(data.input_text),
+        full_text=await weather_prompt(data.input_text),
         chat=data.message.chat.title,
         only_chatgpt=True,
         prompt_inject=None,
@@ -132,7 +132,7 @@ async def _forecast_detect(data: ReactData) -> bool:
                 bot.send_message(
                     message_text=await bot.openai.generate_message(
                         message_username=data.username,
-                        message_text=data.input_text + await get_forecast(bot=bot, place=city, days=days),
+                        full_text=data.input_text + await get_forecast(bot=bot, place=city, days=days),
                         chat=data.message.chat.title,
                         return_raw_text=True,
                         only_chatgpt=True,
@@ -164,7 +164,8 @@ async def _regular_pedro_react(data: ReactData) -> None:
             bot.send_message(
                 message_text=await bot.openai.generate_message(
                     message_username=data.message.from_.first_name,
-                    message_text=prompt_text,
+                    full_text=prompt_text,
+                    short_text=data.input_text,
                     chat=data.message.chat.title,
                     only_chatgpt=True if data.url_detector else False,
                     prompt_inject=None if data.url_detector else OPENAI_PROMPTS['fale'],
@@ -188,7 +189,7 @@ async def _annoy_persona_non_grata(data: ReactData) -> None:
             message_text=await bot.openai.generate_message(
                 message_username=data.username,
                 chat=data.message.chat.title,
-                message_text=f"O {data.message.from_.first_name} disse: {data.input_text}.\n"
+                full_text=f"O {data.message.from_.first_name} disse: {data.input_text}.\n"
                              f"pedro:",
                 prompt_inject=OPENAI_PROMPTS['critique_negativamente'],
                 destroy_message=False
@@ -288,7 +289,7 @@ async def _boring_pedro_react(data: ReactData) -> None:
             bot.send_message(
                 message_text=await bot.openai.generate_message(
                     message_username=data.username,
-                    message_text=data.input_text,
+                    full_text=data.input_text,
                     chat=data.message.chat.title,
                     prompt_inject=None,
                     only_chatgpt=True,
@@ -313,7 +314,7 @@ async def _tldr(data: ReactData) -> None:
                 bot.send_message(
                     message_text=await bot.openai.generate_message(
                         message_username=data.username,
-                        message_text=f"faça um curto resumo dessa conversa entre os amigos:\n{chat}",
+                        full_text=f"faça um curto resumo dessa conversa entre os amigos:\n{chat}",
                         chat=data.message.chat.title,
                         prompt_inject=None,
                         moderate=False,
@@ -338,7 +339,7 @@ async def _tldr(data: ReactData) -> None:
                         (
                             await bot.openai.generate_message(
                                 message_username=data.username,
-                                message_text=f"faça um resumo do texto a seguir: {data.input_text}",
+                                full_text=f"faça um resumo do texto a seguir: {data.input_text}",
                                 chat=data.message.chat.title,
                                 moderate=False,
                                 prompt_inject=None,
@@ -402,7 +403,8 @@ async def _critic_or_praise(data: ReactData) -> None:
 
         openai_text = await bot.openai.generate_message(
             message_username=data.username,
-            message_text=prompt,
+            full_text=prompt,
+            short_text=prompt,
             chat=data.message.chat.title,
             destroy_message=data.destroy_message,
             moderate=False if "/critique" in data.message.text.lower()[0:9] else True,
@@ -450,7 +452,7 @@ async def _react_to_words(data: ReactData) -> None:
             bot.send_message(
                 message_text=await bot.openai.generate_message(
                     message_username=data.username,
-                    message_text=f"{data.input_text}\npedro:",
+                    full_text=f"{data.input_text}\npedro:",
                     chat=data.message.chat.title,
                     only_davinci=True,
                     prompt_inject=OPENAI_PROMPTS['fale'],
@@ -473,7 +475,8 @@ async def _react_to_be_on_reply(data: ReactData) -> None:
             bot.send_message(
                 message_text=await bot.openai.generate_message(
                     message_username='.',
-                    message_text=f"{prompt_text}\npedro:",
+                    full_text=f"{prompt_text}\npedro:",
+                    short_text=data.message.text,
                     chat=data.message.chat.title,
                     prompt_inject=OPENAI_PROMPTS['fale'],
                     moderate=False,
@@ -495,7 +498,7 @@ async def _random_conversation_react(data: ReactData) -> None:
             bot.send_message(
                 message_text=await bot.openai.generate_message(
                     message_username='.',
-                    message_text=f"{chat}\npedro:",
+                    full_text=f"{chat}\npedro:",
                     chat=data.message.chat.title,
                     prompt_inject='considere que você é o "pedro", abaixo é uma conversa entre você e '
                                   'seus amigos, comente algum dos assuntos criando uma curta resposta '

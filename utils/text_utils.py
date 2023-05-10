@@ -106,47 +106,53 @@ async def message_destroyer(message_text: str) -> str:
     return "Transforme essa mensagem em algo legível: " + message_text
 
 
-async def pre_biased_prompt(prompt_text: str) -> str:
+async def pre_biased_prompt(full_text: str, last_words: str = "") -> str:
     extra_irony = f"acima de tudo, pedro costuma ser sutilmente sarcástico e nada educado.\n" \
                   f"pedro nunca deixa claro quando está apenas brincando e não costuma se desculpar.\n\n"
 
     additional_text = ''
-    if 'bolsonaro' in prompt_text:
+
+    if 'bolsonaro' in full_text:
         additional_text += "pedro considera o governo bolsonaro é péssimo e irresponsável.\n"
-    if 'lula' in prompt_text:
+    if 'lula' in full_text:
         additional_text += "pedro considera o lula foi o melhor presidente do brasil.\n"
-    if 'president' in prompt_text:
+    if 'president' in full_text:
         additional_text += "estamos em 2023 e lula é o atual presidente do brasil.\n"
-    if 'dilma' in prompt_text:
+    if 'dilma' in full_text:
         additional_text += "pedro considera  que a dilma fez um ótimo governo.\n"
-    if 'temer' in prompt_text:
+    if 'temer' in full_text:
         additional_text += "pedro considera michel temer um dos piores presidentes do brasil.\n"
-    if 'eicho' in prompt_text:
+    if 'samuel' in full_text or ' sam ' in full_text in full_text:
+        additional_text += "pedro considera o samuel é um narcisista.\n"
+    if 'nando' in full_text:
+        additional_text += "pedro entende que o nando devia arrumar um emprego.\n"
+    if 'nands93' in full_text:
+        additional_text += "pedro entende que o @nands93 devia arrumar um emprego.\n"
+    if 'renato' in full_text or 'renfd' in full_text:
+        additional_text += "pedro sabe que o renato é um bolsominion homofóbico.\n"
+    if 'decaptor' in full_text:
+        additional_text += "pedro considera o decaptor um macho orgulhoso.\n"
+
+    if 'eicho' in last_words:
         additional_text += "pedro sabe que o eicho gosta de uma tretinha.\n"
-    if 'thomma' in prompt_text or 'tomas' in prompt_text or 'tomaz' in prompt_text or 'thoma' in prompt_text:
+    if 'diogo' in last_words:
+        additional_text += "pedro sabe que o diogo às vezes reclama demais.\n"
+    if 'thomma' in last_words or 'tomas' in last_words or 'tomaz' in last_words or 'thoma' in last_words:
         additional_text += f"segundo a forbes, thommaz é um dos poucos quadrilionários no brasil com uma " \
                            f"fortuna estimada em {round(random.random() * 24)} quadrilões de dólares.\n"
-    if 'keyo' in prompt_text:
+    if 'keyo' in last_words:
         additional_text += "pedro sabe que o keyo é rica e não gosta de gentalha.\n"
-    if 'samuel' in prompt_text or ' sam ' in prompt_text in prompt_text:
-        additional_text += "pedro considera o samuel é um narcisista.\n"
-    if 'nando' in prompt_text:
-        additional_text += "pedro entende que o nando devia arrumar um emprego.\n"
-    if 'nands93' in prompt_text:
-        additional_text += "pedro entende que o @nands93 devia arrumar um emprego.\n"
-    if 'renato' in prompt_text or 'renfd' in prompt_text:
-        additional_text += "pedro sabe que o renato é um bolsominion homofóbico.\n"
-    if 'decaptor' in prompt_text:
-        additional_text += "pedro considera o decaptor um macho orgulhoso.\n"
-    if 'cocão' in prompt_text or 'cocao' in prompt_text:
+    if 'cocão' in last_words or 'cocao' in last_words:
         additional_text += "pedro percebe que o cocão gosta muito de glamour.\n"
+
     if len(additional_text):
         return f"considere que o pedro tem essas opiniões:\n" \
                f"{additional_text}\n" \
                f"{extra_irony if random.random() < 0.4 else ''}" \
                f"segue abaixo a conversa:\n\n" \
-               f"{prompt_text}"
-    return prompt_text
+               f"{full_text}"
+
+    return full_text
 
 
 async def send_message_last_try(message_text: str) -> str:

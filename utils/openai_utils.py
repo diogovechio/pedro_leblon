@@ -205,7 +205,8 @@ class OpenAiCompletion:
 
     async def generate_message(
             self,
-            message_text: str,
+            full_text: str,
+            short_text = "",
             message_username: T.Optional[str] = "",
             chat="ASD",
             only_chatgpt=False,
@@ -220,21 +221,24 @@ class OpenAiCompletion:
     ) -> str:
         datetime_now = datetime.datetime.utcnow() - datetime.timedelta(hours=3)
 
-        message_text = message_text.lower()
+        full_text = full_text.lower()
 
         if remove_words_list:
             for word in remove_words_list:
-                message_text = message_text.replace(word, '')
+                full_text = full_text.replace(word, '')
 
         if not message_username:
             message_username = "arrombado"
 
         if destroy_message:
             model = "text-ada-001"
-            prompt = await message_destroyer(message_text)
+            prompt = await message_destroyer(full_text)
         else:
             model = await self._model_selector(message_username)
-            prompt = (await pre_biased_prompt(message_text) if biased else message_text)
+            prompt = (await pre_biased_prompt(
+                full_text=full_text,
+                last_words=short_text
+            ) if biased else full_text)
 
         is_flagged, moderation_results = await self.is_flagged(prompt)
 
