@@ -107,6 +107,8 @@ async def message_destroyer(message_text: str) -> str:
 
 async def pre_biased_prompt(prompt_text: str) -> str:
     additional_text = ''
+    if 'diogo' in prompt_text:
+        additional_text += "pedro acha que o diogo às vezes reclama demais.\n"
     if 'bolsonaro' in prompt_text:
         additional_text += "pedro considera o governo bolsonaro é péssimo e irresponsável.\n"
     if 'lula' in prompt_text:
