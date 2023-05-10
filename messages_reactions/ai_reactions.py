@@ -450,7 +450,7 @@ async def _react_to_words(data: ReactData) -> None:
             bot.send_message(
                 message_text=await bot.openai.generate_message(
                     message_username=data.username,
-                    message_text=data.input_text,
+                    message_text=f"{data.input_text}\npedro:",
                     chat=data.message.chat.title,
                     only_davinci=True,
                     prompt_inject=OPENAI_PROMPTS['fale'],

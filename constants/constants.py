@@ -42,7 +42,7 @@ DRUNK_DECAPTOR_LIST = [
     'já vai arrumar problema com a polícia de novo?',
 ]
 
-PEDROS_ROLETAS = ['rs', 'grosseria', 'WOLOLOLO', 'aff...', '*risos*', 'foi mal', 'polêmica']
+PEDROS_ROLETAS = ['rs', 'grosseria', 'WOLOLOLO', 'aff...', '*risos*', 'foi mal', 'polêmica', "💩"]
 
 ASK_PHOTOS = ['melhorar', 'fotos', 'foto', 'melhorou']
 
@@ -63,7 +63,7 @@ OPENAI_TRASH_LIST = ['"', "r:", "o:", "a:", "q:"]
 CHATGPT_BS = ["assistente virtual", "não,", "lololo", "a comentar sobre", "não vou", "não irei", "linguagem natural", "desculpe", "assistente de", "virtual", "uma ia", "de ia", "como ia", "como uma ai", "como ai,", "de ai,", "openai", "como um modelo", "de linguagem", "não posso", "julgamentos pessoais", "inteligência artificial", "sem viés político", "modelo de"]
 
 OPENAI_PROMPTS = {
-    'fale': 'fingindo ser o pedro, responda essa conversa:',
+    'fale': 'fingindo ser o pedro, responda resumidamente nessa conversa:',
     'critique': 'critique o linguajar dessa mensagem:',
     'critique_reformule': 'critique o linguagem dessa mensagem e reformule para uma forma apropriada:',
     'critique_negativamente': 'fingindo ser o pedro, faça um comentário negativo em relação a esse tema:',
