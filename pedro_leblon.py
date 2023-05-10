@@ -2,7 +2,6 @@ import asyncio
 import logging
 import os
 import random
-import traceback
 from asyncio import AbstractEventLoop
 
 from datetime import datetime, timedelta
@@ -27,6 +26,7 @@ from data_structures.max_size_list import MaxSizeList
 from messages_reactions import messages_coordinator
 from utils.logging_utils import telegram_logging
 from utils.openai_utils import OpenAiCompletion
+from utils.text_utils import get_user_name
 from utils.text_utils import send_message_last_try
 from contextlib import contextmanager
 
@@ -247,7 +247,7 @@ class FakePedro:
 
             if message.text is not None and len(message.text) > 10:
                 self.messages_in_memory[message.chat.id].append(
-                    f"{message.from_.first_name}: {message.text[0:90]}")
+                    f"{get_user_name(message)}: {message.text[0:90]}")
 
     async def image_downloader(
             self,
@@ -410,7 +410,7 @@ class FakePedro:
                     logging.info(resp.status)
                     if 200 <= resp.status < 300:
                         self.messages_in_memory[chat_id].append(
-                            f"Pedro: {message_text[0:90]}")
+                            f"Pedro: {message_text[0:200]}")
                         break
                     parse_mode = fallback_parse_modes.pop() if len(fallback_parse_modes) else ""
 
@@ -476,7 +476,7 @@ if __name__ == '__main__':
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
         secrets_file=SECRETS_FILE,
-        debug_mode=True
+        debug_mode=False
     )
 
     asyncio.run(

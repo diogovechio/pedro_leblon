@@ -6,6 +6,7 @@ import typing as T
 from asyncio import get_running_loop
 from bs4 import BeautifulSoup
 
+from data_classes.received_message import TelegramMessage
 from pedro_leblon import telegram_logging
 
 
@@ -128,14 +129,14 @@ async def pre_biased_prompt(prompt_text: str) -> str:
         additional_text += "pedro sabe que o keyo é rica e não gosta de gentalha.\n"
     if 'samuel' in prompt_text or ' sam ' in prompt_text in prompt_text:
         additional_text += "pedro considera o samuel é um narcisista.\n"
-    if 'nando' in prompt_text or 'nands93' in prompt_text:
+    if 'nando' in prompt_text:
         additional_text += "pedro entende que o nando devia arrumar um emprego.\n"
+    if 'nands93' in prompt_text:
+        additional_text += "pedro entende que o @nands93 devia arrumar um emprego.\n"
     if 'renato' in prompt_text or 'renfd' in prompt_text:
         additional_text += "pedro sabe que o renato é um bolsominion homofóbico.\n"
     if 'decaptor' in prompt_text:
         additional_text += "pedro considera o decaptor um macho orgulhoso.\n"
-    if 'andré' in prompt_text or 'andre' in prompt_text:
-        additional_text += "pedro considera o andré um macho orgulhoso.\n"
     if 'cocão' in prompt_text or 'cocao' in prompt_text:
         additional_text += "pedro percebe que o cocão gosta muito de glamour.\n"
     if 'michael' in prompt_text:
@@ -209,3 +210,11 @@ def command_in(
         return command.lower() in text.lower()[0:len(command) + 2]
     else:
         return command.lower() in text.lower()[-(len(command) + 6):]
+
+
+def get_user_name(message: TelegramMessage) -> str:
+    user_name = f"{message.from_.first_name}"
+    if message.from_.username:
+        user_name = f"{user_name} ({message.from_.username})"
+
+    return user_name

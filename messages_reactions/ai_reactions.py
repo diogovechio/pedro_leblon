@@ -6,7 +6,7 @@ from data_classes.react_data import ReactData
 from utils.face_utils import put_list_of_faces_on_background
 from utils.openai_utils import return_dall_e_limit
 from utils.roleta_utils import get_roletas_from_pavuna, arrombado_classifier
-from utils.text_utils import command_in
+from utils.text_utils import command_in, get_user_name
 from utils.weather_utils import weather_prompt, get_forecast
 
 
@@ -157,7 +157,7 @@ async def _regular_pedro_react(data: ReactData) -> None:
         prompt_text = data.input_text
     else:
         chat = "\n".join([message for message in bot.messages_in_memory[data.message.chat.id][-7:-1]])
-        prompt_text = f"{chat}\n{data.message.from_.first_name}: {data.input_text}\npedro:"
+        prompt_text = f"{chat}\n{get_user_name(data.message)}: {data.input_text}\npedro:"
 
     with bot.sending_action(data.message.chat.id, action="typing", user=data.message.from_.first_name):
         bot.loop.create_task(
@@ -467,7 +467,7 @@ async def _react_to_be_on_reply(data: ReactData) -> None:
     with bot.sending_action(data.message.chat.id, action="typing"):
         chat = "\n".join(bot.messages_in_memory[data.message.chat.id][-15:])
         insert_pedro_msg = f"{chat}\npedro: {data.message.reply_to_message.text}"
-        prompt_text = f"{insert_pedro_msg}\n{data.message.from_.first_name}: {data.message.text}"
+        prompt_text = f"{insert_pedro_msg}\n{get_user_name(data.message)}: {data.message.text}"
 
         bot.loop.create_task(
             bot.send_message(
