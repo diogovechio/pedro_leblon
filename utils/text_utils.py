@@ -141,7 +141,7 @@ async def pre_biased_prompt(prompt_text: str) -> str:
     if 'cocão' in prompt_text or 'cocao' in prompt_text:
         additional_text += "pedro percebe que o cocão gosta muito de glamour.\n"
     if len(additional_text):
-        return f"use essas opiniões do pedro com uma referência para responder:\n" \
+        return f"considere que o pedro tem essas opiniões:\n" \
                f"{additional_text}\n" \
                f"{extra_irony if random.random() < 0.4 else ''}" \
                f"segue abaixo a conversa:\n\n" \
