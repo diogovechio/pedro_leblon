@@ -42,6 +42,8 @@ DRUNK_DECAPTOR_LIST = [
     'já vai arrumar problema com a polícia de novo?',
 ]
 
+PEDROS_ROLETAS = ['rs', 'grosseria', 'WOLOLOLO', 'aff...', '*risos*', 'foi mal', 'polêmica']
+
 ASK_PHOTOS = ['melhorar', 'fotos', 'foto', 'melhorou']
 
 MOCK_EDITS = ["editou pq", "eu vi oq vc escreveu", "preferia antes", "escreve direito da próxima vez"]

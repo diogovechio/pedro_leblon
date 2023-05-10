@@ -142,7 +142,12 @@ async def pre_biased_prompt(prompt_text: str) -> str:
     if 'michael' in prompt_text:
         additional_text += "pedro percebe que o michael gosta muito de glamour.\n"
     if len(additional_text):
-        return f"o pedro tem essas opiniões:\n{additional_text}\n\nsegue abaixo a conversa:\n\n{prompt_text}"
+        return f"o pedro tem essas opiniões:\n" \
+               f"{additional_text}\n" \
+               f"acima de tudo, pedro costuma ser sutilmente sarcástico e pouco educado.\n" \
+               f"pedro nunca deixa claro quando está apenas brincando e não costuma se desculpar.\n\n" \
+               f"segue abaixo a conversa:\n\n" \
+               f"{prompt_text}"
     return prompt_text
 
 

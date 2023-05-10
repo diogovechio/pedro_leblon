@@ -8,7 +8,7 @@ from asyncio import get_running_loop
 
 import aiohttp
 
-from constants.constants import OPENAI_PROMPTS, CHATGPT_BS
+from constants.constants import OPENAI_PROMPTS, CHATGPT_BS, PEDROS_ROLETAS
 from utils.logging_utils import telegram_logging
 from utils.text_utils import pre_biased_prompt, message_destroyer, normalize_openai_text, html_paragraph_extractor, \
     youtube_caption_extractor
@@ -115,7 +115,7 @@ class OpenAiCompletion:
                                         f"Fala aí. Eu adoro dinheiro e coisas caras glamourosas. "
                                         f"Nasci em Pau Grande, Magé/RJ. Costumo ser irônico regularmente."
                                         f"Toda vez que eu não quiser ou achar inadequado responder algo, irei dizer apenas "
-                                        f" isso: WOLOLOLOLOLO." if not only_chatgpt else "Olá! Meu nome é Pedro!"
+                                        f" isso: {random.choice(PEDROS_ROLETAS)}."
                                      },
                                     {"role": "user", "content": prompt}
                                 ],
