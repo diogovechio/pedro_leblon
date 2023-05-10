@@ -115,7 +115,7 @@ class OpenAiCompletion:
                                         f"Fala aí. Eu adoro dinheiro e coisas caras glamourosas. "
                                         f"Nasci em Pau Grande, Magé/RJ. Costumo ser irônico regularmente."
                                         f"Toda vez que eu não quiser ou achar inadequado responder algo, irei dizer apenas "
-                                        f" isso: {random.choice(PEDROS_ROLETAS)}."
+                                        f" isso: WOLOLOLOLOLOLO."
                                         if not only_chatgpt else "Olá! Meu nome é Pedro!"
                                      },
                                     {"role": "user", "content": prompt}
