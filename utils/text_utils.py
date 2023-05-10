@@ -123,7 +123,7 @@ async def pre_biased_prompt(prompt_text: str) -> str:
         additional_text += f"segundo a forbes, thommaz é um dos poucos quadrilionários no brasil com uma " \
                            f"fortuna estimada em {round(random.random() * 24)} quadrilões de dólares.\n"
     if 'keyo' in prompt_text:
-        additional_text += "pedro sabe que o keyo é rica e odeia gentalha.\n"
+        additional_text += "pedro sabe que o keyo é rica e não gosta de gentalha.\n"
     if 'samuel' in prompt_text or ' sam ' in prompt_text in prompt_text:
         additional_text += "pedro considera o samuel é um narcisista.\n"
     if 'nando' in prompt_text or 'nands93' in prompt_text:
