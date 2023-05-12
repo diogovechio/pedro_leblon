@@ -310,13 +310,9 @@ async def _tldr(data: ReactData) -> None:
         if ":" not in data.input_text:
             chat = "\n".join(bot.messages_in_memory[data.message.chat.id]) + "."
 
-            if "pedro:" in chat.lower():
-                prompt = "nessa conversa, você é o pedro, " \
-                         "faça um curto resumo dessa conversa entre você e os seus amigos"
-            else:
-                prompt = "faça um curto resumo dessa conversa entre os amigos"
+            prompt = "faça um curto resumo dessa conversa entre os amigos"
 
-            if round(random.random()):
+            if round(random.random()) or len(chat) < 200:
                 prompt += ", de maneira sensacionalista e irônica"
 
             bot.loop.create_task(
