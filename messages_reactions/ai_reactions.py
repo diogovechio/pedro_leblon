@@ -156,7 +156,7 @@ async def _regular_pedro_react(data: ReactData) -> None:
     if data.url_detector:
         prompt_text = data.input_text
     else:
-        chat = "\n".join([message for message in bot.messages_in_memory[data.message.chat.id][-7:-1]])
+        chat = "\n".join([message for message in bot.messages_in_memory[data.message.chat.id][-9:]])
         prompt_text = f"{chat}\n{get_user_name(data.message)}: {data.input_text}\npedro:"
 
     with bot.sending_action(data.message.chat.id, action="typing", user=data.message.from_.first_name):
