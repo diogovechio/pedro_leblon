@@ -310,11 +310,16 @@ async def _tldr(data: ReactData) -> None:
         if ":" not in data.input_text:
             chat = "\n".join(bot.messages_in_memory[data.message.chat.id]) + "."
 
+            prompt = "faça um curto resumo dessa conversa entre os amigos"
+
+            if round(random.random()):
+                prompt += ", de maneira sensacionalista e irônica"
+
             bot.loop.create_task(
                 bot.send_message(
                     message_text=await bot.openai.generate_message(
                         message_username=data.username,
-                        full_text=f"faça um curto resumo dessa conversa entre os amigos:\n{chat}",
+                        full_text=f"{prompt}:\n{chat}",
                         chat=data.message.chat.title,
                         prompt_inject=None,
                         moderate=False,
