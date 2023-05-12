@@ -27,7 +27,7 @@ async def openai_reactions(
     if not swear_word_detected:
         if (
                 command_in('pedr', data.message.text)
-                or command_in('pedro?', data.message.text, text_end=True)
+                or command_in('pedro', data.message.text, text_end=True)
                 or "ペドロ" in data.message.text
                 or int(data.message.chat.id) > 0
         ) and not command_in('/pedro', data.message.text) and not pedro_on_reply:
@@ -66,7 +66,7 @@ async def openai_reactions(
             await _react_to_be_on_reply(data=data)
 
         elif (
-                data.bot.random_talk != round(data.bot.datetime_now.hour / 8)
+                data.bot.random_talk != round(data.bot.datetime_now.hour / 12)
                 and random.random() < data.bot.config.random_params.random_mock_frequency
                 and data.message.chat.id not in data.bot.config.not_internal_chats
         ):
@@ -490,7 +490,7 @@ async def _react_to_be_on_reply(data: ReactData) -> None:
 async def _random_conversation_react(data: ReactData) -> None:
     bot = data.bot
 
-    bot.random_talk = round(data.bot.datetime_now.hour / 8)
+    bot.random_talk = round(data.bot.datetime_now.hour / 12)
 
     with bot.sending_action(data.message.chat.id, action="typing"):
         chat = "\n".join(data.bot.messages_in_memory[data.message.chat.id][-25:])

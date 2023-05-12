@@ -21,10 +21,9 @@ async def words_reactions(
                         list(data.message.text.lower())
                         )
                     ) <= 2 and len(data.message.text) > 2
-                and random.random() < data.bot.config.random_params.random_mock_frequency
             )
             ) and data.message.chat.id not in data.bot.config.not_internal_chats
-    ):
+    ) and random.random() < data.bot.config.random_params.random_mock_frequency:
         data.bot.loop.create_task(
             data.bot.send_message(
                 message_text=data.message.text,

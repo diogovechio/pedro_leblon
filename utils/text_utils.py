@@ -192,10 +192,11 @@ async def normalize_openai_text(
         ai_message = ai_message.replace("pedro: ","rs, ")
 
         if ai_message:
-            get_running_loop().create_task(telegram_logging(ai_message))
-
             while any(word in ai_message[0] for word in ['.', ',', '?', '\n', ' ', '!']):
                 ai_message = ai_message[1:]
+
+            if '"' in ai_message[0] and '"' in ai_message[-1]:
+                ai_message = ai_message.replace('"',"")
 
             if random.random() < 0.05:
                 ai_message = ai_message.upper()

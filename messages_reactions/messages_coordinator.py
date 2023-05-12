@@ -31,7 +31,7 @@ async def messages_coordinator(
         )
 
         if message.chat.id in bot.allowed_list:
-            if str(message.from_.id) not in bot.config.ignore_users or message.from_.username not in bot.config.ignore_users:
+            if str(message.from_.id) not in bot.config.ignore_users and message.from_.username not in bot.config.ignore_users:
                 if message.photo and message.chat.id not in bot.config.not_internal_chats:
                     bot.loop.create_task(
                         image_reactions(
