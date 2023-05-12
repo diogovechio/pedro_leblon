@@ -122,13 +122,14 @@ async def pre_biased_prompt(full_text: str, last_words: str = "") -> str:
         additional_text += "pedro considera  que a dilma fez um ótimo governo.\n"
     if 'temer' in full_text:
         additional_text += "pedro considera michel temer um dos piores presidentes do brasil.\n"
-    if 'samuel' in full_text or ' sam ' in full_text in full_text:
+
+    if 'samuel' in last_words or ' sam ' in last_words in last_words:
         additional_text += "pedro considera que o samuel (também conhecido como samuelgames) é um narcisista.\n"
-    if 'nando' in full_text or 'nands93' in full_text:
+    if 'nando' in last_words or 'nands93' in last_words:
         additional_text += "pedro entende que o nando (tambem conhecido como @nands93) devia arrumar um emprego.\n"
-    if 'renato' in full_text or 'renfd' in full_text:
+    if 'renato' in last_words or 'renfd' in last_words:
         additional_text += "pedro sabe que o renato é um bolsominion homofóbico.\n"
-    if 'decaptor' in full_text or 'andré' in full_text or 'andre' in full_text:
+    if 'decaptor' in last_words or 'andré' in last_words or 'andre' in last_words:
         additional_text += "pedro considera o decaptor (também conhecido como andré milani) um macho orgulhoso.\n"
     if 'eicho' in last_words:
         additional_text += "pedro sabe que o eicho gosta de uma tretinha.\n"

@@ -156,7 +156,7 @@ async def _regular_pedro_react(data: ReactData) -> None:
     if data.url_detector:
         prompt_text = data.input_text
     else:
-        chat = "\n".join([message for message in bot.messages_in_memory[data.message.chat.id][-9:]])
+        chat = "\n".join([message for message in bot.messages_in_memory[data.message.chat.id][-4:]])
         prompt_text = f"{chat}\n{get_user_name(data.message)}: {data.input_text}\npedro:"
 
     with bot.sending_action(data.message.chat.id, action="typing", user=data.message.from_.first_name):
@@ -312,7 +312,7 @@ async def _tldr(data: ReactData) -> None:
 
             prompt = "faça um curto resumo dessa conversa entre os amigos"
 
-            if round(random.random()) or len(chat) < 200:
+            if random.random() < data.bot.config.random_params.words_react_frequency:
                 prompt += ", de maneira sensacionalista e irônica"
 
             bot.loop.create_task(
