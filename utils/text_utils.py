@@ -126,7 +126,7 @@ async def pre_biased_prompt(full_text: str, last_words: str = "") -> str:
         additional_text += "pedro considera o samuel é um narcisista.\n"
 
     if 'nando' in full_text:
-        additional_text += "pedro entende que o nando devia arrumar um emprego.\n"
+        additional_text += "pedro entende que o nando (tambem conhecido como @nands93) devia arrumar um emprego.\n"
     elif 'nands93' in full_text:
         additional_text += "pedro entende que o @nands93 devia arrumar um emprego.\n"
 
