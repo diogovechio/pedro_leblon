@@ -201,8 +201,9 @@ class FakePedro:
                     if 200 <= request.status < 300:
                         response = json.loads((await request.text()).replace('"from":{"', '"from_":{"'))
                         if 'ok' in response and response['ok']:
-                            logging.info(f'Message polling task running:'
-                                         f"{polling_url.replace(self.config.secrets.bot_token, '#TOKEN#')} last_id: {self.last_id + 1} - {self.datetime_now}")
+                            if self.debug_mode:
+                                logging.info(f'Message polling task running:'
+                                             f"{polling_url.replace(self.config.secrets.bot_token, '#TOKEN#')} last_id: {self.last_id + 1} - {self.datetime_now}")
                             self.messages = MessagesResults(**response)
                             self.last_id = self.messages.result[-1].update_id
             except Exception as exc:
@@ -212,13 +213,15 @@ class FakePedro:
     async def _message_handler(self) -> None:
         while True:
             try:
-                logging.info(f'Message controller task running - {len(self.interacted_updates)} - '
-                             f'Next roleta: {self.roleta_hour}')
+                if self.debug_mode:
+                    logging.info(f'Message controller task running - {len(self.interacted_updates)} - '
+                                 f'Next roleta: {self.roleta_hour}')
                 if hasattr(self.messages, 'result'):
                     for incoming_update in (entry for entry in self.messages.result
                                      if entry.update_id not in self.interacted_updates):
 
-                        logging.info(incoming_update)
+                        if self.debug_mode:
+                            logging.info(incoming_update)
 
                         incoming_update: MessageReceived
 
