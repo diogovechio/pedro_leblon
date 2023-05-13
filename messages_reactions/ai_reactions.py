@@ -472,7 +472,7 @@ async def _react_to_be_on_reply(data: ReactData) -> None:
     bot = data.bot
 
     with bot.sending_action(data.message.chat.id, action="typing"):
-        chat = "\n".join(bot.messages_in_memory[data.message.chat.id][-15:])
+        chat = "\n".join(bot.messages_in_memory[data.message.chat.id][-4:])
         insert_pedro_msg = f"{chat}\npedro: {data.message.reply_to_message.text}"
         prompt_text = f"{insert_pedro_msg}\n{get_user_name(data.message)}: {data.message.text}"
 

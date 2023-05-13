@@ -14,7 +14,7 @@ from scheduling.pedro_roleta import pedro_roleta
 async def scheduler(bot: FakePedro) -> None:
     # IMPORTANT: UNHANDLED EXCEPTIONS MAY BLOCK ALL OTHER SCHEDULES
     schedule.every(5).minutes.do(
-        lambda: logging.info('Scheduling health check')
+        lambda: logging.info(f'Health check - {bot.datetime_now}')
     )
 
     schedule.every().day.at("00:00").do(
