@@ -184,7 +184,9 @@ class FakePedro:
             try:
                 self.schedule.run_pending()
                 await asyncio.sleep(self.polling_rate)
-                logging.info(f'Scheduler is running. Total jobs: {len(self.schedule.get_jobs())}')
+
+                if self.debug_mode:
+                    logging.info(f'Scheduler is running. Total jobs: {len(self.schedule.get_jobs())}')
             except Exception as exc:
                 self.loop.create_task(telegram_logging(exc))
                 await asyncio.sleep(15)

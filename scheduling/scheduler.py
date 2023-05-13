@@ -13,7 +13,7 @@ from scheduling.pedro_roleta import pedro_roleta
 
 async def scheduler(bot: FakePedro) -> None:
     # IMPORTANT: UNHANDLED EXCEPTIONS MAY BLOCK ALL OTHER SCHEDULES
-    schedule.every(15).seconds.do(
+    schedule.every(5).minutes.do(
         lambda: logging.info('Scheduling health check')
     )
 
