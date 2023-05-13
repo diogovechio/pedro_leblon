@@ -1,5 +1,4 @@
 import asyncio
-import multiprocessing.managers
 import os
 import random
 import uuid
@@ -201,10 +200,8 @@ async def detect_face(
     del input_image_embeddings
     os.remove(temp_filename)
 
-    try:
+    if os.path.exists(temp_filename_2):
         os.remove(temp_filename_2)
-    except Exception as exc:
-        get_running_loop().create_task(telegram_logging(exc))
 
     return data
 
@@ -234,8 +231,8 @@ async def face_emotion(img_path: str) -> str:
 
 
 def _emotion(img_path: str, uid: str, return_dict: dict):
+    emotion = ''
     try:
         emotion = DeepFace.analyze(img_path=img_path, actions="emotion")[0]['dominant_emotion']
+    finally:
         return_dict[uid] = emotion
-    except:
-        return_dict[uid] = ""
