@@ -7,11 +7,13 @@ from data_classes.image_data import FaceResult
 from data_classes.received_message import TelegramMessage
 from pedro_leblon import FakePedro
 from utils.face_utils import faces_coordinates_detector, image_cropper, detect_face
+from utils.logging_utils import async_elapsed_time
 from utils.openai_utils import return_dall_e_limit
 from utils.roleta_utils import get_roletas_from_pavuna
 from utils.text_utils import greeter
 
 
+@async_elapsed_time
 async def image_reactions(
         bot: FakePedro,
         message: TelegramMessage,
@@ -24,6 +26,7 @@ async def image_reactions(
         if faces_coordinates := await faces_coordinates_detector(image_bytes, bot.config.face_classifier.box_min_size):
             with bot.sending_action(message.chat.id, action="upload_photo"):
                 if method == 'cropper':
+                    @async_elapsed_time
                     async def _crop_and_send(img_bytes: bytes, coord: tuple):
                         crop_bytes = await image_cropper(img_bytes, coord)
                         recognized_face = await detect_face(

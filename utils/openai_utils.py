@@ -9,7 +9,7 @@ from asyncio import get_running_loop
 import aiohttp
 
 from constants.constants import OPENAI_PROMPTS, CHATGPT_BS, PEDROS_ROLETAS
-from utils.logging_utils import telegram_logging
+from utils.logging_utils import telegram_logging, async_elapsed_time
 from utils.text_utils import pre_biased_prompt, message_destroyer, normalize_openai_text, html_paragraph_extractor, \
     youtube_caption_extractor
 
@@ -75,6 +75,7 @@ class OpenAiCompletion:
 
         return model
 
+    @async_elapsed_time
     async def is_flagged(self, text: str) -> T.Tuple[bool, dict]:
         async with asyncio.Semaphore(self.semaphore):
             async with self.session.post(
@@ -88,6 +89,7 @@ class OpenAiCompletion:
 
                 return mod['results'][0]['flagged'], mod
 
+    @async_elapsed_time
     async def _completion(
             self,
             date: datetime,
@@ -152,6 +154,7 @@ class OpenAiCompletion:
 
                 return response_text
 
+    @async_elapsed_time
     async def generate_image(
             self,
             text: str
@@ -173,6 +176,7 @@ class OpenAiCompletion:
             self.loop.create_task(telegram_logging(exc))
             return None
 
+    @async_elapsed_time
     async def edit_image(
             self,
             text: str,
@@ -203,6 +207,7 @@ class OpenAiCompletion:
             self.loop.create_task(telegram_logging(exc))
             return None
 
+    @async_elapsed_time
     async def generate_message(
             self,
             full_text: str,
@@ -282,7 +287,7 @@ class OpenAiCompletion:
 
         return "meu cérebro tá fora do ar"
 
-
+@async_elapsed_time
 async def extract_website_paragraph_content(
         url: str,
         session: aiohttp.ClientSession,

@@ -4,6 +4,7 @@ import re
 from constants.constants import SWEAR_WORDS, OPENAI_REACT_WORDS, OPENAI_PROMPTS, OPENAI_TRASH_LIST, WEATHER_LIST
 from data_classes.react_data import ReactData
 from utils.face_utils import put_list_of_faces_on_background
+from utils.logging_utils import async_elapsed_time
 from utils.openai_utils import return_dall_e_limit
 from utils.roleta_utils import get_roletas_from_pavuna, arrombado_classifier
 from utils.text_utils import command_in, get_user_name
@@ -72,7 +73,7 @@ async def openai_reactions(
         ):
             await _random_conversation_react(data=data)
 
-
+@async_elapsed_time
 async def _complain_swear_word(data: ReactData) -> None:
     bot = data.bot
 
@@ -97,7 +98,7 @@ async def _complain_swear_word(data: ReactData) -> None:
                     reply_to=data.message.message_id)
             )
 
-
+@async_elapsed_time
 async def _forecast_detect(data: ReactData) -> bool:
     bot = data.bot
 
@@ -149,7 +150,7 @@ async def _forecast_detect(data: ReactData) -> bool:
 
     return False
 
-
+@async_elapsed_time
 async def _regular_pedro_react(data: ReactData) -> None:
     bot = data.bot
 
@@ -178,7 +179,7 @@ async def _regular_pedro_react(data: ReactData) -> None:
             )
         )
 
-
+@async_elapsed_time
 async def _annoy_persona_non_grata(data: ReactData) -> None:
     bot = data.bot
 
@@ -198,7 +199,7 @@ async def _annoy_persona_non_grata(data: ReactData) -> None:
             reply_to=data.message.message_id)
     )
 
-
+@async_elapsed_time
 async def _generate_image_react(data: ReactData) -> None:
     bot = data.bot
 
@@ -280,7 +281,7 @@ async def _generate_image_react(data: ReactData) -> None:
                 )
             )
 
-
+@async_elapsed_time
 async def _boring_pedro_react(data: ReactData) -> None:
     bot = data.bot
 
@@ -302,7 +303,7 @@ async def _boring_pedro_react(data: ReactData) -> None:
                 reply_to=data.message.message_id)
         )
 
-
+@async_elapsed_time
 async def _tldr(data: ReactData) -> None:
     bot = data.bot
 
@@ -357,7 +358,7 @@ async def _tldr(data: ReactData) -> None:
                     reply_to=data.message.message_id)
             )
 
-
+@async_elapsed_time
 async def _critic_or_praise(data: ReactData) -> None:
     bot = data.bot
 
@@ -448,7 +449,7 @@ async def _critic_or_praise(data: ReactData) -> None:
                 )
             )
 
-
+@async_elapsed_time
 async def _react_to_words(data: ReactData) -> None:
     bot = data.bot
 
@@ -467,7 +468,7 @@ async def _react_to_words(data: ReactData) -> None:
                 reply_to=data.message.message_id)
         )
 
-
+@async_elapsed_time
 async def _react_to_be_on_reply(data: ReactData) -> None:
     bot = data.bot
 
@@ -491,7 +492,7 @@ async def _react_to_be_on_reply(data: ReactData) -> None:
             )
         )
 
-
+@async_elapsed_time
 async def _random_conversation_react(data: ReactData) -> None:
     bot = data.bot
 

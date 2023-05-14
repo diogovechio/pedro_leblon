@@ -1,9 +1,13 @@
+import functools
 import logging
 import typing as T
+from asyncio import coroutine
+
 import aiohttp
 import asyncio
 import traceback
 import json
+from datetime import datetime
 
 from constants.constants import SECRETS_FILE
 
@@ -33,3 +37,21 @@ async def telegram_logging(text: T.Union[str, Exception], chat_id=-704277411):
 
             await session.close()
             await asyncio.sleep(0.25)
+
+
+def elapsed_time(func):
+    def _elapsed_time(*args, **kwargs):
+        start_time = datetime.now()
+        data = func(*args, **kwargs)
+        logging.info(f"{func.__name__} - elapsed time: {(datetime.now() - start_time).seconds} seconds")
+        return data
+    return _elapsed_time
+
+
+def async_elapsed_time(func):
+    async def _elapsed_time(*args, **kwargs):
+        start_time = datetime.now()
+        data = await func(*args, **kwargs)
+        logging.info(f"{func.__name__} - elapsed time: {(datetime.now() - start_time).seconds} seconds")
+        return data
+    return _elapsed_time

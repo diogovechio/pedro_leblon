@@ -24,7 +24,7 @@ from data_classes.commemorations import Commemorations
 from data_classes.received_message import MessagesResults, TelegramMessage, MessageReceived
 from data_structures.max_size_list import MaxSizeList
 from messages_reactions import messages_coordinator
-from utils.logging_utils import telegram_logging
+from utils.logging_utils import telegram_logging, elapsed_time, async_elapsed_time
 from utils.openai_utils import OpenAiCompletion
 from utils.text_utils import get_user_name
 from utils.text_utils import send_message_last_try
@@ -122,6 +122,7 @@ class FakePedro:
 
             await self.run()
 
+    @async_elapsed_time
     async def load_config_params(self) -> None:
         logging.info('Loading params')
 
@@ -254,6 +255,7 @@ class FakePedro:
                 self.messages_in_memory[message.chat.id].append(
                     f"{get_user_name(message)}: {message.text[0:90]}")
 
+    @async_elapsed_time
     async def image_downloader(
             self,
             message: TelegramMessage,

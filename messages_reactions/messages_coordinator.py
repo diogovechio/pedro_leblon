@@ -10,7 +10,7 @@ from messages_reactions.ai_reactions import openai_reactions
 from messages_reactions.bot_commands import bot_commands
 from messages_reactions.general_text_reactions import words_reactions
 from messages_reactions.image_reactions import image_reactions
-from utils.logging_utils import telegram_logging
+from utils.logging_utils import telegram_logging, elapsed_time, async_elapsed_time
 from utils.openai_utils import extract_website_paragraph_content
 from utils.text_utils import https_url_extract
 
@@ -76,6 +76,7 @@ async def messages_coordinator(
         bot.loop.create_task(telegram_logging(str(incoming)))
 
 
+@async_elapsed_time
 async def _pre_processor(
         bot: FakePedro,
         from_samuel: bool,

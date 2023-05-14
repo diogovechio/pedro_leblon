@@ -13,9 +13,12 @@ from PIL import Image, ImageOps
 from data_classes.image_data import FaceResult
 from data_classes.image_data import FaceCrop
 from pedro_leblon import FakePedro, telegram_logging
+from utils.logging_utils import async_elapsed_time
 
 responses_dict = {}
 
+
+@async_elapsed_time
 async def faces_coordinates_detector(image: bytes, min_size: int) -> T.Optional[T.List[T.Tuple]]:
     temp_filename = f'tmp/{uuid.uuid4()}.tmp'
     with open(temp_filename, 'wb') as file:
@@ -30,6 +33,7 @@ async def faces_coordinates_detector(image: bytes, min_size: int) -> T.Optional[
         return filtered_by_size
 
 
+@async_elapsed_time
 async def image_cropper(image: bytes, coords: tuple) -> FaceCrop:
     temp_load = f'tmp/{uuid.uuid4()}.tmp'
     with open(temp_load, 'wb') as file:
@@ -49,6 +53,8 @@ async def image_cropper(image: bytes, coords: tuple) -> FaceCrop:
         face_with_alpha_background=image_with_alpha_background
     )
 
+
+@async_elapsed_time
 async def put_face_on_background(image: bytes, small_face=False) -> bytes:
     background = Image.open("static/background.png")
     temp_load = f'tmp/{uuid.uuid4()}.tmp'
@@ -86,6 +92,8 @@ async def put_face_on_background(image: bytes, small_face=False) -> bytes:
 
     return file_bytes
 
+
+@async_elapsed_time
 async def put_list_of_faces_on_background(bot: FakePedro, names: T.List[str], small_face=False) -> bytes:
     background = Image.open("static/background.png")
     background = background.convert('RGBA')
@@ -141,6 +149,7 @@ async def put_list_of_faces_on_background(bot: FakePedro, names: T.List[str], sm
     return file_bytes
 
 
+@async_elapsed_time
 async def detect_face(
         crop_image: bytes,
         full_image: bytes,
@@ -206,6 +215,7 @@ async def detect_face(
     return data
 
 
+@async_elapsed_time
 async def face_emotion(img_path: str) -> str:
     emotion = ''
     try:
