@@ -170,7 +170,7 @@ async def _default_pedro(data: ReactData) -> None:
                     only_chatgpt=True if data.url_detector else False,
                     prompt_inject=None
                     if data.url_detector
-                    else f"fingindo ser o pedro, responda objetivamente a mensagem do {data.username}:",
+                    else f"fingindo ser o pedro, responda objetivamente a mensagem do {get_user_name(data.message)}:",
                     biased=False if data.url_detector else True,
                     moderate=False,
                     remove_words_list=None,
