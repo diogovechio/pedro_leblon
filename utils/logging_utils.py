@@ -1,7 +1,6 @@
-import functools
+import sys
 import logging
 import typing as T
-from asyncio import coroutine
 
 import aiohttp
 import asyncio
@@ -33,7 +32,7 @@ async def telegram_logging(text: T.Union[str, Exception], chat_id=-704277411):
                     'disable_notification': True,
                 }
         ) as resp:
-            logging.info(resp.status)
+            logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
 
             await session.close()
             await asyncio.sleep(0.25)

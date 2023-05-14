@@ -156,8 +156,13 @@ async def _default_pedro(data: ReactData) -> None:
     if data.url_detector:
         prompt_text = data.input_text
     else:
+        user_message = f"{get_user_name(data.message)}: {data.input_text}\n"
         chat = "\n".join([message for message in bot.messages_in_memory[data.message.chat.id][-4:]])
-        prompt_text = f"{chat}\n{get_user_name(data.message)}: {data.input_text}\npedro:"
+
+        if user_message in chat:
+            chat.replace(user_message, "")
+
+        prompt_text = f"{chat}\n{user_message}\npedro:"
 
     with bot.sending_action(data.message.chat.id, action="typing", user=data.message.from_.first_name):
         bot.loop.create_task(

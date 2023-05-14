@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 import random
+import sys
 from asyncio import AbstractEventLoop
 
 from datetime import datetime, timedelta
@@ -291,7 +292,7 @@ class FakePedro:
                                 )
                             )
                     ) as resp:
-                        logging.info(resp.status)
+                        logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
                         if 200 <= resp.status < 300:
                             break
             except Exception as exc:
@@ -313,7 +314,7 @@ class FakePedro:
                         )
                     )
             ) as resp:
-                logging.info(resp.status)
+                logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
 
     async def send_action(
             self,
@@ -332,7 +333,7 @@ class FakePedro:
                             )
                         )
                 ) as resp:
-                    logging.info(resp.status)
+                    logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
 
             if not repeats:
                 break
@@ -355,7 +356,7 @@ class FakePedro:
                         )
                     )
             ) as resp:
-                logging.info(resp.status)
+                logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
 
     async def forward_message(
             self,
@@ -381,7 +382,7 @@ class FakePedro:
                         )
                     )
             ) as resp:
-                logging.info(resp.status)
+                logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
 
                 return resp.status
 
@@ -414,7 +415,7 @@ class FakePedro:
                             'parse_mode': parse_mode
                         }
                 ) as resp:
-                    logging.info(resp.status)
+                    logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
                     if 200 <= resp.status < 300:
                         self.messages_in_memory[chat_id].append(
                             f"Pedro: {message_text[0:200]}")
@@ -428,7 +429,7 @@ class FakePedro:
                 f"{self.api_route}/leaveChat".replace('\n', ''),
                 json={"chat_id": chat_id}
         ) as resp:
-            logging.info(resp.status)
+            logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
 
     async def delete_message(self, chat_id: int, message_id=int) -> None:
         async with self.session.post(
@@ -438,7 +439,7 @@ class FakePedro:
                     "message_id": message_id
                 }
         ) as resp:
-            logging.info(resp.status)
+            logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
 
     async def is_taking_too_long(self, chat_id: int, user = "", max_loops=3, timeout=10):
         if user:
