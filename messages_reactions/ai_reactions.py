@@ -19,7 +19,6 @@ async def openai_reactions(
             and data.message.reply_to_message.from_.username == "pedroleblonbot"
     )
 
-
     if swear_word_detected := any(
             block_word in data.message.text.lower() for block_word in SWEAR_WORDS
     ) and not data.url_detector and data.bot.mocked_hour != data.bot.datetime_now.hour:
@@ -32,7 +31,7 @@ async def openai_reactions(
                 or "ペドロ" in data.message.text
                 or int(data.message.chat.id) > 0
         ) and not command_in('/pedro', data.message.text) and not pedro_on_reply:
-            await _regular_pedro_react(data=data)
+            await _default_pedro(data=data)
 
         elif (
                 str(data.message.from_.id) in data.bot.config.annoy_users
@@ -41,10 +40,10 @@ async def openai_reactions(
             await _annoy_persona_non_grata(data=data)
 
         elif command_in('/imag', data.message.text):
-            await _generate_image_react(data=data)
+            await _generate_image_command(data=data)
 
         elif command_in("/pedro", data.message.text):
-            await _boring_pedro_react(data=data)
+            await _boring_pedro(data=data)
 
         elif command_in("/tldr", data.message.text):
             await _tldr(data=data)
@@ -64,14 +63,14 @@ async def openai_reactions(
         elif pedro_on_reply and data.message.text != "/del" and (
             len(data.message.text.split(" ")) > 1 or "@" not in data.message.text[0]
         ):
-            await _react_to_be_on_reply(data=data)
+            await _reply_reaction(data=data)
 
         elif (
-                data.bot.random_talk != round(data.bot.datetime_now.hour / 12)
+                data.bot.random_talk != round(data.bot.datetime_now.hour / 18)
                 and random.random() < data.bot.config.random_params.random_mock_frequency
                 and data.message.chat.id not in data.bot.config.not_internal_chats
         ):
-            await _random_conversation_react(data=data)
+            await _random_conversation(data=data)
 
 @async_elapsed_time
 async def _complain_swear_word(data: ReactData) -> None:
@@ -151,7 +150,7 @@ async def _forecast_detect(data: ReactData) -> bool:
     return False
 
 @async_elapsed_time
-async def _regular_pedro_react(data: ReactData) -> None:
+async def _default_pedro(data: ReactData) -> None:
     bot = data.bot
 
     if data.url_detector:
@@ -169,7 +168,9 @@ async def _regular_pedro_react(data: ReactData) -> None:
                     short_text=data.input_text,
                     chat=data.message.chat.title,
                     only_chatgpt=True if data.url_detector else False,
-                    prompt_inject=None if data.url_detector else OPENAI_PROMPTS['fale'],
+                    prompt_inject=None
+                    if data.url_detector
+                    else f"fingindo ser o pedro, responda objetivamente a mensagem do {data.username}:",
                     biased=False if data.url_detector else True,
                     moderate=False,
                     remove_words_list=None,
@@ -200,7 +201,7 @@ async def _annoy_persona_non_grata(data: ReactData) -> None:
     )
 
 @async_elapsed_time
-async def _generate_image_react(data: ReactData) -> None:
+async def _generate_image_command(data: ReactData) -> None:
     bot = data.bot
 
     with bot.sending_action(data.message.chat.id, user=data.message.from_.first_name, action="upload_photo"):
@@ -282,7 +283,7 @@ async def _generate_image_react(data: ReactData) -> None:
             )
 
 @async_elapsed_time
-async def _boring_pedro_react(data: ReactData) -> None:
+async def _boring_pedro(data: ReactData) -> None:
     bot = data.bot
 
     with bot.sending_action(data.message.chat.id, user=data.message.from_.first_name, action="typing"):
@@ -469,7 +470,7 @@ async def _react_to_words(data: ReactData) -> None:
         )
 
 @async_elapsed_time
-async def _react_to_be_on_reply(data: ReactData) -> None:
+async def _reply_reaction(data: ReactData) -> None:
     bot = data.bot
 
     with bot.sending_action(data.message.chat.id, action="typing"):
@@ -493,10 +494,10 @@ async def _react_to_be_on_reply(data: ReactData) -> None:
         )
 
 @async_elapsed_time
-async def _random_conversation_react(data: ReactData) -> None:
+async def _random_conversation(data: ReactData) -> None:
     bot = data.bot
 
-    bot.random_talk = round(data.bot.datetime_now.hour / 12)
+    bot.random_talk = round(data.bot.datetime_now.hour / 18)
 
     with bot.sending_action(data.message.chat.id, action="typing"):
         chat = "\n".join(data.bot.messages_in_memory[data.message.chat.id][-25:])
