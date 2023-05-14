@@ -7,7 +7,7 @@ from utils.face_utils import put_list_of_faces_on_background
 from utils.logging_utils import async_elapsed_time
 from utils.openai_utils import return_dall_e_limit
 from utils.roleta_utils import get_roletas_from_pavuna, arrombado_classifier
-from utils.text_utils import command_in, get_user_name
+from utils.text_utils import command_in, create_username
 from utils.weather_utils import weather_prompt, get_forecast
 
 
@@ -156,13 +156,17 @@ async def _default_pedro(data: ReactData) -> None:
     if data.url_detector:
         prompt_text = data.input_text
     else:
-        user_message = f"{get_user_name(data.message)}: {data.input_text}\n"
-        chat = "\n".join([message for message in bot.messages_in_memory[data.message.chat.id][-4:]])
+        chat_text = ""
+        chat_messages = bot.messages_in_memory[data.message.chat.id][-5:]
+        user_message = f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}: {data.message.text}\n"
 
-        if user_message in chat:
-            chat.replace(user_message, "")
+        if len(chat_messages):
+            chat_text = "\n".join(chat_messages[:-1 if data.message.text in chat_messages[-1] else len(chat_messages)])
 
-        prompt_text = f"{chat}\n{user_message}\npedro:"
+        if data.message.reply_to_message:
+            chat_text += f"\n{data.message.reply_to_message.from_.first_name}: {data.message.reply_to_message.text}\n"
+
+        prompt_text = f"{chat_text}\n{user_message}\npedro:"
 
     with bot.sending_action(data.message.chat.id, action="typing", user=data.message.from_.first_name):
         bot.loop.create_task(
@@ -175,7 +179,8 @@ async def _default_pedro(data: ReactData) -> None:
                     only_chatgpt=True if data.url_detector else False,
                     prompt_inject=None
                     if data.url_detector
-                    else f"fingindo ser o pedro, responda objetivamente a mensagem do {get_user_name(data.message)}, "
+                    else f"fingindo ser o pedro, responda objetivamente a mensagem do "
+                         f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}, "
                          f"não comente mensagens anteriores a dele:",
                     biased=False if data.url_detector else True,
                     moderate=False,
@@ -185,7 +190,6 @@ async def _default_pedro(data: ReactData) -> None:
                 reply_to=data.message.message_id
             )
         )
-
 @async_elapsed_time
 async def _annoy_persona_non_grata(data: ReactData) -> None:
     bot = data.bot
@@ -480,9 +484,9 @@ async def _reply_reaction(data: ReactData) -> None:
     bot = data.bot
 
     with bot.sending_action(data.message.chat.id, action="typing"):
-        chat = "\n".join(bot.messages_in_memory[data.message.chat.id][-4:])
+        chat = "\n".join(bot.messages_in_memory[data.message.chat.id][-7:])
         insert_pedro_msg = f"{chat}\npedro: {data.message.reply_to_message.text}"
-        prompt_text = f"{insert_pedro_msg}\n{get_user_name(data.message)}: {data.message.text}"
+        prompt_text = f"{insert_pedro_msg}\n{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}: {data.message.text}"
 
         bot.loop.create_task(
             bot.send_message(

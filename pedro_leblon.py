@@ -27,7 +27,7 @@ from data_structures.max_size_list import MaxSizeList
 from messages_reactions import messages_coordinator
 from utils.logging_utils import telegram_logging, elapsed_time, async_elapsed_time
 from utils.openai_utils import OpenAiCompletion
-from utils.text_utils import get_user_name
+from utils.text_utils import create_username
 from utils.text_utils import send_message_last_try
 from contextlib import contextmanager
 
@@ -254,7 +254,7 @@ class FakePedro:
 
             if message.text is not None and len(message.text) > 10:
                 self.messages_in_memory[message.chat.id].append(
-                    f"{get_user_name(message)}: {message.text[0:90]}")
+                    f"{create_username(message.from_.first_name, message.from_.username)}: {message.text[0:90]}")
 
     @async_elapsed_time
     async def image_downloader(

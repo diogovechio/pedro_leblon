@@ -225,9 +225,9 @@ def command_in(
         return command.lower() in text.lower()[-(len(command) + 6):]
 
 
-def get_user_name(message: TelegramMessage) -> str:
-    user_name = f"{message.from_.first_name}"
-    if message.from_.username:
-        user_name = f"{user_name} ({message.from_.username})"
+def create_username(first_name: str, username: T.Optional[str]) -> str:
+    user_name = first_name
+    if username:
+        user_name = f"{first_name} ({username})"
 
     return user_name
