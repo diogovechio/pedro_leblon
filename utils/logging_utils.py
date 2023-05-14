@@ -24,25 +24,24 @@ async def telegram_logging(text: T.Union[str, Exception], chat_id=-704277411):
     api_route = f"https://api.telegram.org/bot{TOKEN}"
 
     async with asyncio.Semaphore(5):
-        async with session.post(
+        await session.post(
                 f"{api_route}/sendMessage".replace('\n', ''),
                 json={
                     "chat_id": chat_id,
                     'text': f"#log\n{text[:3800]}",
                     'disable_notification': True,
                 }
-        ) as resp:
-            logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
-
-            await session.close()
-            await asyncio.sleep(0.25)
+        )
+        await session.close()
+        await asyncio.sleep(0.25)
 
 
 def elapsed_time(func):
     def _elapsed_time(*args, **kwargs):
         start_time = datetime.now()
         data = func(*args, **kwargs)
-        logging.info(f"{func.__name__} - elapsed time: {(datetime.now() - start_time).seconds} seconds")
+        elapsed = datetime.now() - start_time
+        logging.info(f"{func.__name__} - Elapsed time: {elapsed.seconds} seconds - {elapsed.microseconds} microseconds")
         return data
     return _elapsed_time
 
