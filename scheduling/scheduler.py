@@ -1,4 +1,6 @@
 import logging
+import subprocess
+from time import sleep
 
 import schedule
 
@@ -9,6 +11,7 @@ from scheduling.check_pending_and_save import check_agenda_and_save
 from scheduling.commemorations import fixed_commemorations
 from scheduling.daily_reset import daily_routines
 from scheduling.pedro_roleta import pedro_roleta
+from utils.logging_utils import telegram_logging
 
 
 async def scheduler(bot: FakePedro) -> None:
@@ -43,3 +46,17 @@ async def scheduler(bot: FakePedro) -> None:
     schedule.every(13).minutes.do(
         pedro_roleta, bot
     )
+
+    schedule.every(15).minutes.do(
+        _restart_proxy, bot
+    )
+
+def _restart_proxy(bot: FakePedro) -> None:
+    try:
+        subprocess.run(['systemctl', 'stop', 'mtprotoproxy'],
+                       check=True, text=True)
+        sleep(5)
+        subprocess.run(['systemctl', 'start', 'mtprotoproxy'],
+                       check=True, text=True)
+    except Exception as exc:
+        bot.loop.create_task(telegram_logging(exc))

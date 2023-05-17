@@ -1,7 +1,4 @@
-import json
-import logging
 import random
-
 
 from pedro_leblon import FakePedro, telegram_logging
 from utils.roleta_utils import get_roletas_from_pavuna
