@@ -7,7 +7,7 @@ from utils.face_utils import put_list_of_faces_on_background
 from utils.logging_utils import async_elapsed_time
 from utils.openai_utils import return_dall_e_limit
 from utils.roleta_utils import get_roletas_from_pavuna, arrombado_classifier
-from utils.text_utils import command_in, create_username
+from utils.text_utils import command_in, create_username, message_destroyer
 from utils.weather_utils import weather_prompt, get_forecast
 
 
@@ -21,7 +21,7 @@ async def openai_reactions(
 
     if swear_word_detected := any(
             block_word in data.message.text.lower() for block_word in SWEAR_WORDS
-    ) and not data.url_detector and data.bot.mocked_hour != data.bot.datetime_now.hour:
+    ) and not data.url_detector and data.bot.mocked_hour != data.bot.datetime_now.hour and not data.mock_chat:
         await _complain_swear_word(data=data)
 
     if not swear_word_detected:
@@ -39,10 +39,10 @@ async def openai_reactions(
         ) and random.random() < data.bot.config.random_params.annoy_user_frequency:
             await _annoy_persona_non_grata(data=data)
 
-        elif command_in('/imag', data.message.text):
+        elif command_in('/imag', data.message.text) and not data.mock_chat:
             await _generate_image_command(data=data)
 
-        elif command_in("/pedro", data.message.text):
+        elif command_in("/pedro", data.message.text) and not data.mock_chat:
             await _boring_pedro(data=data)
 
         elif command_in("/tldr", data.message.text):
@@ -52,23 +52,24 @@ async def openai_reactions(
                 command_in("/critique", data.message.text) or
                 command_in("/elogie", data.message.text) or
                 command_in("/simpatize", data.message.text)
-        ):
+        ) and not data.mock_chat:
             await _critic_or_praise(data=data)
 
         elif any(
                 react_word in data.message.text.lower() for react_word in OPENAI_REACT_WORDS
-        ) and random.random() < data.bot.config.random_params.words_react_frequency and not data.url_detector:
+        ) and random.random() < data.bot.config.random_params.words_react_frequency and not data.url_detector and not data.mock_chat:
             await _react_to_words(data=data)
 
         elif pedro_on_reply and data.message.text != "/del" and (
             len(data.message.text.split(" ")) > 1 or "@" not in data.message.text[0]
-        ):
+        ) and not data.mock_chat:
             await _reply_reaction(data=data)
 
         elif (
                 data.bot.random_talk != round(data.bot.datetime_now.hour / 18)
                 and random.random() < data.bot.config.random_params.random_mock_frequency
                 and data.message.chat.id not in data.bot.config.not_internal_chats
+                and not data.mock_chat
         ):
             await _random_conversation(data=data)
 
@@ -166,7 +167,10 @@ async def _default_pedro(data: ReactData) -> None:
         if data.message.reply_to_message:
             chat_text += f"\n{data.message.reply_to_message.from_.first_name}: {data.message.reply_to_message.text}\n"
 
-        prompt_text = f"{chat_text}\n{user_message}\npedro:"
+        if data.destroy_message:
+            prompt_text = user_message
+        else:
+            prompt_text = f"{chat_text}\n{user_message}\npedro:"
 
     with bot.sending_action(data.message.chat.id, action="typing", user=data.message.from_.first_name):
         bot.loop.create_task(
@@ -177,8 +181,9 @@ async def _default_pedro(data: ReactData) -> None:
                     short_text=data.input_text,
                     chat=data.message.chat.title,
                     only_chatgpt=True if data.url_detector else False,
+                    destroy_message=data.destroy_message,
                     prompt_inject=None
-                    if data.url_detector
+                    if data.url_detector or data.destroy_message
                     else f"fingindo ser o pedro, responda objetivamente a mensagem do "
                          f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}, "
                          f"não comente mensagens anteriores a dele:",
@@ -320,7 +325,14 @@ async def _tldr(data: ReactData) -> None:
 
     with bot.sending_action(data.message.chat.id, user=data.message.from_.first_name, action="typing"):
         if ":" not in data.input_text:
-            chat = "\n".join(bot.messages_in_memory[data.message.chat.id]) + "."
+            if data.destroy_message:
+                chat = ""
+                chat_messages = bot.messages_in_memory[data.message.chat.id]
+                for msg in chat_messages:
+                    splited = msg.split(":")
+                    chat = f"{chat}\n{splited[0]}:{await message_destroyer(splited[1], extra_text=False)}"
+            else:
+                chat = "\n".join(bot.messages_in_memory[data.message.chat.id]) + "."
 
             prompt = "faça um curto resumo dessa conversa entre os amigos"
 

@@ -1,5 +1,3 @@
-import logging
-
 from pedro_leblon import FakePedro, telegram_logging
 
 
@@ -18,7 +16,8 @@ def daily_routines(bot: FakePedro) -> None:
                 document=open(f'commemorations.json', 'rb').read()
             )
         )
-        
+
+        bot.loop.create_task(_send_bosta_andre_summary(bot))
         
         bot.loop.create_task(
             bot.send_document(
@@ -29,3 +28,17 @@ def daily_routines(bot: FakePedro) -> None:
         )
     except Exception as exc:
         bot.loop.create_task(telegram_logging(exc))
+
+
+async def _send_bosta_andre_summary(bot: FakePedro):
+    andre_chat = "\n".join(bot.messages_in_memory[-942505785])
+
+    await bot.send_message(
+        message_text=(
+            await bot.openai.generate_message(
+                full_text=f"faça um curto resumo da conversa de hoje no chat do andré decaptor:{andre_chat}",
+                biased=True,
+            )
+        ),
+        chat_id=-1001369599178,
+    )

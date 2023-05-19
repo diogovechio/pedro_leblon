@@ -86,7 +86,7 @@ async def _pre_processor(
     input_text = message.text
 
     username = message.from_.username if message.from_.username else message.from_.first_name
-    destroy_message = bot.config.block_samuel and from_samuel
+    destroy_message = message.chat.id in bot.config.mock_chats
 
     if message.reply_to_message and message.reply_to_message.text:
         input_text += " : " + message.reply_to_message.text
@@ -108,4 +108,5 @@ async def _pre_processor(
         input_text=input_text,
         url_detector=url_detector,
         destroy_message=destroy_message,
+        mock_chat=message.chat.id in bot.config.mock_chats
     )

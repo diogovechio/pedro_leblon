@@ -93,7 +93,7 @@ async def html_paragraph_extractor(text: str, char_limit: int) -> str:
     return final_text
 
 
-async def message_destroyer(message_text: str) -> str:
+async def message_destroyer(message_text: str, extra_text=True) -> str:
     message_text = message_text.lower()
     message_text = message_text.replace('a', 'o')
     message_text = message_text.replace('o', 'a')
@@ -103,7 +103,9 @@ async def message_destroyer(message_text: str) -> str:
     message_text = message_text.replace('h', '')
     message_text = message_text.replace('m', 't')
 
-    return "Transforme essa mensagem em algo legível: " + message_text
+    if extra_text:
+        return "Transforme essa mensagem em algo legível: " + message_text
+    return message_text
 
 
 async def pre_biased_prompt(full_text: str, last_words: str = "") -> str:
