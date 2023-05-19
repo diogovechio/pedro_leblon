@@ -36,7 +36,7 @@ async def openai_reactions(
         elif (
                 str(data.message.from_.id) in data.bot.config.annoy_users
                 or data.message.from_.username in data.bot.config.annoy_users
-        ) and random.random() < data.bot.config.random_params.annoy_user_frequency:
+        ) and random.random() < data.bot.config.random_params.annoy_user_frequency and not data.mock_chat:
             await _annoy_persona_non_grata(data=data)
 
         elif command_in('/imag', data.message.text) and not data.mock_chat:

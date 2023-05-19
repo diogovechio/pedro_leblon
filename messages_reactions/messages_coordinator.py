@@ -86,7 +86,10 @@ async def _pre_processor(
     input_text = message.text
 
     username = message.from_.username if message.from_.username else message.from_.first_name
-    destroy_message = message.chat.id in bot.config.mock_chats
+    destroy_message = message.chat.id in bot.config.mock_chats or (
+            str(message.from_.id) in bot.config.annoy_users
+            or message.from_.username in bot.config.annoy_users
+    )
 
     if message.reply_to_message and message.reply_to_message.text:
         input_text += " : " + message.reply_to_message.text
