@@ -95,13 +95,22 @@ async def html_paragraph_extractor(text: str, char_limit: int) -> str:
 
 async def message_destroyer(message_text: str, extra_text=True) -> str:
     message_text = message_text.lower()
-    message_text = message_text.replace('a', 'o')
-    message_text = message_text.replace('o', 'a')
-    message_text = message_text.replace('c', 'b')
-    message_text = message_text.replace('b', 't')
-    message_text = message_text.replace('l', 'a')
-    message_text = message_text.replace('h', '')
-    message_text = message_text.replace('m', 't')
+
+    if round(random.random()):
+        message_text = message_text.replace('a', ' pqp ')
+        message_text = message_text.replace('o', ' pinto ')
+    if round(random.random()):
+        message_text = message_text.replace('c', ' bosta ')
+        message_text = message_text.replace('b', ' cu ')
+    if round(random.random()):
+        message_text = message_text.replace('l', ' cérebro ')
+        message_text = message_text.replace('h', '')
+        message_text = message_text.replace('m', 'n')
+    if round(random.random()):
+        message_text = message_text.replace('t', ' rolão ')
+        message_text = message_text.replace('f', ' wololo ')
+    else:
+        message_text = "tomei no cu"
 
     if extra_text:
         return "Transforme essa mensagem em algo legível: " + message_text
