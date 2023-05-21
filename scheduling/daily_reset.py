@@ -32,15 +32,19 @@ def daily_routines(bot: FakePedro) -> None:
 
 async def _send_bosta_andre_summary(bot: FakePedro):
     andre_chat = "\n".join(bot.messages_in_memory[-942505785])
-    prompt = f"faça um curto resumo da conversa de hoje no chat do andré decaptor:{andre_chat}"
+    prompt = f"faça um curto resumo da conversa entre amigos:\n\n{andre_chat}"
 
     await bot.send_message(
         message_text=(
-                "NO EPISÓDIO DE HOJE DO CLUBINHO DO DECAPTOR:\n\n" +
+                "no episódio de hoje do clubinho do @decaptor...\n\n" +
                     await bot.openai.generate_message(
                         full_text=prompt,
-                        short_text=prompt,
-                        biased=True,
+                        chat=data.message.chat.title,
+                        prompt_inject=None,
+                        moderate=False,
+                        biased=False,
+                        only_chatgpt=True,
+                        remove_words_list=None
                     )
         ),
         chat_id=-1001369599178,

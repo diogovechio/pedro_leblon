@@ -25,7 +25,7 @@
   "ask_photos": false,
   "telegram_api_semaphore": 5,
   "not_internal_chats": [-632911267, -942505785],
-  "mock_chats": [-942505785, -884201527],
+  "mock_chats": [-942505785, -884201527, -1001369599178],
   "ignore_users": [],
   "annoy_users": [],
   "block_samuel": false,
