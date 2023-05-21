@@ -30,7 +30,10 @@ async def openai_reactions(
                 or command_in('pedro', data.message.text, text_end=True)
                 or "ペドロ" in data.message.text
                 or int(data.message.chat.id) > 0
-        ) and not command_in('/pedro', data.message.text) and not pedro_on_reply:
+        ) and not command_in('/pedro', data.message.text) and not pedro_on_reply and not data.limited_prompt:
+            await _default_pedro(data=data)
+
+        elif data.limited_prompt and command_in('pedro,', data.message.text):
             await _default_pedro(data=data)
 
         elif (
@@ -57,7 +60,7 @@ async def openai_reactions(
 
         elif any(
                 react_word in data.message.text.lower() for react_word in OPENAI_REACT_WORDS
-        ) and random.random() < data.bot.config.random_params.words_react_frequency and not data.url_detector and not data.mock_chat:
+        ) and random.random() < data.bot.config.random_params.words_react_frequency and not data.url_detector and not data.mock_chat and not data.limited_prompt:
             await _react_to_words(data=data)
 
         elif pedro_on_reply and data.message.text != "/del" and (
@@ -69,7 +72,7 @@ async def openai_reactions(
                 data.bot.random_talk != round(data.bot.datetime_now.hour / 18)
                 and random.random() < data.bot.config.random_params.random_mock_frequency
                 and data.message.chat.id not in data.bot.config.not_internal_chats
-                and not data.mock_chat
+                and not data.mock_chat and not data.limited_prompt
         ):
             await _random_conversation(data=data)
 
