@@ -39,11 +39,9 @@ async def _send_bosta_andre_summary(bot: FakePedro):
                 "no episódio de hoje do clubinho do @decaptor...\n\n" +
                     await bot.openai.generate_message(
                         full_text=prompt,
-                        chat=data.message.chat.title,
                         prompt_inject=None,
                         moderate=False,
                         biased=False,
-                        only_chatgpt=True,
                         remove_words_list=None
                     )
         ),
