@@ -442,7 +442,7 @@ class FakePedro:
         ) as resp:
             logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
 
-    async def is_taking_too_long(self, chat_id: int, user = "", max_loops=3, timeout=10):
+    async def is_taking_too_long(self, chat_id: int, user="", max_loops=3, timeout=20):
         if user:
             messages = [f"{user.lower()} ja vou te responder",
                         "humanos escrevem mais rápido",
@@ -468,7 +468,7 @@ class FakePedro:
     def sending_action(
             self,
             chat_id: int,
-            user = "",
+            user="",
             action=T.Union[T.Literal['typing'], T.Literal['upload_photo'], T.Literal['find_location']]
     ):
         sending = self.loop.create_task(self.send_action(chat_id, action, True))

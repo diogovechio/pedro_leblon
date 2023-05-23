@@ -34,7 +34,7 @@ async def openai_reactions(
             await _default_pedro(data=data)
 
         elif data.limited_prompt and command_in('pedro,', data.message.text):
-            await _default_pedro(data=data)
+            await _default_pedro(data=data, always_ironic=True)
 
         elif (
                 str(data.message.from_.id) in data.bot.config.annoy_users
@@ -157,14 +157,14 @@ async def _forecast_detect(data: ReactData) -> bool:
 
 
 @async_elapsed_time
-async def _default_pedro(data: ReactData) -> None:
+async def _default_pedro(data: ReactData, always_ironic=False) -> None:
     bot = data.bot
 
     if data.url_detector:
         prompt_text = data.input_text
     else:
         chat_text = ""
-        chat_messages = bot.messages_in_memory[data.message.chat.id][-4:]
+        chat_messages = bot.messages_in_memory[data.message.chat.id][-2:]
         user_message = f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}: {data.message.text}\n"
 
         if len(chat_messages):
@@ -194,8 +194,9 @@ async def _default_pedro(data: ReactData) -> None:
                          f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}, "
                          f"não comente mensagens anteriores a dele:",
                     biased=False if data.url_detector else True,
-                    moderate=False,
+                    moderate=True,
                     remove_words_list=None,
+                    always_ironic=always_ironic,
                 ),
                 chat_id=data.message.chat.id,
                 reply_to=data.message.message_id

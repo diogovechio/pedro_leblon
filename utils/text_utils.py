@@ -117,8 +117,8 @@ async def message_destroyer(message_text: str, extra_text=True) -> str:
     return message_text
 
 
-async def pre_biased_prompt(full_text: str, last_words: str = "") -> str:
-    extra_irony = f"pedro costuma ser sutilmente sarcástico e nada educado.\n" \
+async def pre_biased_prompt(full_text: str, last_words: str = "", always_ironic=False) -> str:
+    extra_irony = f"pedro costuma ser extremamente sarcástico e nada educado.\n" \
                   f"pedro nunca deixa claro quando está apenas brincando e não costuma se desculpar.\n\n"
 
     additional_text = ''
@@ -161,7 +161,7 @@ async def pre_biased_prompt(full_text: str, last_words: str = "") -> str:
                f"segue abaixo a conversa:\n\n" \
                f"{full_text}"
 
-    if random.random() < 0.4:
+    if random.random() < 0.4 or always_ironic:
         full_text = f"{extra_irony}segue abaixo a conversa:\n\n{full_text}"
 
     return full_text

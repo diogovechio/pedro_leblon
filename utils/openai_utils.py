@@ -51,7 +51,6 @@ class OpenAiCompletion:
             "Authorization": f"Bearer {self.api_key}"
         }
 
-
     async def _model_selector(
             self,
             message_username: T.Optional[str] = "",
@@ -222,7 +221,8 @@ class OpenAiCompletion:
             prompt_inject: T.Optional[str] = None,
             return_raw_text: bool = False,
             destroy_message: bool = False,
-            remove_words_list=None
+            remove_words_list=None,
+            always_ironic=False
     ) -> str:
         datetime_now = datetime.datetime.utcnow() - datetime.timedelta(hours=3)
 
@@ -242,7 +242,8 @@ class OpenAiCompletion:
             model = await self._model_selector(message_username)
             prompt = (await pre_biased_prompt(
                 full_text=full_text,
-                last_words=short_text
+                last_words=short_text,
+                always_ironic=always_ironic
             ) if biased else full_text)
 
         is_flagged, moderation_results = await self.is_flagged(prompt)
