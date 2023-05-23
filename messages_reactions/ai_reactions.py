@@ -160,15 +160,18 @@ async def _forecast_detect(data: ReactData) -> bool:
 async def _default_pedro(data: ReactData, always_ironic=False) -> None:
     bot = data.bot
 
+    short_text = data.input_text
+
     if data.url_detector:
         prompt_text = data.input_text
     else:
         chat_text = ""
-        chat_messages = bot.messages_in_memory[data.message.chat.id][-2:]
+        chat_messages = bot.messages_in_memory[data.message.chat.id][-3:]
         user_message = f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}: {data.message.text}\n"
 
         if len(chat_messages):
             chat_text = "\n".join(chat_messages[:-1 if data.message.text in chat_messages[-1] else len(chat_messages)])
+            short_text = "\n".join([text.split(":")[-1] for text in chat_messages])
 
         if data.message.reply_to_message:
             chat_text += f"\n{data.message.reply_to_message.from_.first_name}: {data.message.reply_to_message.text}\n"
@@ -184,7 +187,7 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
                 message_text=await bot.openai.generate_message(
                     message_username=data.message.from_.first_name,
                     full_text=prompt_text,
-                    short_text=data.input_text,
+                    short_text=short_text,
                     chat=data.message.chat.title,
                     only_chatgpt=True if data.url_detector else False,
                     destroy_message=data.destroy_message,
