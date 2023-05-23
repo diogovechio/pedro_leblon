@@ -76,6 +76,7 @@ async def openai_reactions(
         ):
             await _random_conversation(data=data)
 
+
 @async_elapsed_time
 async def _complain_swear_word(data: ReactData) -> None:
     bot = data.bot
@@ -100,6 +101,7 @@ async def _complain_swear_word(data: ReactData) -> None:
                     sleep_time=1 + (round(random.random()) * 4),
                     reply_to=data.message.message_id)
             )
+
 
 @async_elapsed_time
 async def _forecast_detect(data: ReactData) -> bool:
@@ -153,6 +155,7 @@ async def _forecast_detect(data: ReactData) -> bool:
 
     return False
 
+
 @async_elapsed_time
 async def _default_pedro(data: ReactData) -> None:
     bot = data.bot
@@ -161,7 +164,7 @@ async def _default_pedro(data: ReactData) -> None:
         prompt_text = data.input_text
     else:
         chat_text = ""
-        chat_messages = bot.messages_in_memory[data.message.chat.id][-5:]
+        chat_messages = bot.messages_in_memory[data.message.chat.id][-4:]
         user_message = f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}: {data.message.text}\n"
 
         if len(chat_messages):
@@ -198,6 +201,8 @@ async def _default_pedro(data: ReactData) -> None:
                 reply_to=data.message.message_id
             )
         )
+
+
 @async_elapsed_time
 async def _annoy_persona_non_grata(data: ReactData) -> None:
     bot = data.bot
@@ -217,6 +222,7 @@ async def _annoy_persona_non_grata(data: ReactData) -> None:
             chat_id=data.message.chat.id,
             reply_to=data.message.message_id)
     )
+
 
 @async_elapsed_time
 async def _generate_image_command(data: ReactData) -> None:
@@ -300,6 +306,7 @@ async def _generate_image_command(data: ReactData) -> None:
                 )
             )
 
+
 @async_elapsed_time
 async def _boring_pedro(data: ReactData) -> None:
     bot = data.bot
@@ -321,6 +328,7 @@ async def _boring_pedro(data: ReactData) -> None:
                 chat_id=data.message.chat.id,
                 reply_to=data.message.message_id)
         )
+
 
 @async_elapsed_time
 async def _tldr(data: ReactData) -> None:
@@ -383,6 +391,7 @@ async def _tldr(data: ReactData) -> None:
                     chat_id=data.message.chat.id,
                     reply_to=data.message.message_id)
             )
+
 
 @async_elapsed_time
 async def _critic_or_praise(data: ReactData) -> None:
@@ -475,6 +484,7 @@ async def _critic_or_praise(data: ReactData) -> None:
                 )
             )
 
+
 @async_elapsed_time
 async def _react_to_words(data: ReactData) -> None:
     bot = data.bot
@@ -494,12 +504,13 @@ async def _react_to_words(data: ReactData) -> None:
                 reply_to=data.message.message_id)
         )
 
+
 @async_elapsed_time
 async def _reply_reaction(data: ReactData) -> None:
     bot = data.bot
 
     with bot.sending_action(data.message.chat.id, action="typing"):
-        chat = "\n".join(bot.messages_in_memory[data.message.chat.id][-7:])
+        chat = "\n".join(bot.messages_in_memory[data.message.chat.id][-12:])
         insert_pedro_msg = f"{chat}\npedro: {data.message.reply_to_message.text}"
         prompt_text = f"{insert_pedro_msg}\n{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}: {data.message.text}"
 
@@ -517,6 +528,7 @@ async def _reply_reaction(data: ReactData) -> None:
                 chat_id=data.message.chat.id,
             )
         )
+
 
 @async_elapsed_time
 async def _random_conversation(data: ReactData) -> None:

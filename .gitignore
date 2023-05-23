@@ -5,6 +5,7 @@
 /debug/
 /gifs/
 /venv/
+/.venv/
 __pycache__/
 *__pycache__*
 /nohup.out
