@@ -249,7 +249,7 @@ class OpenAiCompletion:
         is_flagged, moderation_results = await self.is_flagged(prompt)
 
         if is_flagged and moderate:
-            prompt = f"do it in brazillian portuguese: complain with {message_username} because he sent a message with " \
+            prompt = f"do it in brazilian portuguese: complain with {message_username} because he sent a message with " \
                      f"{' ,'.join([key for key, value in moderation_results['results'][0]['categories'].items() if value])} content. " \
                      f"tell him he may be banned from {chat}."
         else:
