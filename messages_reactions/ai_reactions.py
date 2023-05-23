@@ -520,11 +520,12 @@ async def _reply_reaction(data: ReactData) -> None:
                 message_text=await bot.openai.generate_message(
                     message_username='.',
                     full_text=f"{prompt_text}\npedro:",
-                    short_text=data.message.text,
+                    short_text=prompt_text,
                     chat=data.message.chat.title,
                     prompt_inject=OPENAI_PROMPTS['fale'],
                     moderate=False,
                     biased=True,
+                    always_ironic=True
                 ),
                 chat_id=data.message.chat.id,
             )
