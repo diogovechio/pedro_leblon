@@ -339,7 +339,7 @@ async def _tldr(data: ReactData) -> None:
         if ":" not in data.input_text:
             if data.destroy_message:
                 chat = ""
-                chat_messages = bot.messages_in_memory[data.message.chat.id]
+                chat_messages = bot.messages_in_memory[data.message.chat.id][:-1]
                 for msg in chat_messages:
                     splited = msg.split(":")
                     chat = f"{chat}\n{splited[0]}:{await message_destroyer(splited[1], extra_text=False)}"
