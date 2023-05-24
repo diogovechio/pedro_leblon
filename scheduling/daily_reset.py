@@ -17,7 +17,7 @@ def daily_routines(bot: FakePedro) -> None:
             )
         )
 
-        bot.loop.create_task(_send_bosta_andre_summary(bot))
+        # bot.loop.create_task(_send_bosta_andre_summary(bot))
 
         bot.loop.create_task(
             bot.send_document(
