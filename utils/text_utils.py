@@ -75,10 +75,13 @@ async def html_paragraph_extractor(text: str, char_limit: int) -> str:
     soup = BeautifulSoup(text, 'html.parser')
     if soup.find("article"):
         tag = soup.article
+
     elif soup.find("main"):
         tag = soup.main
+
     elif soup.find("body"):
         tag = soup.body
+
     else:
         return ""
 
@@ -87,7 +90,22 @@ async def html_paragraph_extractor(text: str, char_limit: int) -> str:
          if len(text.strip()) > 1]
     )
 
-    if len(text) > char_limit:
+    if len(final_text) < 500:
+        if soup.find("main"):
+            tag = soup.main
+
+        elif soup.find("body"):
+            tag = soup.body
+
+        new_text = "\n".join(
+            [text for text in tag.strings
+             if len(text.strip()) > 1]
+        )
+
+        if len(new_text) > len(final_text):
+            final_text = new_text
+
+    if len(final_text) > char_limit:
         final_text = final_text[:int(char_limit / 2)] + final_text[-int(char_limit / 2):]
 
     return final_text

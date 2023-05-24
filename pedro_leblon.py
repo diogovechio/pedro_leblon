@@ -161,24 +161,25 @@ class FakePedro:
                 self.faces_names = []
                 self.face_embeddings = []
 
-                for (_, _, filenames) in os.walk(self.face_images_path):
-                    self.faces_files.extend(filenames)
-                    break
+                if not self.debug_mode:
+                    for (_, _, filenames) in os.walk(self.face_images_path):
+                        self.faces_files.extend(filenames)
+                        break
 
-                for (_, _, filenames) in os.walk(self.alpha_faces_path):
-                    self.alpha_faces_files.extend(filenames)
-                    break
+                    for (_, _, filenames) in os.walk(self.alpha_faces_path):
+                        self.alpha_faces_files.extend(filenames)
+                        break
 
-                for file in self.faces_files:
-                    embeddings = face_recognition.face_encodings(
-                        face_recognition.load_image_file(f"{self.face_images_path}/{file}")
-                    )
-                    if len(embeddings):
-                        self.faces_names.append(file[:-7])
-                        self.face_embeddings.append(embeddings[0])
-                        logging.info(f"Loaded embeddings for {file}")
-                    else:
-                        logging.critical(f'NO EMBEDDINGS FOR {file}')
+                    for file in self.faces_files:
+                        embeddings = face_recognition.face_encodings(
+                            face_recognition.load_image_file(f"{self.face_images_path}/{file}")
+                        )
+                        if len(embeddings):
+                            self.faces_names.append(file[:-7])
+                            self.face_embeddings.append(embeddings[0])
+                            logging.info(f"Loaded embeddings for {file}")
+                        else:
+                            logging.critical(f'NO EMBEDDINGS FOR {file}')
 
         logging.info('Loading finished')
 
