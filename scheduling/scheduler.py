@@ -20,7 +20,7 @@ async def scheduler(bot: FakePedro) -> None:
         lambda: logging.info(f'Health check - {bot.datetime_now}')
     )
 
-    schedule.every().day.at("00:05").do(
+    schedule.every().day.at("00:00").do(
         daily_routines, bot
     )
 

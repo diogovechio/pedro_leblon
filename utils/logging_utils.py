@@ -41,7 +41,7 @@ def elapsed_time(func):
         start_time = datetime.now()
         data = func(*args, **kwargs)
         elapsed = datetime.now() - start_time
-        logging.info(f"{func.__name__} - Elapsed time: {elapsed.seconds} seconds - {elapsed.microseconds} microseconds")
+        logging.info(f"{func.__name__} - Elapsed time: {round(elapsed.total_seconds(), 3)} seconds")
         return data
     return _elapsed_time
 
@@ -50,6 +50,7 @@ def async_elapsed_time(func):
     async def _elapsed_time(*args, **kwargs):
         start_time = datetime.now()
         data = await func(*args, **kwargs)
-        logging.info(f"{func.__name__} - elapsed time: {(datetime.now() - start_time).seconds} seconds")
+        elapsed = datetime.now() - start_time
+        logging.info(f"{func.__name__} - Elapsed time: {round(elapsed.total_seconds(), 3)} seconds")
         return data
     return _elapsed_time

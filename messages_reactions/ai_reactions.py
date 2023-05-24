@@ -95,6 +95,7 @@ async def _complain_swear_word(data: ReactData) -> None:
                             random.random()) else OPENAI_PROMPTS['critique_reformule'],
                         remove_words_list=['pedro'],
                         only_davinci=True,
+                        biased=False,
                         temperature=1.0,
                     ),
                     chat_id=data.message.chat.id,
