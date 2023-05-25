@@ -23,7 +23,7 @@ async def mock_users(
 
     if (
             user_identified
-            and bot.config.mock_messages[user_identified].last_mock_hour != round(bot.datetime_now.hour / 12)
+            and bot.config.mock_messages[user_identified].last_mock_hour != round(bot.datetime_now.hour / 18)
             and random.random() < bot.config.random_params.random_mock_frequency
             and message.chat.id not in bot.config.not_internal_chats
     ):
@@ -31,12 +31,12 @@ async def mock_users(
             bot.send_message(
                 message_text=random.choice(bot.config.mock_messages[user_identified].messages),
                 chat_id=message.chat.id,
-                sleep_time=2 + round(random.random() * 5),
+                sleep_time=20 + round(random.random() * 15),
                 reply_to=None
             ),
         )
 
-        bot.config.mock_messages[user_identified].last_mock_hour = round(bot.datetime_now.hour / 12)
+        bot.config.mock_messages[user_identified].last_mock_hour = round(bot.datetime_now.hour / 18)
 
     if (
             (message.from_.username in ['nands93'])
@@ -88,7 +88,9 @@ async def mock_users(
                 bot.send_video(
                     video=open(f'gifs/kardashian{round(random.random())}.mp4', 'rb').read(),
                     chat_id=message.chat.id,
-                    reply_to=message.message_id),
+                    reply_to=None,
+                    sleep_time=60 + (random.random() * 60)
+                ),
             )
             bot.mocked_today = True
 
@@ -101,25 +103,30 @@ async def mock_users(
                     message_text=await message_miguxer(message.text) if round(
                         random.random()) else random.choice(DRUNK_DECAPTOR_LIST),
                     chat_id=message.chat.id,
-                    reply_to=message.message_id if round(random.random()) else None),
+                    reply_to=message.message_id if round(random.random()) else None
+                )
             )
 
         if 'lol' in message.text.lower() and random.random(
 
-        ) < bot.config.random_params.words_react_frequency and not bot.kardashian_gif != round(bot.datetime_now.hour / 8):
+        ) < bot.config.random_params.words_react_frequency and not bot.kardashian_gif != round(bot.datetime_now.hour / 18):
             bot.loop.create_task(
                 bot.send_video(
                     video=open(f'gifs/kardashian_lol.mp4', 'rb').read(),
                     chat_id=message.chat.id,
-                    reply_to=None)
+                    reply_to=None,
+                    sleep_time=10 + (random.random() * 15)
+                )
             )
             bot.kardashian_gif = round(bot.datetime_now.hour / 8)
 
-        if any(word in message.text.lower() for word in DECAPTOR_DISAPPOINTS) and not bot.kardashian_gif != round(bot.datetime_now.hour / 8):
+        if any(word in message.text.lower() for word in DECAPTOR_DISAPPOINTS) and not bot.kardashian_gif != round(bot.datetime_now.hour / 18):
             bot.loop.create_task(
                 bot.send_video(
                     video=open(f'gifs/kardashian_disappointed.mp4', 'rb').read(),
                     chat_id=message.chat.id,
-                    reply_to=message.message_id),
+                    reply_to=None,
+                    sleep_time=10 + (random.random() * 15)
+                )
             )
-            bot.kardashian_gif = round(bot.datetime_now.hour / 8)
+            bot.kardashian_gif = round(bot.datetime_now.hour / 18)

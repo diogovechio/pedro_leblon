@@ -111,5 +111,9 @@ async def _pre_processor(
         input_text=input_text,
         url_detector=url_detector,
         destroy_message=destroy_message,
-        mock_chat=message.chat.id in bot.config.mock_chats
+        mock_chat=message.chat.id in bot.config.mock_chats,
+        limited_prompt=(
+                str(message.from_.id) in bot.config.limited_prompt_users
+                or message.from_.username in bot.config.limited_prompt_users
+        )
     )

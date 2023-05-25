@@ -75,10 +75,13 @@ async def html_paragraph_extractor(text: str, char_limit: int) -> str:
     soup = BeautifulSoup(text, 'html.parser')
     if soup.find("article"):
         tag = soup.article
+
     elif soup.find("main"):
         tag = soup.main
+
     elif soup.find("body"):
         tag = soup.body
+
     else:
         return ""
 
@@ -87,7 +90,22 @@ async def html_paragraph_extractor(text: str, char_limit: int) -> str:
          if len(text.strip()) > 1]
     )
 
-    if len(text) > char_limit:
+    if len(final_text) < 500:
+        if soup.find("main"):
+            tag = soup.main
+
+        elif soup.find("body"):
+            tag = soup.body
+
+        new_text = "\n".join(
+            [text for text in tag.strings
+             if len(text.strip()) > 1]
+        )
+
+        if len(new_text) > len(final_text):
+            final_text = new_text
+
+    if len(final_text) > char_limit:
         final_text = final_text[:int(char_limit / 2)] + final_text[-int(char_limit / 2):]
 
     return final_text
@@ -117,8 +135,8 @@ async def message_destroyer(message_text: str, extra_text=True) -> str:
     return message_text
 
 
-async def pre_biased_prompt(full_text: str, last_words: str = "") -> str:
-    extra_irony = f"pedro costuma ser sutilmente sarcástico e nada educado.\n" \
+async def pre_biased_prompt(full_text: str, last_words: str = "", always_ironic=False) -> str:
+    extra_irony = f"pedro costuma ser extremamente sarcástico e nada educado.\n" \
                   f"pedro nunca deixa claro quando está apenas brincando e não costuma se desculpar.\n\n"
 
     additional_text = ''
@@ -161,7 +179,7 @@ async def pre_biased_prompt(full_text: str, last_words: str = "") -> str:
                f"segue abaixo a conversa:\n\n" \
                f"{full_text}"
 
-    if random.random() < 0.4:
+    if random.random() < 0.4 or always_ironic:
         full_text = f"{extra_irony}segue abaixo a conversa:\n\n{full_text}"
 
     return full_text

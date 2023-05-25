@@ -30,8 +30,11 @@ async def openai_reactions(
                 or command_in('pedro', data.message.text, text_end=True)
                 or "ペドロ" in data.message.text
                 or int(data.message.chat.id) > 0
-        ) and not command_in('/pedro', data.message.text) and not pedro_on_reply:
+        ) and not command_in('/pedro', data.message.text) and not pedro_on_reply and not data.limited_prompt:
             await _default_pedro(data=data)
+
+        elif data.limited_prompt and command_in('pedro,', data.message.text):
+            await _default_pedro(data=data, always_ironic=True)
 
         elif (
                 str(data.message.from_.id) in data.bot.config.annoy_users
@@ -57,7 +60,7 @@ async def openai_reactions(
 
         elif any(
                 react_word in data.message.text.lower() for react_word in OPENAI_REACT_WORDS
-        ) and random.random() < data.bot.config.random_params.words_react_frequency and not data.url_detector and not data.mock_chat:
+        ) and random.random() < data.bot.config.random_params.words_react_frequency and not data.url_detector and not data.mock_chat and not data.limited_prompt:
             await _react_to_words(data=data)
 
         elif pedro_on_reply and data.message.text != "/del" and (
@@ -69,9 +72,10 @@ async def openai_reactions(
                 data.bot.random_talk != round(data.bot.datetime_now.hour / 18)
                 and random.random() < data.bot.config.random_params.random_mock_frequency
                 and data.message.chat.id not in data.bot.config.not_internal_chats
-                and not data.mock_chat
+                and not data.mock_chat and not data.limited_prompt
         ):
             await _random_conversation(data=data)
+
 
 @async_elapsed_time
 async def _complain_swear_word(data: ReactData) -> None:
@@ -91,12 +95,14 @@ async def _complain_swear_word(data: ReactData) -> None:
                             random.random()) else OPENAI_PROMPTS['critique_reformule'],
                         remove_words_list=['pedro'],
                         only_davinci=True,
+                        biased=False,
                         temperature=1.0,
                     ),
                     chat_id=data.message.chat.id,
                     sleep_time=1 + (round(random.random()) * 4),
                     reply_to=data.message.message_id)
             )
+
 
 @async_elapsed_time
 async def _forecast_detect(data: ReactData) -> bool:
@@ -150,19 +156,23 @@ async def _forecast_detect(data: ReactData) -> bool:
 
     return False
 
+
 @async_elapsed_time
-async def _default_pedro(data: ReactData) -> None:
+async def _default_pedro(data: ReactData, always_ironic=False) -> None:
     bot = data.bot
+
+    short_text = data.input_text
 
     if data.url_detector:
         prompt_text = data.input_text
     else:
         chat_text = ""
-        chat_messages = bot.messages_in_memory[data.message.chat.id][-5:]
+        chat_messages = bot.messages_in_memory[data.message.chat.id][-3:]
         user_message = f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}: {data.message.text}\n"
 
         if len(chat_messages):
             chat_text = "\n".join(chat_messages[:-1 if data.message.text in chat_messages[-1] else len(chat_messages)])
+            short_text = "\n".join([text.split(":")[-1] for text in chat_messages])
 
         if data.message.reply_to_message:
             chat_text += f"\n{data.message.reply_to_message.from_.first_name}: {data.message.reply_to_message.text}\n"
@@ -178,7 +188,7 @@ async def _default_pedro(data: ReactData) -> None:
                 message_text=await bot.openai.generate_message(
                     message_username=data.message.from_.first_name,
                     full_text=prompt_text,
-                    short_text=data.input_text,
+                    short_text=short_text + data.username if random.random() < data.bot.config.random_params.words_react_frequency else "",
                     chat=data.message.chat.title,
                     only_chatgpt=True if data.url_detector else False,
                     destroy_message=data.destroy_message,
@@ -188,13 +198,16 @@ async def _default_pedro(data: ReactData) -> None:
                          f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}, "
                          f"não comente mensagens anteriores a dele:",
                     biased=False if data.url_detector else True,
-                    moderate=False,
+                    moderate=True,
                     remove_words_list=None,
+                    always_ironic=always_ironic,
                 ),
                 chat_id=data.message.chat.id,
                 reply_to=data.message.message_id
             )
         )
+
+
 @async_elapsed_time
 async def _annoy_persona_non_grata(data: ReactData) -> None:
     bot = data.bot
@@ -214,6 +227,7 @@ async def _annoy_persona_non_grata(data: ReactData) -> None:
             chat_id=data.message.chat.id,
             reply_to=data.message.message_id)
     )
+
 
 @async_elapsed_time
 async def _generate_image_command(data: ReactData) -> None:
@@ -297,6 +311,7 @@ async def _generate_image_command(data: ReactData) -> None:
                 )
             )
 
+
 @async_elapsed_time
 async def _boring_pedro(data: ReactData) -> None:
     bot = data.bot
@@ -319,6 +334,7 @@ async def _boring_pedro(data: ReactData) -> None:
                 reply_to=data.message.message_id)
         )
 
+
 @async_elapsed_time
 async def _tldr(data: ReactData) -> None:
     bot = data.bot
@@ -327,7 +343,7 @@ async def _tldr(data: ReactData) -> None:
         if ":" not in data.input_text:
             if data.destroy_message:
                 chat = ""
-                chat_messages = bot.messages_in_memory[data.message.chat.id]
+                chat_messages = bot.messages_in_memory[data.message.chat.id][:-1]
                 for msg in chat_messages:
                     splited = msg.split(":")
                     chat = f"{chat}\n{splited[0]}:{await message_destroyer(splited[1], extra_text=False)}"
@@ -380,6 +396,7 @@ async def _tldr(data: ReactData) -> None:
                     chat_id=data.message.chat.id,
                     reply_to=data.message.message_id)
             )
+
 
 @async_elapsed_time
 async def _critic_or_praise(data: ReactData) -> None:
@@ -472,6 +489,7 @@ async def _critic_or_praise(data: ReactData) -> None:
                 )
             )
 
+
 @async_elapsed_time
 async def _react_to_words(data: ReactData) -> None:
     bot = data.bot
@@ -491,12 +509,19 @@ async def _react_to_words(data: ReactData) -> None:
                 reply_to=data.message.message_id)
         )
 
+
 @async_elapsed_time
 async def _reply_reaction(data: ReactData) -> None:
     bot = data.bot
 
+    chat_messages = bot.messages_in_memory[data.message.chat.id][-3:]
+
+    short_text = ""
+    if len(chat_messages):
+        short_text = "\n".join([text.split(":")[-1] for text in chat_messages])
+
     with bot.sending_action(data.message.chat.id, action="typing"):
-        chat = "\n".join(bot.messages_in_memory[data.message.chat.id][-7:])
+        chat = "\n".join(bot.messages_in_memory[data.message.chat.id][-12:])
         insert_pedro_msg = f"{chat}\npedro: {data.message.reply_to_message.text}"
         prompt_text = f"{insert_pedro_msg}\n{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}: {data.message.text}"
 
@@ -505,15 +530,17 @@ async def _reply_reaction(data: ReactData) -> None:
                 message_text=await bot.openai.generate_message(
                     message_username='.',
                     full_text=f"{prompt_text}\npedro:",
-                    short_text=data.message.text,
+                    short_text=short_text + data.username if random.random() < data.bot.config.random_params.words_react_frequency else "",
                     chat=data.message.chat.title,
                     prompt_inject=OPENAI_PROMPTS['fale'],
                     moderate=False,
                     biased=True,
+                    always_ironic=True
                 ),
                 chat_id=data.message.chat.id,
             )
         )
+
 
 @async_elapsed_time
 async def _random_conversation(data: ReactData) -> None:

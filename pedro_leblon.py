@@ -35,6 +35,7 @@ logging.basicConfig(level=logging.INFO)
 
 session_timeout = aiohttp.ClientTimeout(total=None,sock_connect=120,sock_read=120)
 
+
 class FakePedro:
     def __init__(
             self,
@@ -160,24 +161,25 @@ class FakePedro:
                 self.faces_names = []
                 self.face_embeddings = []
 
-                for (_, _, filenames) in os.walk(self.face_images_path):
-                    self.faces_files.extend(filenames)
-                    break
+                if not self.debug_mode:
+                    for (_, _, filenames) in os.walk(self.face_images_path):
+                        self.faces_files.extend(filenames)
+                        break
 
-                for (_, _, filenames) in os.walk(self.alpha_faces_path):
-                    self.alpha_faces_files.extend(filenames)
-                    break
+                    for (_, _, filenames) in os.walk(self.alpha_faces_path):
+                        self.alpha_faces_files.extend(filenames)
+                        break
 
-                for file in self.faces_files:
-                    embeddings = face_recognition.face_encodings(
-                        face_recognition.load_image_file(f"{self.face_images_path}/{file}")
-                    )
-                    if len(embeddings):
-                        self.faces_names.append(file[:-7])
-                        self.face_embeddings.append(embeddings[0])
-                        logging.info(f"Loaded embeddings for {file}")
-                    else:
-                        logging.critical(f'NO EMBEDDINGS FOR {file}')
+                    for file in self.faces_files:
+                        embeddings = face_recognition.face_encodings(
+                            face_recognition.load_image_file(f"{self.face_images_path}/{file}")
+                        )
+                        if len(embeddings):
+                            self.faces_names.append(file[:-7])
+                            self.face_embeddings.append(embeddings[0])
+                            logging.info(f"Loaded embeddings for {file}")
+                        else:
+                            logging.critical(f'NO EMBEDDINGS FOR {file}')
 
         logging.info('Loading finished')
 
@@ -441,7 +443,7 @@ class FakePedro:
         ) as resp:
             logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
 
-    async def is_taking_too_long(self, chat_id: int, user = "", max_loops=3, timeout=10):
+    async def is_taking_too_long(self, chat_id: int, user="", max_loops=3, timeout=20):
         if user:
             messages = [f"{user.lower()} ja vou te responder",
                         "humanos escrevem mais rápido",
@@ -467,7 +469,7 @@ class FakePedro:
     def sending_action(
             self,
             chat_id: int,
-            user = "",
+            user="",
             action=T.Union[T.Literal['typing'], T.Literal['upload_photo'], T.Literal['find_location']]
     ):
         sending = self.loop.create_task(self.send_action(chat_id, action, True))
@@ -484,7 +486,7 @@ if __name__ == '__main__':
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
         secrets_file=SECRETS_FILE,
-        debug_mode=False
+        debug_mode=True
     )
 
     asyncio.run(

@@ -12,15 +12,15 @@ from utils.roleta_utils import get_roletas_from_pavuna
 async def words_reactions(
         data: ReactData
 ) -> None:
-    #Todo: organizar a bagunça
+    # Todo: organizar a bagunça
     if (
             (
-            data.message.text.lower() in ['oi', 'bom dia', 'boa noite', 'adeus', 'kk'] or (
-                len(
-                    set(
-                        list(data.message.text.lower())
+                data.message.text.lower() in ['oi', 'bom dia', 'boa noite', 'adeus', 'kk'] or (
+                    len(
+                        set(
+                            list(data.message.text.lower())
                         )
-                    ) <= 2 and len(data.message.text) > 2
+                    ) <= 2 < len(data.message.text)
             )
             ) and data.message.chat.id not in data.bot.config.not_internal_chats
     ) and random.random() < data.bot.config.random_params.random_mock_frequency:
@@ -51,7 +51,6 @@ async def words_reactions(
             and data.message.chat.id not in data.bot.config.not_internal_chats
     ):
         if data.bot.asked_for_photo != round(data.bot.datetime_now.hour / 8):
-
             embeddings_count = {key: data.bot.faces_names.count(key) for key in data.bot.faces_names}
 
             low_photo_count = [key for key, value in embeddings_count.items() if

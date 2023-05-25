@@ -14,3 +14,4 @@ class ReactData:
     url_detector: str
     destroy_message: bool
     mock_chat: bool
+    limited_prompt: bool
