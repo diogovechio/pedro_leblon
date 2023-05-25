@@ -7,7 +7,7 @@ from asyncio import get_running_loop, wait_for
 from multiprocessing import Process, Manager
 
 import face_recognition
-# from deepface import DeepFace
+from deepface import DeepFace
 from PIL import Image, ImageOps
 
 from data_classes.image_data import FaceResult
@@ -243,7 +243,6 @@ async def face_emotion(img_path: str) -> str:
 def _emotion(img_path: str, uid: str, return_dict: dict):
     emotion = ''
     try:
-        emotion = ""
-        # emotion = DeepFace.analyze(img_path=img_path, actions="emotion")[0]['dominant_emotion']
+        emotion = DeepFace.analyze(img_path=img_path, actions="emotion")[0]['dominant_emotion']
     finally:
         return_dict[uid] = emotion
