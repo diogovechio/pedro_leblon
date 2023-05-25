@@ -17,8 +17,8 @@ def daily_routines(bot: FakePedro) -> None:
             )
         )
 
-        bot.loop.create_task(_send_bosta_andre_summary(bot))
-        
+        # bot.loop.create_task(_send_bosta_andre_summary(bot))
+
         bot.loop.create_task(
             bot.send_document(
                 chat_id=8375482,
@@ -37,15 +37,13 @@ async def _send_bosta_andre_summary(bot: FakePedro):
     await bot.send_message(
         message_text=(
                 "no episódio de hoje do clubinho do @decaptor...\n\n" +
-                    await bot.openai.generate_message(
-                        full_text=prompt,
-                        chat=data.message.chat.title,
-                        prompt_inject=None,
-                        moderate=False,
-                        biased=False,
-                        only_chatgpt=True,
-                        remove_words_list=None
-                    )
+                await bot.openai.generate_message(
+                    full_text=prompt,
+                    prompt_inject=None,
+                    moderate=False,
+                    biased=False,
+                    remove_words_list=None
+                )
         ),
         chat_id=-1001369599178,
     )
