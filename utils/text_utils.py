@@ -175,12 +175,9 @@ async def pre_biased_prompt(full_text: str, last_words: str = "", always_ironic=
     if len(additional_text):
         return f"considere que o pedro tem essas opiniões:\n" \
                f"{additional_text}\n" \
-               f"{'acima de tudo,' + extra_irony if random.random() < 0.4 else ''}" \
+               f"{'acima de tudo,' + extra_irony if random.random() < 0.4 or always_ironic else ''}" \
                f"segue abaixo a conversa:\n\n" \
                f"{full_text}"
-
-    if random.random() < 0.4 or always_ironic:
-        full_text = f"{extra_irony}segue abaixo a conversa:\n\n{full_text}"
 
     return full_text
 
