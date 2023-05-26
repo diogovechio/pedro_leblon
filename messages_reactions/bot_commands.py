@@ -208,7 +208,7 @@ async def bot_commands(
                     parse_mode="HTML"
                 )
             )
-    elif command_in('/del', message.text) and message.reply_to_message:
+    elif command_in('/del', message.text) and message.reply_to_message and not data.limited_prompt:
         if (
                 message.reply_to_message.from_.id == message.from_.id
                 or "pedroleblon" in message.reply_to_message.from_.username
@@ -242,7 +242,7 @@ async def bot_commands(
                         message_text=(await bot.openai.generate_message(
                             short_text=from_username + reply_username,
                             chat=data.message.chat.title,
-                            full_text=f'critique duramente o'
+                            full_text=f'critique duramente o '
                                       f'{from_username} '
                                       f'por ter tentado deletar a mensagem do'
                                       f" {reply_username}. 'diga que pretende baní-lo do {message.chat.title}.'",
