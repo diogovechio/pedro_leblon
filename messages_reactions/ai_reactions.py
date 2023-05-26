@@ -1,7 +1,8 @@
 import random
 import re
 
-from constants.constants import SWEAR_WORDS, OPENAI_REACT_WORDS, OPENAI_PROMPTS, OPENAI_TRASH_LIST, WEATHER_LIST
+from constants.constants import SWEAR_WORDS, OPENAI_REACT_WORDS, OPENAI_PROMPTS, OPENAI_TRASH_LIST, WEATHER_LIST, \
+    CHATGPT_BS
 from data_classes.react_data import ReactData
 from utils.face_utils import put_list_of_faces_on_background
 from utils.logging_utils import async_elapsed_time
@@ -167,7 +168,7 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
         prompt_text = data.input_text
     else:
         chat_text = ""
-        chat_messages = bot.messages_in_memory[data.message.chat.id][-3:]
+        chat_messages = bot.messages_in_memory[data.message.chat.id][-5:]
         user_message = f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}: {data.message.text}\n"
 
         if len(chat_messages):
@@ -546,13 +547,10 @@ async def _reply_reaction(data: ReactData) -> None:
 async def _random_conversation(data: ReactData) -> None:
     bot = data.bot
 
-    bot.random_talk = round(data.bot.datetime_now.hour / 18)
-
     with bot.sending_action(data.message.chat.id, action="typing"):
         chat = "\n".join(data.bot.messages_in_memory[data.message.chat.id][-25:])
-        bot.loop.create_task(
-            bot.send_message(
-                message_text=await bot.openai.generate_message(
+
+        message = await bot.openai.generate_message(
                     message_username='.',
                     full_text=f"{chat}\npedro:",
                     chat=data.message.chat.title,
@@ -561,7 +559,14 @@ async def _random_conversation(data: ReactData) -> None:
                                   'para "pedro" no final: ',
                     only_chatgpt=True,
                     biased=True,
-                ),
-                chat_id=data.message.chat.id,
-            )
         )
+
+        if not any(word in message for word in CHATGPT_BS):
+            bot.random_talk = round(data.bot.datetime_now.hour / 18)
+
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=message,
+                    chat_id=data.message.chat.id,
+                )
+            )

@@ -51,6 +51,7 @@ async def scheduler(bot: FakePedro) -> None:
         _restart_proxy, bot
     )
 
+
 def _restart_proxy(bot: FakePedro) -> None:
     try:
         subprocess.run(['systemctl', 'stop', 'mtprotoproxy'],
