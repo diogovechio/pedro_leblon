@@ -12,6 +12,7 @@ from constants.constants import SECRETS_FILE
 
 TOKEN = json.loads(open(SECRETS_FILE).read())['secrets']['bot_token']
 
+
 async def telegram_logging(text: T.Union[str, Exception], chat_id=-704277411):
     if isinstance(text, Exception):
         text = "\n".join(traceback.format_exception(text))

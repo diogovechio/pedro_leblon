@@ -8,6 +8,7 @@ from constants.constants import BOLSOFF_LIST, ANNUAL_DATE_PATTERN, ONCE_DATE_PAT
 from data_classes.commemorations import Commemoration
 from data_classes.react_data import ReactData
 from messages_reactions.utils.date_utils import display_time
+from utils.logging_utils import telegram_logging
 from utils.text_utils import command_in, create_username
 
 
@@ -224,6 +225,12 @@ async def bot_commands(
                 bot.delete_message(
                     chat_id=message.chat.id,
                     message_id=message.message_id
+                )
+            )
+
+            bot.loop.create_task(
+                telegram_logging(
+                    text=f"{message.from_.first_name},{message.text},{message.reply_to_message.text}"
                 )
             )
         else:
