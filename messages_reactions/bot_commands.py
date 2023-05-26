@@ -8,7 +8,7 @@ from constants.constants import BOLSOFF_LIST, ANNUAL_DATE_PATTERN, ONCE_DATE_PAT
 from data_classes.commemorations import Commemoration
 from data_classes.react_data import ReactData
 from messages_reactions.utils.date_utils import display_time
-from utils.text_utils import command_in
+from utils.text_utils import command_in, create_username
 
 
 async def bot_commands(
@@ -208,20 +208,52 @@ async def bot_commands(
                     parse_mode="HTML"
                 )
             )
-    elif command_in('/del', message.text) and message.reply_to_message and message.from_.username == 'diogovechio':
-        bot.loop.create_task(
-            bot.delete_message(
-                chat_id=message.chat.id,
-                message_id=message.reply_to_message.message_id
+    elif command_in('/del', message.text) and message.reply_to_message:
+        if (
+                message.reply_to_message.from_.id == message.from_.id
+                or "pedroleblon" in message.reply_to_message.from_.username
+        ):
+            bot.loop.create_task(
+                bot.delete_message(
+                    chat_id=message.chat.id,
+                    message_id=message.reply_to_message.message_id
+                )
             )
-        )
 
-        bot.loop.create_task(
-            bot.delete_message(
-                chat_id=message.chat.id,
-                message_id=message.message_id
+            bot.loop.create_task(
+                bot.delete_message(
+                    chat_id=message.chat.id,
+                    message_id=message.message_id
+                )
             )
-        )
+        else:
+            with bot.sending_action(data.message.chat.id, action="typing"):
+                from_username = create_username(
+                    first_name=message.from_.first_name,
+                    username=message.from_.username
+                )
+                reply_username = create_username(
+                    first_name=message.reply_to_message.from_.first_name,
+                    username=message.reply_to_message.from_.username
+                )
+
+                bot.loop.create_task(
+                    bot.send_message(
+                        message_text=(await bot.openai.generate_message(
+                            short_text=from_username + reply_username,
+                            chat=data.message.chat.title,
+                            full_text=f'critique duramente o'
+                                      f'{from_username} '
+                                      f'por ter tentado deletar a mensagem do'
+                                      f" {reply_username}. 'diga que pretende baní-lo do {message.chat.title}.'",
+                            temperature=1,
+                            only_davinci=True,
+                            biased=True,
+                        )).upper(),
+                        chat_id=message.chat.id,
+                        reply_to=message.message_id,
+                    )
+                )
 
     elif command_in('/delete', message.text):
         msg_id = message.text.split(' ')

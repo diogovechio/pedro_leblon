@@ -165,7 +165,7 @@ class OpenAiCompletion:
                 async with self.session.post(
                         "https://api.openai.com/v1/images/generations",
                         headers=self.headers,
-                        json={'prompt': text,'n': 1, 'size': "256x256"}
+                        json={'prompt': text, 'n': 1, 'size': "256x256"}
                 ) as openai_request:
                     async with self.session.get(
                             json.loads(await openai_request.text())['data'][0]['url']
@@ -192,14 +192,14 @@ class OpenAiCompletion:
                         },
                         data=aiohttp.FormData(
                             (
-                                ("image", square_png),
-                                ("prompt", text),
-                                ("size", "256x256"),
+                                    ("image", square_png),
+                                    ("prompt", text),
+                                    ("size", "256x256"),
                             )
                         )
                 ) as openai_request:
                     async with self.session.get(
-                        json.loads(await openai_request.text())['data'][0]['url']
+                            json.loads(await openai_request.text())['data'][0]['url']
                     ) as image:
                         return await image.content.read()
         except Exception as exc:
@@ -210,7 +210,7 @@ class OpenAiCompletion:
     async def generate_message(
             self,
             full_text: str,
-            short_text = "",
+            short_text="",
             message_username: T.Optional[str] = "",
             chat="ASD",
             only_chatgpt=False,
@@ -293,7 +293,7 @@ class OpenAiCompletion:
 async def extract_website_paragraph_content(
         url: str,
         session: aiohttp.ClientSession,
-        char_limit = 11000
+        char_limit=11000
 ) -> str:
     try:
         if "youtube.com/" in url or "https://youtu.be" in url:
@@ -351,7 +351,7 @@ async def list_reducer(l: list) -> list:
                         int(middle / 2 + middle): int(middle / 2 + middle) + 4
                         ])
 
-        new_list.extend(l[total_size-9:-2])
+        new_list.extend(l[total_size - 9:-2])
 
         return new_list
     return l
