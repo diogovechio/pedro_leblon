@@ -252,7 +252,8 @@ async def bot_commands(
                             full_text=f'critique duramente o '
                                       f'{from_username} '
                                       f'por ter tentado deletar a mensagem do'
-                                      f" {reply_username}. 'diga que pretende baní-lo do {message.chat.title}.'",
+                                      f" {reply_username}. 'diga que pretende baní-lo do {message.chat.title}.\n\n"
+                                      f"pedro:'",
                             temperature=1,
                             only_davinci=True,
                             biased=True,
