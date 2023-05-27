@@ -189,7 +189,7 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
                 message_text=await bot.openai.generate_message(
                     message_username=data.message.from_.first_name,
                     full_text=prompt_text,
-                    short_text=short_text + data.username if random.random() < data.bot.config.random_params.words_react_frequency else "",
+                    short_text=short_text + data.username if random.random() < data.bot.config.random_params.words_react_frequency else data.input_text,
                     chat=data.message.chat.title,
                     only_chatgpt=True if data.url_detector else False,
                     destroy_message=data.destroy_message,
@@ -524,14 +524,14 @@ async def _reply_reaction(data: ReactData) -> None:
     with bot.sending_action(data.message.chat.id, action="typing"):
         chat = "\n".join(bot.messages_in_memory[data.message.chat.id][-12:])
         insert_pedro_msg = f"{chat}\npedro: {data.message.reply_to_message.text}"
-        prompt_text = f"{insert_pedro_msg}\n{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}: {data.message.text}"
+        prompt_text = f"{insert_pedro_msg}\n{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}: {data.input_text}"
 
         bot.loop.create_task(
             bot.send_message(
                 message_text=await bot.openai.generate_message(
                     message_username='.',
                     full_text=f"{prompt_text}\npedro:",
-                    short_text=short_text + data.username if random.random() < data.bot.config.random_params.words_react_frequency else "",
+                    short_text=short_text + data.username if random.random() < data.bot.config.random_params.words_react_frequency else create_username(first_name=data.message.from_.first_name, username=data.message.from_.username) + data.message.text,
                     chat=data.message.chat.title,
                     prompt_inject=OPENAI_PROMPTS['fale'],
                     moderate=False,

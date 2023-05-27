@@ -140,6 +140,8 @@ async def pre_biased_prompt(full_text: str, last_words: str = "", always_ironic=
                   f"pedro nunca deixa claro quando está apenas brincando e não costuma se desculpar.\n\n"
 
     additional_text = ''
+    if last_words:
+        last_words = last_words + full_text
 
     if 'bolsonaro' in full_text:
         additional_text += "pedro considera o governo bolsonaro é péssimo e irresponsável.\n"
