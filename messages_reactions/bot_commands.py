@@ -1,4 +1,5 @@
 import re
+from asyncio import Task
 from datetime import datetime
 import random
 import uuid
@@ -52,6 +53,24 @@ async def bot_commands(
             ,
             chat_id=message.chat.id)
         )
+
+    elif command_in('/stop', message.text):
+        for task in bot.messages_tasks[message.chat.id]:
+            task: Task
+            task.cancel()
+        #
+        # bot.loop.create_task(
+        #     bot.delete_message(
+        #         chat_id=message.chat.id,
+        #         message_id=message.message_id,
+        #     )
+        # )
+        #
+        # bot.loop.create_task(
+        #     telegram_logging(
+        #         text=f"{message.from_.first_name},{message.text}"
+        #     )
+        # )
 
     elif command_in('/bolso', message.text):
         bolso_expires_at = datetime.strptime('1/1/2023', "%m/%d/%Y")

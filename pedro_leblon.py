@@ -86,6 +86,8 @@ class FakePedro:
         self.mocked_today = False
         self.sent_news = 0
 
+        self.messages_tasks = {}
+
         self.roleta_hour = 4
         self.last_roleta_day = 0
 
@@ -231,9 +233,17 @@ class FakePedro:
                         incoming_update: MessageReceived
 
                         if incoming_update is not None:
-                            self.loop.create_task(
-                                messages_coordinator(self, incoming_update)
+                            chat_id = incoming_update.message.chat.id
+
+                            if chat_id not in self.messages_tasks:
+                                self.messages_tasks[chat_id] = MaxSizeList(15)
+
+                            self.messages_tasks[chat_id].append(
+                                self.loop.create_task(
+                                    messages_coordinator(self, incoming_update)
+                                )
                             )
+
                             self.loop.create_task(
                                 self._store_messages_info(incoming_update)
                             )
@@ -485,7 +495,7 @@ if __name__ == '__main__':
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
         secrets_file=SECRETS_FILE,
-        debug_mode=True
+        debug_mode=False
     )
 
     asyncio.run(
