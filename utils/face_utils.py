@@ -5,6 +5,7 @@ import uuid
 import typing as T
 from asyncio import get_running_loop, wait_for
 from multiprocessing import Process, Manager
+from multiprocessing.process import BaseProcess
 
 import face_recognition
 from deepface import DeepFace
@@ -218,24 +219,36 @@ async def detect_face(
 @async_elapsed_time
 async def face_emotion(img_path: str) -> str:
     emotion = ''
+    manager = Manager()
+    return_dict = manager.dict()
+
     try:
-        manager = Manager()
-        return_dict = manager.dict()
+        with asyncio.Semaphore(1):
 
-        _id = str(uuid.uuid4())
+            _id = str(uuid.uuid4())
 
-        Process(
-            target=_emotion,
-            args=(img_path, _id, return_dict,)
-        ).start()
+            released = False
+            for _ in range(12):
+                if len(return_dict) > 0:
+                    await asyncio.sleep(5)
+                else:
+                    released = True
+                    break
 
-        for _ in range(25):
-            if _id in return_dict:
-                emotion = return_dict[_id]
-                del return_dict[_id]
-                break
-            await asyncio.sleep(1)
+            if released:
+                Process(
+                    target=_emotion,
+                    args=(img_path, _id, return_dict,)
+                ).start()
 
+                for _ in range(25):
+                    if _id in return_dict:
+                        emotion = return_dict[_id]
+                        del return_dict[_id]
+                        break
+                await asyncio.sleep(1)
+    except Exception as exc:
+        get_running_loop().create_task(telegram_logging(exc))
     finally:
         return emotion
 

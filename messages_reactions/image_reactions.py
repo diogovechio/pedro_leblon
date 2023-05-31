@@ -51,7 +51,6 @@ async def image_reactions(
                                     recognized_face is not None and recognized_face.face_name == "samuel"
                                     and bot.dall_e_uses_today.count(message.from_.id) < bot.config.openai.dall_e_daily_limit
                             ):
-
                                 caption, image = await asyncio.gather(
                                     create_caption(
                                         bot=bot,
@@ -86,7 +85,6 @@ async def image_reactions(
                                     text=roulette_text,
                                     square_png=crop_bytes.face_with_alpha_background
                                 )
-
 
                                 await bot.send_photo(
                                     image=image,
