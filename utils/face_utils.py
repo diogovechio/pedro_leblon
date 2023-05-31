@@ -221,41 +221,38 @@ async def face_emotion(img_path: str) -> str:
     emotion = ''
     manager = Manager()
     return_dict = manager.dict()
+    _id = str(uuid.uuid4())
 
     try:
-        with asyncio.Semaphore(1):
+        released = False
+        for _ in range(12):
+            if len(return_dict) != 0:
+                await asyncio.sleep(5)
+            else:
+                released = True
+                break
 
-            _id = str(uuid.uuid4())
+        if released:
+            Process(
+                target=_emotion,
+                args=(img_path, _id, return_dict,)
+            ).start()
 
-            released = False
-            for _ in range(12):
-                if len(return_dict) > 0:
-                    await asyncio.sleep(5)
-                else:
-                    released = True
+            for _ in range(25):
+                if _id in return_dict:
+                    emotion = return_dict[_id]
                     break
-
-            if released:
-                Process(
-                    target=_emotion,
-                    args=(img_path, _id, return_dict,)
-                ).start()
-
-                for _ in range(25):
-                    if _id in return_dict:
-                        emotion = return_dict[_id]
-                        del return_dict[_id]
-                        break
                 await asyncio.sleep(1)
-    except Exception as exc:
-        get_running_loop().create_task(telegram_logging(exc))
     finally:
+        if _id in return_dict:
+            del return_dict[_id]
         return emotion
 
 
 def _emotion(img_path: str, uid: str, return_dict: dict):
     emotion = ''
     try:
-        emotion = DeepFace.analyze(img_path=img_path, actions="emotion")[0]['dominant_emotion']
+        if len(return_dict) == 1:
+            emotion = DeepFace.analyze(img_path=img_path, actions="emotion")[0]['dominant_emotion']
     finally:
         return_dict[uid] = emotion
