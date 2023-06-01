@@ -83,7 +83,7 @@ async def mock_users(
             bot.sent_news = round(bot.datetime_now.hour / 6)
 
     if message.from_.username == f"{'decaptor' if not bot.debug_mode else 'diogovechio'}":
-        if random.random() < bot.config.random_params.random_mock_frequency and not bot.mocked_today:
+        if random.random() < bot.config.random_params.random_mock_frequency and not bot.mocked_today and bot.datetime_now.day % 5 == 0:
             bot.loop.create_task(
                 bot.send_video(
                     video=open(f'gifs/kardashian{round(random.random())}.mp4', 'rb').read(),

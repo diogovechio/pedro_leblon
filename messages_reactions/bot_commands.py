@@ -58,6 +58,7 @@ async def bot_commands(
         for task in bot.messages_tasks[message.chat.id]:
             task: Task
             task.cancel()
+            del bot.messages_tasks[task]
         #
         # bot.loop.create_task(
         #     bot.delete_message(

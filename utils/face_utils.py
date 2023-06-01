@@ -246,13 +246,14 @@ async def face_emotion(img_path: str) -> str:
     finally:
         if _id in return_dict:
             del return_dict[_id]
+        return_dict = manager.dict()
         return emotion
 
 
 def _emotion(img_path: str, uid: str, return_dict: dict):
     emotion = ''
+    return_dict[uid] = emotion
     try:
-        if len(return_dict) == 1:
-            emotion = DeepFace.analyze(img_path=img_path, actions="emotion")[0]['dominant_emotion']
+        emotion = DeepFace.analyze(img_path=img_path, actions="emotion")[0]['dominant_emotion']
     finally:
         return_dict[uid] = emotion

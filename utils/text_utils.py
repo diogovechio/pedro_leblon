@@ -179,6 +179,11 @@ async def pre_biased_prompt(full_text: str, last_words: str = "", always_ironic=
                f"segue abaixo a conversa:\n\n" \
                f"{full_text}"
 
+    if always_ironic:
+        full_text = f"considere que o {extra_irony}" \
+                   f"segue abaixo a conversa:\n\n" \
+                   f"{full_text}"
+
     return full_text
 
 
