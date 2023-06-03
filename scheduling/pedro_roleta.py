@@ -33,14 +33,16 @@ async def send_roleta(bot: FakePedro) -> None:
             ]
             bot.loop.create_task(bot.send_action(chat_id=chat_id, action="typing"))
 
-            bot.loop.create_task(
-                bot.send_message(
-                    message_text=(
+            message_text = (
                         await bot.openai.generate_message(
                             full_text=f"repita essa frase e em seguinte dê a sua conclusão: "
                                          f"'{random.choice(roleta_list)['text']}'",
                         )
-                    ).upper(),
+                    ).upper()
+
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=message_text,
                     chat_id=chat_id,
                     sleep_time=1 + (round(random.random()) * 10),
                     reply_to=random.choice(messages_ids) if len(messages_ids) else None

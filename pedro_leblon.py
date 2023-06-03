@@ -88,7 +88,7 @@ class FakePedro:
 
         self.messages_tasks = {}
 
-        self.roleta_hour = 4
+        self.roleta_hour = 14
         self.last_roleta_day = 0
 
         self.openai: T.Optional[OpenAiCompletion] = None
@@ -495,7 +495,7 @@ if __name__ == '__main__':
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
         secrets_file=SECRETS_FILE,
-        debug_mode=True
+        debug_mode=False
     )
 
     asyncio.run(
