@@ -36,6 +36,7 @@ async def words_reactions(
         if (
                 random.random() < data.bot.config.random_params.words_react_frequency
                 and data.message.chat.id not in data.bot.config.not_internal_chats
+                and data.bot.datetime_now.day % 2 == 0
         ):
             data.bot.loop.create_task(
                 data.bot.send_message(
