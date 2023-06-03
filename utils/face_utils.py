@@ -246,7 +246,6 @@ async def face_emotion(img_path: str) -> str:
     finally:
         if _id in return_dict:
             del return_dict[_id]
-        return_dict = manager.dict()
         return emotion
 
 
