@@ -232,7 +232,7 @@ class FakePedro:
 
                         incoming_update: MessageReceived
 
-                        if incoming_update is not None:
+                        if incoming_update is not None and incoming_update.message is not None:
                             chat_id = incoming_update.message.chat.id
 
                             if chat_id not in self.messages_tasks:
