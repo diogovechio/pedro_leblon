@@ -274,7 +274,7 @@ async def bot_commands(
                                       f'por ter tentado deletar a mensagem do'
                                       f" {reply_username}. 'diga que pretende baní-lo do {message.chat.title}.\n\n"
                                       f"pedro:'",
-                            temperature=1,
+                            temperature=2.0,
                             only_davinci=True,
                             biased=True,
                         )).upper(),

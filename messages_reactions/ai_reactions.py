@@ -98,7 +98,7 @@ async def _complain_swear_word(data: ReactData) -> None:
                         remove_words_list=['pedro'],
                         only_davinci=True,
                         biased=False,
-                        temperature=1.0,
+                        temperature=2.0,
                     ),
                     chat_id=data.message.chat.id,
                     sleep_time=1 + (round(random.random()) * 4),
@@ -457,7 +457,8 @@ async def _critic_or_praise(data: ReactData) -> None:
             destroy_message=data.destroy_message,
             moderate=False if "/critique" in data.message.text.lower()[0:9] else True,
             prompt_inject="O",
-            temperature=1.0,
+            temperature=2.0,
+            only_davinci=True,
             remove_words_list=['asd']
         )
         message_text = openai_text.lower()
