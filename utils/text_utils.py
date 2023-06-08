@@ -36,6 +36,7 @@ async def message_miguxer(message: str) -> str:
         ]
     )
 
+
 async def https_url_extract(text: str) -> str:
     final_text = ""
     text = text[text.find('https://'):]
@@ -62,7 +63,7 @@ async def youtube_caption_extractor(url: str, char_limit: int) -> str:
 
         text = "\n".join([i['text'] for i in a if 'text' in i])
         if len(text) > char_limit:
-            text = text[:int(char_limit/2)] + text[-int(char_limit/2):]
+            text = text[:int(char_limit / 2)] + text[-int(char_limit / 2):]
 
         return text
     except Exception as exc:
@@ -181,8 +182,8 @@ async def pre_biased_prompt(full_text: str, last_words: str = "", always_ironic=
 
     if always_ironic:
         full_text = f"considere que o {extra_irony}" \
-                   f"segue abaixo a conversa:\n\n" \
-                   f"{full_text}"
+                    f"segue abaixo a conversa:\n\n" \
+                    f"{full_text}"
 
     return full_text
 
@@ -202,14 +203,16 @@ async def normalize_openai_text(
     try:
         ai_message = ""
         idx_to_lower = 0
-        if "```" not in original_message:
+        if "```" not in original_message and len(original_message) > 1:
             original_message = original_message.strip()
             for i, letter in enumerate(original_message):
+                next_idx = i + 1
                 if idx_to_lower == i:
-                    letter = letter.lower()
+                    if (len(original_message) - 1 != next_idx) and not original_message[next_idx].isupper():
+                        letter = letter.lower()
                 ai_message += letter
 
-                if letter in (".", "!", "?"):
+                if letter in (".", "!", "?", ":"):
                     idx_to_lower = i + 2
                 elif letter == '"':
                     idx_to_lower = i + 1
@@ -223,14 +226,14 @@ async def normalize_openai_text(
             for _, msg in clean_prompts.items():
                 ai_message = ai_message.replace(msg, '')
 
-        ai_message = ai_message.replace("pedro: ","rs, ")
+        ai_message = ai_message.replace("pedro: ", "rs, ")
 
         if ai_message:
             while any(word in ai_message[0] for word in ['.', ',', '?', '\n', ' ', '!']):
                 ai_message = ai_message[1:]
 
             if '"' in ai_message[0] and '"' in ai_message[-1]:
-                ai_message = ai_message.replace('"',"")
+                ai_message = ai_message.replace('"', "")
 
             if random.random() < 0.05:
                 ai_message = ai_message.upper()
@@ -244,6 +247,7 @@ async def normalize_openai_text(
         get_running_loop().create_task(telegram_logging(exc))
 
         return '@diogovechio dei pau vai ver o log'
+
 
 def command_in(
         command: str,
