@@ -246,6 +246,9 @@ async def normalize_openai_text(
     except Exception as exc:
         get_running_loop().create_task(telegram_logging(exc))
 
+        if len(original_message):
+            return original_message.upper()
+
         return '@diogovechio dei pau vai ver o log'
 
 

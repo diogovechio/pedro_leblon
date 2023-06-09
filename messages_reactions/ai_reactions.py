@@ -459,6 +459,7 @@ async def _critic_or_praise(data: ReactData) -> None:
             prompt_inject="O",
             temperature=1,
             only_davinci=True,
+            biased=False,
             remove_words_list=['asd']
         )
         message_text = openai_text.lower()
