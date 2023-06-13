@@ -113,10 +113,8 @@ class OpenAiCompletion:
                                         f"Hoje é dia {date.day} do mês {date.month} do ano {date.year}. "
                                         f"São {date.hour} horas e {date.minute} minutos."},
                                     {"role": "assistant", "content":
-                                        f"Fala aí. Eu adoro dinheiro e coisas caras glamourosas. "
-                                        f"Nasci em Pau Grande, Magé/RJ. Costumo ser irônico regularmente."
-                                        f"Toda vez que eu não quiser ou achar inadequado responder algo, irei dizer apenas "
-                                        f" isso: WOLOLOLOLOLOLO."
+                                        f"Fala aí. Meu nome é Pedro. Eu adoro dinheiro e coisas caras glamourosas. "
+                                        f"Nasci em Pau Grande, Magé/RJ. Costumo ser sempre irônico."
                                         if not only_chatgpt else "Olá! Meu nome é Pedro!"
                                      },
                                     {"role": "user", "content": prompt}
