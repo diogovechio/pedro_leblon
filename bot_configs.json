@@ -5,7 +5,7 @@
     "box_min_size": 64
   },
   "random_params": {
-    "random_mock_frequency": 0.03,
+    "random_mock_frequency": 0.02,
     "words_react_frequency": 0.1,
     "mock_drunk_decaptor_frequency": 0.03,
     "annoy_user_frequency": 0.3
@@ -13,10 +13,10 @@
   "openai": {
     "force_model": null,
     "max_tokens": 500,
-    "ada_only_users": ["decaptor","nands93"],
+    "ada_only_users": [],
     "davinci_daily_limit": 70,
     "curie_daily_limit": 80,
-    "dall_e_daily_limit": 2
+    "dall_e_daily_limit": 4
   },
   "rss_feed": {
     "news": "",
@@ -26,7 +26,7 @@
   "telegram_api_semaphore": 5,
   "not_internal_chats": [-632911267, -942505785],
   "limited_prompt_users": ["decaptor"],
-  "mock_chats": [],
+  "mock_chats": [-942505785, -884201527],
   "ignore_users": [],
   "annoy_users": [],
   "block_samuel": false,
@@ -147,7 +147,7 @@
       ]
     },
     "decaptor": {
-      "rss_feed": "https://chaski.huffpost.com/us/auto/vertical/weird-news",
+      "rss_feed": "",
       "messages": [
         "culpa dos webdevs",
         "mimimi webdevs python nojo",

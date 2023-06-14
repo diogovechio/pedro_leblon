@@ -84,15 +84,19 @@ async def mock_users(
             bot.sent_news = round(bot.datetime_now.hour / 6)
 
     if message.from_.username == f"{'decaptor' if not bot.debug_mode else 'diogovechio'}":
-        if random.random() < bot.config.random_params.random_mock_frequency and not bot.mocked_today and bot.datetime_now.day % 5 == 0:
+        if (
+                random.random() < bot.config.random_params.random_mock_frequency
+                and not bot.mocked_today and bot.datetime_now.day % 3 == 0
+        ):
             bot.loop.create_task(
                 bot.send_video(
                     video=open(f'gifs/kardashian{round(random.random())}.mp4', 'rb').read(),
                     chat_id=message.chat.id,
                     reply_to=None,
-                    sleep_time=60 + (random.random() * 60)
+                    sleep_time=15 + (random.random() * 60)
                 ),
             )
+
             bot.mocked_today = True
 
         if (
@@ -116,10 +120,10 @@ async def mock_users(
                     video=open(f'gifs/kardashian_lol.mp4', 'rb').read(),
                     chat_id=message.chat.id,
                     reply_to=None,
-                    sleep_time=10 + (random.random() * 15)
+                    sleep_time=3 + (random.random() * 5)
                 )
             )
-            bot.kardashian_gif = round(bot.datetime_now.hour / 8)
+            bot.kardashian_gif = round(bot.datetime_now.hour / 18)
 
         if any(word in message.text.lower() for word in DECAPTOR_DISAPPOINTS) and not bot.kardashian_gif != round(bot.datetime_now.hour / 18):
             bot.loop.create_task(
@@ -127,7 +131,7 @@ async def mock_users(
                     video=open(f'gifs/kardashian_disappointed.mp4', 'rb').read(),
                     chat_id=message.chat.id,
                     reply_to=None,
-                    sleep_time=10 + (random.random() * 15)
+                    sleep_time=3 + (random.random() * 5)
                 )
             )
             bot.kardashian_gif = round(bot.datetime_now.hour / 18)

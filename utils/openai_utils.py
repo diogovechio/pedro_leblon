@@ -195,7 +195,7 @@ class OpenAiCompletion:
                             (
                                     ("image", square_png),
                                     ("prompt", text),
-                                    ("size", "512x512"),
+                                    ("size", "1024x1024"),
                             )
                         )
                 ) as openai_request:

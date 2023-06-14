@@ -20,9 +20,14 @@ async def openai_reactions(
             and data.message.reply_to_message.from_.username == "pedroleblonbot"
     )
 
-    if swear_word_detected := any(
+    if (swear_word_detected := any(
             block_word in data.message.text.lower() for block_word in SWEAR_WORDS
-    ) and not data.url_detector and data.bot.mocked_hour != data.bot.datetime_now.hour and not data.mock_chat and data.bot.datetime_now.day % 3 == 0:
+    )
+       and not data.url_detector
+       and data.bot.mocked_hour != data.bot.datetime_now.hour
+       and not data.mock_chat
+       and data.bot.datetime_now.day % 4 == 0
+    ):
         await _complain_swear_word(data=data)
 
     if not swear_word_detected:
@@ -59,9 +64,15 @@ async def openai_reactions(
         ) and not data.mock_chat:
             await _critic_or_praise(data=data)
 
-        elif any(
+        elif (any(
                 react_word in data.message.text.lower() for react_word in OPENAI_REACT_WORDS
-        ) and random.random() < data.bot.config.random_params.words_react_frequency and not data.url_detector and not data.mock_chat and not data.limited_prompt and data.bot.datetime_now.day % 7 == 0:
+        )
+              and random.random() < data.bot.config.random_params.words_react_frequency
+              and not data.url_detector
+              and not data.mock_chat
+              and not data.limited_prompt
+              and data.bot.datetime_now.day % 5 == 0
+        ):
             await _react_to_words(data=data)
 
         elif pedro_on_reply and not command_in("/del", data.message.text) and (
@@ -71,7 +82,7 @@ async def openai_reactions(
 
         elif (
                 data.bot.random_talk != round(data.bot.datetime_now.hour / 18)
-                and data.bot.datetime_now.day % 4 == 0
+                and data.bot.datetime_now.day % 3 == 0
                 and random.random() < data.bot.config.random_params.random_mock_frequency
                 and data.message.chat.id not in data.bot.config.not_internal_chats
                 and not data.mock_chat and not data.limited_prompt

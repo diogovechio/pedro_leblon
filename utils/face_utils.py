@@ -224,25 +224,16 @@ async def face_emotion(img_path: str) -> str:
     _id = str(uuid.uuid4())
 
     try:
-        released = False
-        for _ in range(12):
-            if len(return_dict) != 0:
-                await asyncio.sleep(5)
-            else:
-                released = True
+        Process(
+            target=_emotion,
+            args=(img_path, _id, return_dict,)
+        ).start()
+
+        for _ in range(25):
+            if _id in return_dict:
+                emotion = return_dict[_id]
                 break
-
-        if released:
-            Process(
-                target=_emotion,
-                args=(img_path, _id, return_dict,)
-            ).start()
-
-            for _ in range(25):
-                if _id in return_dict:
-                    emotion = return_dict[_id]
-                    break
-                await asyncio.sleep(1)
+            await asyncio.sleep(1)
     finally:
         if _id in return_dict:
             del return_dict[_id]
@@ -253,6 +244,8 @@ def _emotion(img_path: str, uid: str, return_dict: dict):
     emotion = ''
     return_dict[uid] = emotion
     try:
-        emotion = DeepFace.analyze(img_path=img_path, actions="emotion")[0]['dominant_emotion']
+        # todo: essa merda tem travado o bot regularmente, resolva isso quando não tiver mais o que fazer
+        # emotion = DeepFace.analyze(img_path=img_path, actions="emotion")[0]['dominant_emotion'][
+        emotion = random.choice(['estranho', 'charmoso', 'elegante', 'confiante', 'determinado'])
     finally:
         return_dict[uid] = emotion
