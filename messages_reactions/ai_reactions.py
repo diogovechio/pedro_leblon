@@ -538,7 +538,7 @@ async def _reply_reaction(data: ReactData) -> None:
     with bot.sending_action(data.message.chat.id, action="typing"):
         chat = "\n".join(bot.messages_in_memory[data.message.chat.id][-10:])
         insert_pedro_msg = f"{chat}\npedro: {data.message.reply_to_message.text}"
-        prompt_text = f"{insert_pedro_msg}\n{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}: {data.input_text}"
+        prompt_text = f"{insert_pedro_msg}\n{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}: {data.message.text}"
 
         bot.loop.create_task(
             bot.send_message(
