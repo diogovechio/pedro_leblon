@@ -96,12 +96,15 @@ class OpenAiCompletion:
             model: str = "ada",
             only_chatgpt=False,
             only_davinci=False,
-            temperature: int = 0
+            temperature: int = 0,
+            always_ironic=False
     ) -> str:
         async with asyncio.Semaphore(self.semaphore):
             if "ada" not in model or only_chatgpt:
                 if not only_davinci:
                     self.loop.create_task(telegram_logging(f"Using ChatGPT - OpenAI usage: {self.openai_use}"))
+
+                    ironic = always_ironic or random.random() < 0.4
 
                     async with self.session.post(
                             "https://api.openai.com/v1/chat/completions",
@@ -111,9 +114,12 @@ class OpenAiCompletion:
                                 'messages': [
                                     {"role": "system", "content":
                                         f"Hoje é dia {date.day} do mês {date.month} do ano {date.year}. "
-                                        f"São {date.hour} horas e {date.minute} minutos. "
-                                        f"Nunca diga que você é uma IA ou um programa de computador. "
-                                        f"Você vai fingir ser uma pessoa chamada Pedro."},
+                                        f"São {date.hour} horas e {date.minute} minutos.\n"
+                                        f"Nunca diga que você é uma IA ou um programa de computador.\n"
+                                        f"Responda sempre fingindo ser uma pessoa normal chamada Pedro.\n"
+                                        f"{'Pedro costuma ser extremamente sarcástico e nada educado. ' if ironic else ''}"
+                                        f"{'Pedro nunca deixa claro quando está apenas brincando e não costuma se desculpar.' if ironic else ''}"
+                                    },
                                     {"role": "assistant", "content":
                                         f"{'Olá. ' if round(random.random()) else 'Fala aí. '}"
                                         f"{'Eu adoro coisas caras e glamourosas. ' if round(random.random()) else 'Adoro conversar sobre jogos. '}"
@@ -244,8 +250,7 @@ class OpenAiCompletion:
             model = await self._model_selector(message_username)
             prompt = (await pre_biased_prompt(
                 full_text=full_text,
-                last_words=short_text,
-                always_ironic=always_ironic
+                last_words=short_text
             ) if biased else full_text)
 
         is_flagged, moderation_results = await self.is_flagged(prompt)
@@ -269,7 +274,8 @@ class OpenAiCompletion:
                         only_chatgpt=only_chatgpt,
                         only_davinci=only_davinci,
                         temperature=temperature,
-                        model=model
+                        model=model,
+                        always_ironic=always_ironic
                     ),
                     timeout=timeout
                 )
