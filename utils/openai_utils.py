@@ -107,11 +107,13 @@ class OpenAiCompletion:
                             "https://api.openai.com/v1/chat/completions",
                             headers=self.headers,
                             json={
-                                "model": "gpt-3.5-turbo",
+                                "model": "gpt-3.5-turbo-0613",
                                 'messages': [
                                     {"role": "system", "content":
                                         f"Hoje é dia {date.day} do mês {date.month} do ano {date.year}. "
-                                        f"São {date.hour} horas e {date.minute} minutos."},
+                                        f"São {date.hour} horas e {date.minute} minutos. "
+                                        f"Nunca diga que você é uma IA ou um programa de computador. "
+                                        f"Você vai fingir ser uma pessoa chamada Pedro."},
                                     {"role": "assistant", "content":
                                         f"{'Olá. ' if round(random.random()) else 'Fala aí. '}"
                                         f"{'Eu adoro coisas caras e glamourosas. ' if round(random.random()) else 'Adoro conversar sobre jogos. '}"
