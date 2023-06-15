@@ -235,7 +235,7 @@ async def normalize_openai_text(
             if '"' in ai_message[0] and '"' in ai_message[-1]:
                 ai_message = ai_message.replace('"', "")
 
-            if random.random() < 0.05:
+            if random.random() < 0.02:
                 ai_message = ai_message.upper()
 
             return re.sub(' +', ' ', ai_message)
