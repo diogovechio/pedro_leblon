@@ -47,7 +47,7 @@ async def scheduler(bot: FakePedro) -> None:
         pedro_roleta, bot
     )
 
-    schedule.every(15).minutes.do(
+    schedule.every(3).minutes.do(
         _restart_proxy, bot
     )
 
@@ -56,7 +56,7 @@ def _restart_proxy(bot: FakePedro) -> None:
     try:
         subprocess.run(['systemctl', 'stop', 'mtprotoproxy'],
                        check=True, text=True)
-        sleep(5)
+        sleep(1)
         subprocess.run(['systemctl', 'start', 'mtprotoproxy'],
                        check=True, text=True)
     except Exception as exc:

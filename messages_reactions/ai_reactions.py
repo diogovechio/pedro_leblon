@@ -555,6 +555,7 @@ async def _reply_reaction(data: ReactData) -> None:
                     always_ironic=True
                 ),
                 chat_id=data.message.chat.id,
+                reply_to=data.message.message_id
             )
         )
 
