@@ -536,7 +536,7 @@ async def _reply_reaction(data: ReactData) -> None:
         short_text = "\n".join([text.split(":")[-1] for text in chat_messages])
 
     with bot.sending_action(data.message.chat.id, action="typing"):
-        chat = "\n".join(bot.messages_in_memory[data.message.chat.id][-12:])
+        chat = "\n".join(bot.messages_in_memory[data.message.chat.id][-10:])
         insert_pedro_msg = f"{chat}\npedro: {data.message.reply_to_message.text}"
         prompt_text = f"{insert_pedro_msg}\n{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}: {data.input_text}"
 
@@ -547,7 +547,9 @@ async def _reply_reaction(data: ReactData) -> None:
                     full_text=f"{prompt_text}\npedro:",
                     short_text=short_text + data.username if random.random() < data.bot.config.random_params.words_react_frequency else create_username(first_name=data.message.from_.first_name, username=data.message.from_.username) + data.message.text,
                     chat=data.message.chat.title,
-                    prompt_inject=OPENAI_PROMPTS['fale'],
+                    prompt_inject=f"fingindo ser o pedro, responda objetivamente a mensagem do "
+                     f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}, "
+                     f"não comente mensagens anteriores a dele:",
                     moderate=False,
                     biased=True,
                     always_ironic=True

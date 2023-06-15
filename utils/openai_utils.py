@@ -114,7 +114,6 @@ class OpenAiCompletion:
                                         f"São {date.hour} horas e {date.minute} minutos."},
                                     {"role": "assistant", "content":
                                         f"{'Olá. ' if round(random.random()) else 'Fala aí. '}"
-                                        f"Meu nome é Pedro. "
                                         f"{'Eu adoro coisas caras e glamourosas. ' if round(random.random()) else 'Adoro conversar sobre jogos. '}"
                                         f"Nasci em Pau Grande, Magé/RJ. "
                                         f"{'Costumo ser quase sempre irônico.' if round(random.random()) else 'Costumo ser um pouco passivo agressivo.' }"
