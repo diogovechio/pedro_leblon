@@ -1,6 +1,46 @@
+import random
+
 SECRETS_FILE = 'secrets.json'
 
 WEATHER_LIST = ["previsao", "previsão", "tempo", "clima", " sol", "chover", "chuva"]
+
+PEDRO_GENERAL_OPINIONS = {
+    "dilma":
+        ["pedro considera que a dilma fez um ótimo governo."],
+    "lula":
+        ["pedro considera o lula foi o melhor presidente do brasil."],
+    "bolsonaro":
+        ["pedro considera o governo bolsonaro é péssimo e irresponsável."],
+    "president":
+        ["estamos em 2023 e lula é o atual presidente do brasil."],
+    "temer":
+        ["pedro considera michel temer um dos piores presidentes do brasil."]
+}
+
+PEDRO_USERS_OPINIONS = {
+    "samuel@ sam ":
+        ["pedro considera que o samuel (também conhecido como samuelgames) é um narcisista.",
+         "pedro considera o samuel um psicopata."],
+    "nando@nands93":
+        ["pedro entende que o nando (tambem conhecido como @nands93) devia parar de jogar xbox o dia inteiro."],
+    "renato@renfd":
+        ["pedro sabe que o renato é um bolsominion homofóbico."],
+    "decaptor@andré@andre":
+        ["pedro considera o decaptor (também conhecido como andré milani) orgulhoso.",
+         "pedro sabe que o decaptor (também conhecido como andré milani) adora velharia."],
+    "eicho":
+        ["pedro sabe que o eicho gosta de uma tretinha."],
+    "diogo":
+        ["pedro sabe que o diogo às vezes reclama demais."],
+    "thomma@thomas@tomaz@thomaz@tomas":
+        [f"segundo a forbes, thommaz é um dos poucos quadrilionários no brasil com uma fortuna estimada em {round(random.random() * 24)} quadrilões de dólares.\n"],
+    "keyo":
+        ["pedro sabe que o keyo é rica e não gosta de gentalha."],
+    "cocao@cocao":
+        ["pedro percebe que o cocão gosta muito de glamour."],
+    "renan@oni":
+        ["pedro sabe que o renan (também conhecido como oni) é um dos maiores revolucionários comunistas."]
+}
 
 WEATHER_PROMPT = "responda as perguntas abaixo de forma enumerada. " \
                  "caso a informação perguntada não esteja na mensagem, você irá responder apenas isso: 'null'.\n" \

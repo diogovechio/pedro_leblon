@@ -1,4 +1,3 @@
-import logging
 from youtube_transcript_api import YouTubeTranscriptApi
 import random
 import re
@@ -6,8 +5,8 @@ import typing as T
 from asyncio import get_running_loop
 from bs4 import BeautifulSoup
 
-from data_classes.received_message import TelegramMessage
 from pedro_leblon import telegram_logging
+from constants.constants import PEDRO_USERS_OPINIONS, PEDRO_GENERAL_OPINIONS
 
 
 async def greeter(
@@ -139,36 +138,16 @@ async def message_destroyer(message_text: str, extra_text=True) -> str:
 async def pre_biased_prompt(full_text: str, last_words: str = "") -> str:
     additional_text = ''
 
-    if 'bolsonaro' in full_text:
-        additional_text += "pedro considera o governo bolsonaro é péssimo e irresponsável.\n"
-    if 'lula' in full_text:
-        additional_text += "pedro considera o lula foi o melhor presidente do brasil.\n"
-    if 'president' in full_text:
-        additional_text += "estamos em 2023 e lula é o atual presidente do brasil.\n"
-    if 'dilma' in full_text:
-        additional_text += "pedro considera  que a dilma fez um ótimo governo.\n"
-    if 'temer' in full_text:
-        additional_text += "pedro considera michel temer um dos piores presidentes do brasil.\n"
+    for entity in PEDRO_GENERAL_OPINIONS:
+        if entity in full_text:
+            additional_text += random.choice(PEDRO_GENERAL_OPINIONS[entity])
 
-    if 'samuel' in last_words or ' sam ' in last_words in last_words:
-        additional_text += "pedro considera que o samuel (também conhecido como samuelgames) é um narcisista.\n"
-    if 'nando' in last_words or 'nands93' in last_words:
-        additional_text += "pedro entende que o nando (tambem conhecido como @nands93) devia parar de jogar xbox o dia inteiro.\n"
-    if 'renato' in last_words or 'renfd' in last_words:
-        additional_text += "pedro sabe que o renato é um bolsominion homofóbico.\n"
-    if 'decaptor' in last_words or 'andré' in last_words or 'andre' in last_words:
-        additional_text += "pedro considera o decaptor (também conhecido como andré milani) um macho orgulhoso.\n"
-    if 'eicho' in last_words:
-        additional_text += "pedro sabe que o eicho gosta de uma tretinha.\n"
-    if 'diogo' in last_words:
-        additional_text += "pedro sabe que o diogo às vezes reclama demais.\n"
-    if 'thomma' in last_words or 'tomas' in last_words or 'tomaz' in last_words or 'thoma' in last_words:
-        additional_text += f"segundo a forbes, thommaz é um dos poucos quadrilionários no brasil com uma " \
-                           f"fortuna estimada em {round(random.random() * 24)} quadrilões de dólares.\n"
-    if 'keyo' in last_words:
-        additional_text += "pedro sabe que o keyo é rica e não gosta de gentalha.\n"
-    if 'cocão' in last_words or 'cocao' in last_words:
-        additional_text += "pedro percebe que o cocão gosta muito de glamour.\n"
+    for entity_names, opinions in PEDRO_USERS_OPINIONS.items():
+        names_list = entity_names.split("@")
+        for name in names_list:
+            if name in last_words:
+                additional_text += random.choice(opinions)
+                break
 
     if len(additional_text):
         return f"considere que o pedro tem essas opiniões:\n" \
