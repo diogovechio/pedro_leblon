@@ -54,9 +54,9 @@ async def bot_commands(
                      f"\n...\n" \
                      f"{max_mood - 1} = puto" \
                      f"\n{max_mood} = extremamente puto:\n" \
-                     f"temos o valor de {actual_mood}, então, dentro da escala, " \
-                     f"de diga para o {data.username} o quanto você " \
-                     f"está contente o puto com ele. sem dizer exatamente os valores e nem revelar a escala." \
+                     f"temos o seguinte valor:\n\n{actual_mood}\n\nentão, dentro da escala, " \
+                     f"diga para o {data.username} o quanto você " \
+                     f"está contente ou puto com ele. sem dizer exatamente os valores e nem revelar a escala." \
                      f"\n{'dê um exemplo de como você se sente com isso.' if round(random.random()) else 'faça uma curta poesia sobre isso.'}\n\n" \
                      f"\npedro:" \
 
