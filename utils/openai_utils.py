@@ -8,7 +8,7 @@ from asyncio import get_running_loop
 
 import aiohttp
 
-from constants.constants import OPENAI_PROMPTS, CHATGPT_BS, PEDROS_ROLETAS
+from constants.constants import OPENAI_PROMPTS, CHATGPT_BS, PEDROS_ROLETAS, PEDRO_MOOD
 from utils.logging_utils import telegram_logging, async_elapsed_time
 from utils.text_utils import pre_biased_prompt, message_destroyer, normalize_openai_text, html_paragraph_extractor, \
     youtube_caption_extractor
@@ -93,18 +93,25 @@ class OpenAiCompletion:
             self,
             date: datetime,
             prompt: str,
+            mood: float,
             model: str = "ada",
             only_chatgpt=False,
             only_davinci=False,
             temperature: int = 0,
-            always_ironic=False
+            always_ironic=False,
     ) -> str:
         async with asyncio.Semaphore(self.semaphore):
             if "ada" not in model or only_chatgpt:
                 if not only_davinci:
                     self.loop.create_task(telegram_logging(f"Using ChatGPT - OpenAI usage: {self.openai_use}"))
 
-                    ironic = always_ironic or random.random() < 0.4
+                    if always_ironic:
+                        mood = 100.0
+
+                    if round(mood) >= len(PEDRO_MOOD) - 1:
+                        mood = len(PEDRO_MOOD) - 1
+
+                    mood_selector = PEDRO_MOOD[round(mood)]
 
                     async with self.session.post(
                             "https://api.openai.com/v1/chat/completions",
@@ -117,9 +124,7 @@ class OpenAiCompletion:
                                         f"São {date.hour} horas e {date.minute} minutos.\n"
                                         f"Nunca diga que você é uma IA ou um programa de computador.\n"
                                         f"Responda sempre fingindo ser uma pessoa normal chamada Pedro.\n"
-                                        f"{'Pedro é sempre sutilmente irônico, frio e com respostas curtas.' if round(random.random()) else 'Pedro costuma ser um pouco passivo agressivo.' }\n"
-                                        f"{'Pedro costuma ser extremamente sarcástico e nada educado.' if ironic else ''}\n"
-                                        f"{'Pedro nunca deixa claro quando está apenas brincando e não costuma se desculpar.' if ironic else ''}"
+                                        f"{mood_selector}"
                                     },
                                     {"role": "assistant", "content":
                                         f"{'Olá. Meu nome é Pedro. ' if round(random.random()) else 'E aí, meu nome é Pedro. '}"
@@ -230,7 +235,8 @@ class OpenAiCompletion:
             return_raw_text: bool = False,
             destroy_message: bool = False,
             remove_words_list=None,
-            always_ironic=False
+            always_ironic=False,
+            mood=0.0
     ) -> str:
         datetime_now = datetime.datetime.utcnow() - datetime.timedelta(hours=3)
 
@@ -275,7 +281,8 @@ class OpenAiCompletion:
                         only_davinci=only_davinci,
                         temperature=temperature,
                         model=model,
-                        always_ironic=always_ironic
+                        always_ironic=always_ironic,
+                        mood=mood
                     ),
                     timeout=timeout
                 )

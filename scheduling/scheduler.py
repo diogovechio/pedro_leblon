@@ -51,6 +51,10 @@ async def scheduler(bot: FakePedro) -> None:
         _restart_proxy, bot
     )
 
+    schedule.every(3).hours.do(
+        _mood_restore, bot
+    )
+
 
 def _restart_proxy(bot: FakePedro) -> None:
     try:
@@ -59,5 +63,14 @@ def _restart_proxy(bot: FakePedro) -> None:
         sleep(1)
         subprocess.run(['systemctl', 'start', 'mtprotoproxy'],
                        check=True, text=True)
+    except Exception as exc:
+        bot.loop.create_task(telegram_logging(exc))
+
+
+def _mood_restore(bot: FakePedro) -> None:
+    try:
+        for _, user_mood in bot.mood_per_user.items():
+            if user_mood >= 1.0:
+                user_mood -= 1.0
     except Exception as exc:
         bot.loop.create_task(telegram_logging(exc))

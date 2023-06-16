@@ -7,6 +7,7 @@ from asyncio import AbstractEventLoop
 
 from datetime import datetime, timedelta
 from pathlib import Path
+from collections import defaultdict
 
 import aiohttp
 import json
@@ -33,7 +34,11 @@ from contextlib import contextmanager
 
 logging.basicConfig(level=logging.INFO)
 
-session_timeout = aiohttp.ClientTimeout(total=None,sock_connect=120,sock_read=120)
+session_timeout = aiohttp.ClientTimeout(
+    total=None,
+    sock_connect=120,
+    sock_read=120
+)
 
 
 class FakePedro:
@@ -61,6 +66,7 @@ class FakePedro:
         self.interacted_messages_with_chat_id = MaxSizeList(400)
 
         self.messages_in_memory = {}
+        self.mood_per_user = defaultdict(lambda: 0.0)
 
         self.datetime_now = datetime.now() - timedelta(hours=3)
 
@@ -266,6 +272,7 @@ class FakePedro:
             if message.text is not None and len(message.text) > 10:
                 self.messages_in_memory[message.chat.id].append(
                     f"{create_username(message.from_.first_name, message.from_.username)}: {message.text[0:90]}")
+
 
     @async_elapsed_time
     async def image_downloader(
@@ -495,7 +502,7 @@ if __name__ == '__main__':
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
         secrets_file=SECRETS_FILE,
-        debug_mode=True
+        debug_mode=False
     )
 
     asyncio.run(

@@ -174,6 +174,11 @@ async def _forecast_detect(data: ReactData) -> bool:
 async def _default_pedro(data: ReactData, always_ironic=False) -> None:
     bot = data.bot
 
+    if "@pedroleblonbot" in data.input_text:
+        bot.mood_per_user[data.message.from_.id] += 2.5
+    else:
+        bot.mood_per_user[data.message.from_.id] += 0.75
+
     short_text = data.input_text
 
     if data.url_detector:
@@ -214,6 +219,7 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
                     moderate=True,
                     remove_words_list=None,
                     always_ironic=always_ironic,
+                    mood=bot.mood_per_user[data.message.from_.id]
                 ),
                 chat_id=data.message.chat.id,
                 reply_to=data.message.message_id
@@ -529,6 +535,8 @@ async def _react_to_words(data: ReactData) -> None:
 async def _reply_reaction(data: ReactData) -> None:
     bot = data.bot
 
+    bot.mood_per_user[data.message.from_.id] += 1.5
+
     chat_messages = bot.messages_in_memory[data.message.chat.id][-3:]
 
     short_text = ""
@@ -552,7 +560,8 @@ async def _reply_reaction(data: ReactData) -> None:
                      f"não comente mensagens anteriores a dele:",
                     moderate=False,
                     biased=True,
-                    always_ironic=True
+                    mood=bot.mood_per_user[data.message.from_.id],
+                    always_ironic=data.limited_prompt
                 ),
                 chat_id=data.message.chat.id,
                 reply_to=data.message.message_id

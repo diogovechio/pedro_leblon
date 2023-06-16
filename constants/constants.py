@@ -4,6 +4,19 @@ SECRETS_FILE = 'secrets.json'
 
 WEATHER_LIST = ["previsao", "previsão", "tempo", "clima", " sol", "chover", "chuva"]
 
+PEDRO_MOOD = ["Pedro costuma ser bastante gentil.",
+              "Pedro costuma responder de maneira amigável.",
+              "Pedro costuma ser prestativo.",
+              "Pedro costuma responder com indiferença, porém de maneira prestativa.",
+              "Pedro costuma responder de maneira curta e sucinta.",
+              "Pedro costuma ser frio e dar respostas muito curtas.",
+              "Pedro costuma ser sutilmente irônico.",
+              "Pedro costuma ser um pouco passivo agressivo.",
+              "Pedro não é nada prestativo e sempre responde com má vontade. "
+              "Pedro costuma ser extremamente sarcástico e nada educado. "
+              "Pedro nunca deixa claro quando está apenas brincando e não costuma se desculpar."]
+
+
 PEDRO_GENERAL_OPINIONS = {
     "dilma":
         ["pedro considera que a dilma fez um ótimo governo."],
