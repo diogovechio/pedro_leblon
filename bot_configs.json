@@ -22,11 +22,17 @@
     "news": "",
     "games": ""
   },
+  "mood_params": {
+    "regular": 0.5,
+    "reply": 1,
+    "mentioned": 1.5,
+    "swearword": 0.3
+  },
   "ask_photos": false,
   "telegram_api_semaphore": 5,
   "not_internal_chats": [-632911267, -942505785],
   "limited_prompt_users": ["decaptor"],
-  "mock_chats": [-942505785, -884201527],
+  "mock_chats": [-942505785],
   "ignore_users": [],
   "annoy_users": [],
   "block_samuel": false,
@@ -149,8 +155,8 @@
     "decaptor": {
       "rss_feed": "",
       "messages": [
+	"quebra mais",
         "culpa dos webdevs",
-        "mimimi webdevs python nojo",
         "abstraçao em cima de abstração em cima de abstração em cima hardware",
         "fala com o hardware",
         "faz em c",

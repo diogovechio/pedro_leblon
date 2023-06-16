@@ -12,7 +12,7 @@ from messages_reactions.general_text_reactions import words_reactions
 from messages_reactions.image_reactions import image_reactions
 from utils.logging_utils import telegram_logging, elapsed_time, async_elapsed_time
 from utils.openai_utils import extract_website_paragraph_content
-from utils.text_utils import https_url_extract
+from utils.text_utils import https_url_extract, create_username
 
 
 async def messages_coordinator(
@@ -29,6 +29,11 @@ async def messages_coordinator(
             message=message,
             from_samuel=message.from_.is_premium
         )
+
+        if "@pedroleblonbot" in react_data.input_text:
+            bot.mood_per_user[react_data.username] += bot.config.mood_params.mentioned
+        else:
+            bot.mood_per_user[react_data.username] += 0.0
 
         if message.chat.id in bot.allowed_list:
             if str(message.from_.id) not in bot.config.ignore_users and message.from_.username not in bot.config.ignore_users:
@@ -85,7 +90,7 @@ async def _pre_processor(
     url_detector = ""
     input_text = message.text
 
-    username = message.from_.username if message.from_.username else message.from_.first_name
+    username = create_username(first_name=message.from_.first_name, username=message.from_.username)
     destroy_message = message.chat.id in bot.config.mock_chats or (
             str(message.from_.id) in bot.config.annoy_users
             or message.from_.username in bot.config.annoy_users

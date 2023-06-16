@@ -46,12 +46,22 @@ class OpenAI:
     ada_only_users: T.List[str]
     force_model: T.Optional[str] = None
 
+
+@dataclass
+class MoodParams:
+    regular: float
+    reply: float
+    mentioned: float
+    swearword: float
+
+
 @dataclass
 class BotSecret:
     bot_token: str
     openai_key: str
     alternate_bot_token: str
     open_weather: str
+
 
 @dataclass
 class BotConfig:
@@ -61,6 +71,7 @@ class BotConfig:
     telegram_api_semaphore: int
     face_classifier: FaceClassifier
     random_params: RandomParams
+    mood_params: MoodParams
     rss_feed: RSSFeed
     allowed_ids: T.List[UserID]
     mock_messages: T.Dict[str, MockMessage]

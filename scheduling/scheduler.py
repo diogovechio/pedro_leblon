@@ -51,7 +51,7 @@ async def scheduler(bot: FakePedro) -> None:
         _restart_proxy, bot
     )
 
-    schedule.every(3).hours.do(
+    schedule.every(8).hours.do(
         _mood_restore, bot
     )
 
@@ -69,8 +69,8 @@ def _restart_proxy(bot: FakePedro) -> None:
 
 def _mood_restore(bot: FakePedro) -> None:
     try:
-        for _, user_mood in bot.mood_per_user.items():
+        for user, user_mood in bot.mood_per_user.items():
             if user_mood >= 1.0:
-                user_mood -= 1.0
+                bot.mood_per_user[user] -= 1.0
     except Exception as exc:
         bot.loop.create_task(telegram_logging(exc))

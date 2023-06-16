@@ -20,9 +20,12 @@ async def openai_reactions(
             and data.message.reply_to_message.from_.username == "pedroleblonbot"
     )
 
-    if (swear_word_detected := any(
+    if swear_word_detected := any(
             block_word in data.message.text.lower() for block_word in SWEAR_WORDS
-    )
+    ):
+        data.bot.mood_per_user[data.username] += data.bot.config.mood_params.swearword
+
+    if (swear_word_block := swear_word_detected
        and not data.url_detector
        and data.bot.mocked_hour != data.bot.datetime_now.hour
        and not data.mock_chat
@@ -30,7 +33,7 @@ async def openai_reactions(
     ):
         await _complain_swear_word(data=data)
 
-    if not swear_word_detected:
+    if not swear_word_block:
         if (
                 command_in('pedr', data.message.text)
                 or command_in('pedro?', data.message.text, text_end=True)
@@ -174,10 +177,7 @@ async def _forecast_detect(data: ReactData) -> bool:
 async def _default_pedro(data: ReactData, always_ironic=False) -> None:
     bot = data.bot
 
-    if "@pedroleblonbot" in data.input_text:
-        bot.mood_per_user[data.message.from_.id] += 2.5
-    else:
-        bot.mood_per_user[data.message.from_.id] += 0.75
+    bot.mood_per_user[data.username] += bot.config.mood_params.regular
 
     short_text = data.input_text
 
@@ -219,7 +219,7 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
                     moderate=True,
                     remove_words_list=None,
                     always_ironic=always_ironic,
-                    mood=bot.mood_per_user[data.message.from_.id]
+                    mood=bot.mood_per_user[data.username]
                 ),
                 chat_id=data.message.chat.id,
                 reply_to=data.message.message_id
@@ -535,7 +535,7 @@ async def _react_to_words(data: ReactData) -> None:
 async def _reply_reaction(data: ReactData) -> None:
     bot = data.bot
 
-    bot.mood_per_user[data.message.from_.id] += 1.5
+    bot.mood_per_user[data.username] += bot.config.mood_params.reply
 
     chat_messages = bot.messages_in_memory[data.message.chat.id][-3:]
 
@@ -560,7 +560,7 @@ async def _reply_reaction(data: ReactData) -> None:
                      f"não comente mensagens anteriores a dele:",
                     moderate=False,
                     biased=True,
-                    mood=bot.mood_per_user[data.message.from_.id],
+                    mood=bot.mood_per_user[data.username],
                     always_ironic=data.limited_prompt
                 ),
                 chat_id=data.message.chat.id,

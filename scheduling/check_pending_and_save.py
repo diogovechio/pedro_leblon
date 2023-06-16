@@ -72,6 +72,7 @@ def check_agenda_and_save(bot: FakePedro):
 
         new_agenda_data = asdict(bot.commemorations)
         user_forecast = json.dumps(bot.config.user_last_forecast)
+        user_mood = json.dumps(bot.mood_per_user, indent=4)
 
         for idx, _ in enumerate(new_agenda_data['data']):
             new_agenda_data['data'][idx]['created_at'] = str(new_agenda_data['data'][idx]['created_at'])
@@ -87,13 +88,20 @@ def check_agenda_and_save(bot: FakePedro):
         with open("forecast_tmp.json", "w") as file:
             file.write(user_forecast)
 
+        with open("user_mood_tmp.json", "w", encoding="utf8") as file:
+            file.write(user_mood)
+
         if os.path.exists("commemorations.json"):
             os.remove("commemorations.json")
 
         if os.path.exists("forecast_users.json"):
             os.remove("forecast_users.json")
 
+        if os.path.exists("user_mood.json"):
+            os.remove("user_mood.json")
+
         os.rename("commemorations_tmp.json", "commemorations.json")
         os.rename("forecast_tmp.json", "forecast_users.json")
+        os.rename("user_mood_tmp.json", "user_mood.json")
     except Exception as exc:
         bot.loop.create_task(telegram_logging(exc))

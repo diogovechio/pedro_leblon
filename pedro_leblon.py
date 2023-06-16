@@ -46,6 +46,7 @@ class FakePedro:
             self,
             bot_config_file: str,
             commemorations_file: str,
+            user_mood_file: str,
             secrets_file: str,
             polling_rate: int = 1,
             debug_mode=False
@@ -56,6 +57,7 @@ class FakePedro:
         self.config: T.Optional[BotConfig] = None
         self.config_file = bot_config_file
         self.commemorations_file = commemorations_file
+        self.user_mood_file = user_mood_file
         self.commemorations: T.Optional[Commemorations] = None
         self.secrets_file = secrets_file
 
@@ -142,6 +144,9 @@ class FakePedro:
 
                 with open(self.commemorations_file) as comm_file:
                     self.commemorations = Commemorations(json.loads(comm_file.read()))
+
+                with open(self.user_mood_file, encoding='utf8') as mood_file:
+                    self.mood_per_user.update(json.loads(mood_file.read()))
 
                 bot_config.update(
                     json.loads(secret_file.read())
@@ -272,7 +277,6 @@ class FakePedro:
             if message.text is not None and len(message.text) > 10:
                 self.messages_in_memory[message.chat.id].append(
                     f"{create_username(message.from_.first_name, message.from_.username)}: {message.text[0:90]}")
-
 
     @async_elapsed_time
     async def image_downloader(
@@ -501,6 +505,7 @@ if __name__ == '__main__':
     pedro_leblon = FakePedro(
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
+        user_mood_file='user_mood.json',
         secrets_file=SECRETS_FILE,
         debug_mode=False
     )
