@@ -139,7 +139,7 @@ class OpenAiCompletion:
                         response = await chatgpt_request.text()
                         response_text = json.loads(response)['choices'][0]['message']['content']
 
-                        self.loop.create_task(telegram_logging(f"ChatGPT: {response_text}"))
+                        self.loop.create_task(telegram_logging(f"ChatGPT: {response_text} - mood: {mood} - {mood_selector}"))
                         self.loop.create_task(telegram_logging(prompt))
 
                         if not any(word in response_text.lower() for word in CHATGPT_BS) or only_chatgpt:
