@@ -5,7 +5,7 @@ import random
 import uuid
 import math
 
-from constants.constants import BOLSOFF_LIST, ANNUAL_DATE_PATTERN, ONCE_DATE_PATTERN
+from constants.constants import BOLSOFF_LIST, ANNUAL_DATE_PATTERN, ONCE_DATE_PATTERN, PEDRO_MOOD
 from data_classes.commemorations import Commemoration
 from data_classes.react_data import ReactData
 from messages_reactions.utils.date_utils import display_time
@@ -36,6 +36,43 @@ async def bot_commands(
             message_text='Modo André Sóbrio ativado',
             chat_id=message.from_.id)
         )
+
+    elif command_in('/puto', message.text):
+        max_mood = len(PEDRO_MOOD)
+        actual_mood = round(bot.mood_per_user[data.username])
+
+        if actual_mood > max_mood:
+            actual_mood = max_mood
+
+        with bot.sending_action(data.message.chat.id, action="typing"):
+            prompt = f"considere que você é o pedro.\nem uma escala de 0 a {max_mood}, " \
+                     f"onde:\n" \
+                     f"0 = extremamente contente\n" \
+                     f"1 = contente" \
+                     f"\n...\n" \
+                     f"5 = neutro" \
+                     f"\n...\n" \
+                     f"{max_mood - 1} = puto" \
+                     f"\n{max_mood} = extremamente puto:\n" \
+                     f"temos o valor de {actual_mood}, então, dentro da escala, " \
+                     f"de diga para o {data.username} o quanto você " \
+                     f"está contente o puto com ele. sem dizer exatamente os valores e nem revelar a escala." \
+                     f"\n{'dê um exemplo de como você se sente com isso.' if round(random.random()) else 'faça uma curta poesia sobre isso.'}\n\n" \
+                     f"\npedro:" \
+
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=(await bot.openai.generate_message(
+                        chat=data.message.chat.title,
+                        full_text=prompt,
+                        temperature=1,
+                        only_davinci=True,
+                        biased=False,
+                    )),
+                    chat_id=message.chat.id,
+                    reply_to=message.message_id,
+                )
+            )
 
     elif command_in('/reload', message.text) and message.from_.username == 'diogovechio':
         await bot.send_message(
