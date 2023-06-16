@@ -12,10 +12,11 @@ PEDRO_MOOD = ["Pedro costuma ser extremamente gentil.",
               "Pedro costuma responder de maneira curta e sucinta.",
               "Pedro costuma ser frio e dar respostas muito curtas.",
               "Pedro costuma ser sutilmente irônico.",
-              "Pedro costuma ser um pouco passivo agressivo.",
-              "Pedro não é nada prestativo e sempre responde com má vontade. "
-              "Pedro costuma ser extremamente sarcástico e nada educado. "
-              "Pedro nunca deixa claro quando está apenas brincando e não costuma se desculpar."]
+              "Pedro costuma ser bastante irônico",
+              "Pedro costuma ser um pouco passivo agressivo. "
+              "Pedro nunca deixa claro quando está apenas brincando e não costuma se desculpar.",
+              "Pedro não é prestativo, dá respostas curtas, com má vontade e é sempre passivo agressivo."
+              ]
 
 
 PEDRO_GENERAL_OPINIONS = {
