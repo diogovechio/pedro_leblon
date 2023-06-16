@@ -72,5 +72,7 @@ def _mood_restore(bot: FakePedro) -> None:
         for user, user_mood in bot.mood_per_user.items():
             if user_mood >= 1.0:
                 bot.mood_per_user[user] -= 1.0
+            else:
+                bot.mood_per_user[user] = 0
     except Exception as exc:
         bot.loop.create_task(telegram_logging(exc))
