@@ -336,7 +336,7 @@ async def _boring_pedro(data: ReactData) -> None:
     bot = data.bot
 
     message = data.message.text
-    if data.message.reply_to_message.text:
+    if data.message.reply_to_message and data.message.reply_to_message.text:
         message = f"{message} - {data.message.reply_to_message.text}"
 
     with bot.sending_action(data.message.chat.id, user=data.message.from_.first_name, action="typing"):

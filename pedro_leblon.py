@@ -508,7 +508,7 @@ if __name__ == '__main__':
         commemorations_file='commemorations.json',
         user_mood_file='user_mood.json',
         secrets_file=SECRETS_FILE,
-        debug_mode=False
+        debug_mode=True
     )
 
     asyncio.run(
