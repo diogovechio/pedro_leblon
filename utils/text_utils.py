@@ -206,7 +206,7 @@ async def normalize_openai_text(
                 ai_message = ai_message.replace('"', "")
 
             if random.random() < 0.02 or any(word in ai_message for word in [
-                "uau,", "olha só", "que original", "puxa vida",
+                "uau,", "olha só", "que original", "puxa vida", "olha,", "sério mesmo", "que pena ",
                 "tão educado", "esse sujeito", "esse ser ", "que interessante", "não é mesmo", "quem diria"
             ]):
                 ai_message = ai_message.upper()
