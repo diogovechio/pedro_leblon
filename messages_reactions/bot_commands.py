@@ -44,10 +44,13 @@ async def bot_commands(
         if actual_mood > max_mood:
             actual_mood = max_mood
 
+        if actual_mood < 0:
+            actual_mood = 0
+
         with bot.sending_action(data.message.chat.id, action="typing"):
             prompt = f"considere que você é o pedro.\nem uma escala de 0 a {max_mood}, " \
                      f"onde:\n" \
-                     f"0 = extremamente contente\n" \
+                     f"0 = extremamente contente, são melhores amigos\n" \
                      f"1 = contente" \
                      f"\n...\n" \
                      f"5 = neutro" \
