@@ -139,13 +139,13 @@ async def pre_biased_prompt(full_text: str, last_words: str = "") -> str:
     additional_text = ''
 
     for entity in PEDRO_GENERAL_OPINIONS:
-        if entity in full_text:
+        if entity in full_text.lower():
             additional_text += random.choice(PEDRO_GENERAL_OPINIONS[entity])
 
     for entity_names, opinions in PEDRO_USERS_OPINIONS.items():
         names_list = entity_names.split("@")
         for name in names_list:
-            if name in last_words:
+            if name in last_words.lower():
                 additional_text += random.choice(opinions)
                 break
 
