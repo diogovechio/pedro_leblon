@@ -67,7 +67,7 @@ class FakePedro:
         self.interacted_updates = MaxSizeList(400)
         self.interacted_messages_with_chat_id = MaxSizeList(400)
 
-        self.messages_in_memory = {}
+        self.messages_in_memory = defaultdict(lambda: MaxSizeList(130))
         self.mood_per_user = defaultdict(lambda: 0.0)
 
         self.datetime_now = datetime.now() - timedelta(hours=3)
@@ -94,7 +94,7 @@ class FakePedro:
         self.mocked_today = False
         self.sent_news = 0
 
-        self.messages_tasks = {}
+        self.messages_tasks = defaultdict(lambda: MaxSizeList(15))
 
         self.roleta_hour = 14
         self.last_roleta_day = 0
@@ -247,9 +247,6 @@ class FakePedro:
                         if incoming_update is not None and incoming_update.message is not None:
                             chat_id = incoming_update.message.chat.id
 
-                            if chat_id not in self.messages_tasks:
-                                self.messages_tasks[chat_id] = MaxSizeList(15)
-
                             self.messages_tasks[chat_id].append(
                                 self.loop.create_task(
                                     messages_coordinator(self, incoming_update)
@@ -271,9 +268,6 @@ class FakePedro:
         if message := incoming.message:
             self.interacted_messages_with_chat_id.append(f"{message.chat.id}:"
                                                          f"{message.message_id}")
-
-            if message.chat.id not in self.messages_in_memory:
-                self.messages_in_memory[message.chat.id] = MaxSizeList(130)
 
             if message.text is not None and len(message.text) > 10:
                 self.messages_in_memory[message.chat.id].append(
@@ -508,7 +502,7 @@ if __name__ == '__main__':
         commemorations_file='commemorations.json',
         user_mood_file='user_mood.json',
         secrets_file=SECRETS_FILE,
-        debug_mode=True
+        debug_mode=False
     )
 
     asyncio.run(
