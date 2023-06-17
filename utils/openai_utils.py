@@ -96,13 +96,13 @@ class OpenAiCompletion:
     ) -> int:
         prompt = "dado a mensagem abaixo:\n" \
                  f"{prompt}" \
-                 f"a mensagem é 'neutra', 'amigável', 'extremamente amigável', 'grosseira' ou 'extremamente grosseira'?\n" \
-                 f"responda apenas uma das 5 opções:\n" \
-                 f"1 - extremamente amigável\n" \
-                 f"2 - amigável\n" \
-                 f"3 - neutra\n" \
-                 f"4 - grosseira\n" \
-                 f"5 - extremamente grosseira\n\n" \
+                 f"responda apenas uma das 6 opções que melhor se adeque ao conteúdo da mensagem:\n" \
+                 f"0 - a mensagem é um pedido de desculpas\n" \
+                 f"1 - mensagem extremamente amigável\n" \
+                 f"2 - mensagem amigável\n" \
+                 f"3 - mensagem neutra\n" \
+                 f"4 - mensagem grosseira\n" \
+                 f"5 - mensagem ofensiva\n\n" \
                  f"não faça qualquer comentário além de responder um número de 1 a 5."
         async with self.session.post(
                 "https://api.openai.com/v1/chat/completions",
