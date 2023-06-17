@@ -603,7 +603,7 @@ async def adjust_mood(data: ReactData):
     message_tone = await data.bot.openai.check_message_tone(prompt=data.message.text)
 
     if message_tone == 5:
-        data.bot.mood_per_user[data.username] += 3.0
+        data.bot.mood_per_user[data.username] += 8.0
     if message_tone == 4:
         data.bot.mood_per_user[data.username] += 1.5
 
