@@ -177,7 +177,7 @@ async def _forecast_detect(data: ReactData) -> bool:
 async def _default_pedro(data: ReactData, always_ironic=False) -> None:
     bot = data.bot
 
-    bot.mood_per_user[data.username] += bot.config.mood_params.regular
+    bot.loop.create_task(adjust_mood(data))
 
     short_text = data.input_text
 
@@ -535,7 +535,7 @@ async def _react_to_words(data: ReactData) -> None:
 async def _reply_reaction(data: ReactData) -> None:
     bot = data.bot
 
-    bot.mood_per_user[data.username] += bot.config.mood_params.reply
+    bot.loop.create_task(adjust_mood(data))
 
     chat_messages = bot.messages_in_memory[data.message.chat.id][-3:]
 
@@ -596,3 +596,18 @@ async def _random_conversation(data: ReactData) -> None:
                     chat_id=data.message.chat.id,
                 )
             )
+
+
+@async_elapsed_time
+async def adjust_mood(data: ReactData):
+    message_tone = await data.bot.openai.check_message_tone(prompt=data.message.text)
+
+    if message_tone == 5:
+        data.bot.mood_per_user[data.username] += 3.0
+    if message_tone == 4:
+        data.bot.mood_per_user[data.username] += 1.5
+
+    if message_tone == 2:
+        data.bot.mood_per_user[data.username] -= 1
+    if message_tone == 1:
+        data.bot.mood_per_user[data.username] -= 1.5

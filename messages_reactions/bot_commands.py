@@ -74,7 +74,7 @@ async def bot_commands(
                 )
             )
 
-    elif command_in('/p', message.text):
+    elif command_in('/data', message.text):
         bot.loop.create_task(
             bot.send_message(
                 message_text=str(bot.mood_per_user),

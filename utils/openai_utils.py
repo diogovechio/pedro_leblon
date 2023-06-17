@@ -5,6 +5,7 @@ import typing as T
 
 import json
 from asyncio import get_running_loop
+import re
 
 import aiohttp
 
@@ -89,6 +90,46 @@ class OpenAiCompletion:
                 return mod['results'][0]['flagged'], mod
 
     @async_elapsed_time
+    async def check_message_tone(
+            self,
+            prompt: str,
+    ) -> int:
+        prompt = "dado a mensagem abaixo:\n" \
+                 f"{prompt}" \
+                 f"a mensagem é 'neutra', 'amigável', 'extremamente amigável', 'grosseira' ou 'extremamente grosseira'?\n" \
+                 f"responda apenas uma das 5 opções:\n" \
+                 f"1 - extremamente amigável\n" \
+                 f"2 - amigável\n" \
+                 f"3 - neutra\n" \
+                 f"4 - grosseira\n" \
+                 f"5 - extremamente grosseira\n\n" \
+                 f"não faça qualquer comentário além de responder um número de 1 a 5."
+        async with self.session.post(
+                "https://api.openai.com/v1/chat/completions",
+                headers=self.headers,
+                json={
+                    "model": "gpt-3.5-turbo-0613",
+                    'messages': [
+                        {"role": "system", "content": "Limite-se a responder um número relativo ao que for solicitado."
+                         },
+                        {"role": "user", "content": prompt}
+                    ],
+                    "temperature": 0
+                }
+        ) as chatgpt_request:
+            response = await chatgpt_request.text()
+            response_text = json.loads(response)['choices'][0]['message']['content']
+
+            self.loop.create_task(telegram_logging(f"Message tone: {response_text}"))
+
+            return_num = re.sub("\D", "", response_text)
+
+            if len(return_num):
+                return int(return_num)
+
+            return 3
+
+    @async_elapsed_time
     async def _completion(
             self,
             date: datetime,
@@ -103,13 +144,16 @@ class OpenAiCompletion:
         async with asyncio.Semaphore(self.semaphore):
             if "ada" not in model or only_chatgpt:
                 if not only_davinci:
-                    self.loop.create_task(telegram_logging(f"Using ChatGPT - OpenAI usage: {self.openai_use}"))
+                    self.loop.create_task(telegram_logging(f"Using gpt-3.5-turbo - OpenAI usage: {self.openai_use}"))
 
                     if always_ironic:
                         mood = 100.0
 
                     if round(mood) >= len(PEDRO_MOOD) - 1:
                         mood = len(PEDRO_MOOD) - 1
+
+                    if round(mood) < 0:
+                        mood = 0
 
                     mood_selector = PEDRO_MOOD[round(mood)]
 
@@ -139,13 +183,11 @@ class OpenAiCompletion:
                         response = await chatgpt_request.text()
                         response_text = json.loads(response)['choices'][0]['message']['content']
 
-                        self.loop.create_task(telegram_logging(f"ChatGPT: {response_text} - mood: {mood} - {mood_selector}"))
+                        self.loop.create_task(telegram_logging(f"gpt-3.5-turbo: {response_text} - mood: {mood} - {mood_selector}"))
                         self.loop.create_task(telegram_logging(prompt))
 
                         if not any(word in response_text.lower() for word in CHATGPT_BS) or only_chatgpt:
                             return response_text
-
-            self.loop.create_task(telegram_logging(f"{model} - OpenAI usage: {self.openai_use}"))
 
             async with self.session.post(
                     "https://api.openai.com/v1/completions",
