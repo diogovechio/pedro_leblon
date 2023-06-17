@@ -97,7 +97,7 @@ async def _pre_processor(
     )
 
     if message.reply_to_message and message.reply_to_message.text:
-        input_text += " : " + message.reply_to_message.text
+        input_text += f" ... o {message.reply_to_message.from_.first_name} tinha dito: " + message.reply_to_message.text
 
     if input_text is not None:
         if url_detector := await https_url_extract(input_text):

@@ -177,8 +177,6 @@ async def _forecast_detect(data: ReactData) -> bool:
 async def _default_pedro(data: ReactData, always_ironic=False) -> None:
     bot = data.bot
 
-    bot.loop.create_task(adjust_mood(data))
-
     short_text = data.input_text
 
     if data.url_detector:
@@ -186,7 +184,7 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
     else:
         chat_text = ""
         chat_messages = bot.messages_in_memory[data.message.chat.id][-3:]
-        user_message = f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}: {data.message.text}\n"
+        user_message = f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}: {data.input_text}\n"
 
         if len(chat_messages):
             chat_text = "\n".join(chat_messages[:-1 if data.message.text in chat_messages[-1] else len(chat_messages)])
@@ -225,6 +223,8 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
                 reply_to=data.message.message_id
             )
         )
+
+        bot.loop.create_task(adjust_mood(data))
 
 
 @async_elapsed_time
@@ -335,12 +335,16 @@ async def _generate_image_command(data: ReactData) -> None:
 async def _boring_pedro(data: ReactData) -> None:
     bot = data.bot
 
+    message = data.message.text
+    if data.message.reply_to_message.text:
+        message = f"{message} - {data.message.reply_to_message.text}"
+
     with bot.sending_action(data.message.chat.id, user=data.message.from_.first_name, action="typing"):
         bot.loop.create_task(
             bot.send_message(
                 message_text=await bot.openai.generate_message(
                     message_username=data.username,
-                    full_text=data.input_text,
+                    full_text=message,
                     chat=data.message.chat.title,
                     prompt_inject=None,
                     only_chatgpt=True,
@@ -535,8 +539,6 @@ async def _react_to_words(data: ReactData) -> None:
 async def _reply_reaction(data: ReactData) -> None:
     bot = data.bot
 
-    bot.loop.create_task(adjust_mood(data))
-
     chat_messages = bot.messages_in_memory[data.message.chat.id][-3:]
 
     short_text = ""
@@ -567,6 +569,8 @@ async def _reply_reaction(data: ReactData) -> None:
                 reply_to=data.message.message_id
             )
         )
+
+        bot.loop.create_task(adjust_mood(data))
 
 
 @async_elapsed_time
