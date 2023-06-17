@@ -98,7 +98,7 @@ class OpenAiCompletion:
                  f"{prompt}" \
                  f"responda apenas uma das 6 opções que melhor se adeque ao conteúdo da mensagem:\n" \
                  f"0 - a mensagem é um pedido de desculpas\n" \
-                 f"1 - mensagem extremamente amigável\n" \
+                 f"1 - mensagem amorosa\n" \
                  f"2 - mensagem amigável\n" \
                  f"3 - mensagem neutra\n" \
                  f"4 - mensagem grosseira\n" \
