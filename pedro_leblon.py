@@ -245,7 +245,9 @@ class FakePedro:
                         incoming_update: MessageReceived
 
                         if incoming_update is not None and incoming_update.message is not None:
-                            chat_id = incoming_update.message.chat.id
+                            chat_id = str(incoming_update.message.chat.id)
+
+                            self.interacted_updates.append(incoming_update.update_id)
 
                             self.messages_tasks[chat_id].append(
                                 self.loop.create_task(
@@ -253,24 +255,18 @@ class FakePedro:
                                 )
                             )
 
-                            self.loop.create_task(
-                                self._store_messages_info(incoming_update)
-                            )
-
                 await asyncio.sleep(self.polling_rate)
             except Exception as exc:
                 self.loop.create_task(telegram_logging(exc))
                 await asyncio.sleep(15)
 
-    async def _store_messages_info(self, incoming: MessageReceived):
-        self.interacted_updates.append(incoming.update_id)
-        
+    async def store_messages_info(self, incoming: MessageReceived):
         if message := incoming.message:
             self.interacted_messages_with_chat_id.append(f"{message.chat.id}:"
                                                          f"{message.message_id}")
 
             if message.text is not None and len(message.text) > 10:
-                self.messages_in_memory[message.chat.id].append(
+                self.messages_in_memory[str(message.chat.id)].append(
                     f"{create_username(message.from_.first_name, message.from_.username)}: {message.text[0:90]}")
 
     @async_elapsed_time
