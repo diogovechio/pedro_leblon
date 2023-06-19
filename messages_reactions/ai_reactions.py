@@ -210,7 +210,7 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
                     destroy_message=data.destroy_message,
                     prompt_inject=None
                     if data.url_detector or data.destroy_message
-                    else f"fingindo ser o pedro, responda objetivamente a mensagem do "
+                    else f"fingindo ser o pedro, responda objetivamente a mensagem do seu amigo "
                          f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}, "
                          f"não comente mensagens anteriores a dele:",
                     biased=False if data.url_detector else True,
@@ -557,7 +557,7 @@ async def _reply_reaction(data: ReactData) -> None:
                     full_text=f"{prompt_text}\npedro:",
                     short_text=short_text + data.username if random.random() < data.bot.config.random_params.words_react_frequency else create_username(first_name=data.message.from_.first_name, username=data.message.from_.username) + data.message.text,
                     chat=data.message.chat.title,
-                    prompt_inject=f"fingindo ser o pedro, responda objetivamente a mensagem do "
+                    prompt_inject=f"fingindo ser o pedro, responda objetivamente a mensagem do seu amigo "
                      f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}, "
                      f"não comente mensagens anteriores a dele:",
                     moderate=False,
