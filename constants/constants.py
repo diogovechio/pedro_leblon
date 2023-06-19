@@ -113,7 +113,7 @@ OPENAI_REACT_WORDS = ['bolsonaro', 'segundo turno', 'macho', ' lula ', 'dilma', 
 
 OPENAI_TRASH_LIST = ['"', "r:", "o:", "a:", "q:"]
 
-CHATGPT_BS = ["assistente virtual", "lololo", "a comentar sobre", "linguagem natural", "assistente de", "virtual", "uma ia", "de ia", "como ia", "como uma ai", "como ai,", "de ai,", "openai", "como um modelo", "de linguagem", "inteligência artificial", "sem viés político", "modelo de"]
+CHATGPT_BS = ["desculpe,","respeito a opinião","minha opinião","mas pessoalmente","não acho apropriado","assistente virtual", "lololo", "a comentar sobre", "linguagem natural", "assistente de", "virtual", "uma ia", "de ia", "como ia", "como uma ai", "como ai,", "de ai,", "openai", "como um modelo", "de linguagem", "inteligência artificial", "sem viés político", "modelo de"]
 
 OPENAI_PROMPTS = {
     'fale': 'fingindo ser o pedro, responda resumidamente nessa conversa:',
