@@ -270,6 +270,7 @@ class FakePedro:
                                                          f"{message.message_id}")
 
             if message.text is not None and len(message.text) > 10:
+                await asyncio.sleep(3)
                 self.messages_in_memory[str(message.chat.id)].append(
                     f"{create_username(message.from_.first_name, message.from_.username)}: {message.text[0:90]}")
 
