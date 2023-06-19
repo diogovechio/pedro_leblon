@@ -247,7 +247,9 @@ class FakePedro:
                         if incoming_update is not None and incoming_update.message is not None:
                             chat_id = str(incoming_update.message.chat.id)
 
-                            self.interacted_updates.append(incoming_update.update_id)
+                            self.loop.create_task(
+                                self._store_messages_info(incoming_update)
+                            )
 
                             self.messages_tasks[chat_id].append(
                                 self.loop.create_task(
@@ -260,7 +262,9 @@ class FakePedro:
                 self.loop.create_task(telegram_logging(exc))
                 await asyncio.sleep(15)
 
-    async def store_messages_info(self, incoming: MessageReceived):
+    async def _store_messages_info(self, incoming: MessageReceived):
+        self.interacted_updates.append(incoming.update_id)
+
         if message := incoming.message:
             self.interacted_messages_with_chat_id.append(f"{message.chat.id}:"
                                                          f"{message.message_id}")
