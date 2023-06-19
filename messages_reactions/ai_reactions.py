@@ -204,7 +204,7 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
                 message_text=await bot.openai.generate_message(
                     message_username=data.message.from_.first_name,
                     full_text=prompt_text,
-                    short_text=short_text + data.username if random.random() < data.bot.config.random_params.words_react_frequency else data.input_text,
+                    short_text=prompt_text,
                     chat=data.message.chat.title,
                     only_chatgpt=True if data.url_detector else False,
                     destroy_message=data.destroy_message,
@@ -555,7 +555,7 @@ async def _reply_reaction(data: ReactData) -> None:
                 message_text=await bot.openai.generate_message(
                     message_username='.',
                     full_text=f"{prompt_text}\npedro:",
-                    short_text=short_text + data.username if random.random() < data.bot.config.random_params.words_react_frequency else create_username(first_name=data.message.from_.first_name, username=data.message.from_.username) + data.message.text,
+                    short_text=prompt_text,
                     chat=data.message.chat.title,
                     prompt_inject=f"fingindo ser o pedro, responda objetivamente a mensagem do seu amigo "
                      f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}, "
