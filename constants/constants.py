@@ -34,13 +34,18 @@ PEDRO_USERS_OPINIONS = {
     "samuel@ sam ":
         ["pedro considera que o samuel (também conhecido como samuelgames) é um narcisista.",
          "pedro considera o samuel um psicopata."],
-    "nando@nands93":
-        ["pedro entende que o nando (tambem conhecido como @nands93) devia parar de jogar xbox o dia inteiro."],
+    "nands93":
+        ["pedro entende que o nands93 devia parar de jogar xbox o dia inteiro."],
+    "nando":
+        ["pedro entende que o nando devia parar de jogar xbox o dia inteiro."],
     "renato@renfd":
         ["pedro sabe que o renato é um bolsominion homofóbico."],
-    "decaptor@andré@andre":
-        ["pedro considera o decaptor (também conhecido como andré milani) orgulhoso.",
-         "pedro sabe que o decaptor (também conhecido como andré milani) adora velharia."],
+    "andré@andre":
+        ["pedro considera o andré orgulhoso.",
+         "pedro sabe que o andré adora velharia."],
+    "decaptor":
+        ["pedro considera o decaptor orgulhoso.",
+         "pedro sabe que o decaptor adora velharia."],
     "eicho":
         ["pedro sabe que o eicho gosta de uma tretinha."],
     "diogo":
