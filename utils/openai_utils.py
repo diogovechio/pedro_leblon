@@ -152,7 +152,7 @@ class OpenAiCompletion:
                 mood_selector = random.choice(PEDRO_IN_LOVE)
             else:
                 mood_selector = PEDRO_MOOD[round(mood)]
-                temperature = 2
+                temperature = 1
 
             if "ada" not in model or only_chatgpt:
                 if not only_davinci:
@@ -198,7 +198,7 @@ class OpenAiCompletion:
                         "model": model,
                         'prompt': f"{mood_selector}\n\n{prompt}",
                         'max_tokens': self.max_tokens,
-                        'temperature': temperature if temperature < 1 else 1,
+                        'temperature': temperature,
                         'frequency_penalty': 1.0,
                         'presence_penalty': 2.0,
                     }
