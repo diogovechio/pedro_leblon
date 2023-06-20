@@ -4,6 +4,12 @@ SECRETS_FILE = 'secrets.json'
 
 WEATHER_LIST = ["previsao", "previsão", "tempo", "clima", " sol", "chover", "chuva"]
 
+PEDRO_IN_LOVE = [
+    "Pedro é totalmente apaixonado pela pessoa que está falando com ele. "
+    "Responda de maneira romântica, deixando claro o seu amor.",
+    "Pedro é totalmente apaixonado pela pessoa que está falando com ele. "
+    "Responda chamando de 'meu amor'."]
+
 PEDRO_MOOD = ["Pedro costuma ser extremamente gentil e amigável.",
               "Pedro costuma ser gentil.",
               "Pedro costuma responder de maneira amigável.",

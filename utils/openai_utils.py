@@ -9,7 +9,7 @@ import re
 
 import aiohttp
 
-from constants.constants import OPENAI_PROMPTS, CHATGPT_BS, PEDROS_ROLETAS, PEDRO_MOOD
+from constants.constants import OPENAI_PROMPTS, CHATGPT_BS, PEDROS_ROLETAS, PEDRO_MOOD, PEDRO_IN_LOVE
 from utils.logging_utils import telegram_logging, async_elapsed_time
 from utils.text_utils import pre_biased_prompt, message_destroyer, normalize_openai_text, html_paragraph_extractor, \
     youtube_caption_extractor
@@ -138,24 +138,25 @@ class OpenAiCompletion:
             model: str = "ada",
             only_chatgpt=False,
             only_davinci=False,
-            temperature: int = 0,
+            temperature: int = 1,
             always_ironic=False,
     ) -> str:
         async with asyncio.Semaphore(self.semaphore):
+            if always_ironic:
+                mood = 100.0
+
+            if round(mood) >= len(PEDRO_MOOD) - 1:
+                mood = len(PEDRO_MOOD) - 1
+
+            if round(mood) < 0:
+                mood_selector = random.choice(PEDRO_IN_LOVE)
+            else:
+                mood_selector = PEDRO_MOOD[round(mood)]
+                temperature = 2
+
             if "ada" not in model or only_chatgpt:
                 if not only_davinci:
                     self.loop.create_task(telegram_logging(f"Using gpt-3.5-turbo - OpenAI usage: {self.openai_use}"))
-
-                    if always_ironic:
-                        mood = 100.0
-
-                    if round(mood) >= len(PEDRO_MOOD) - 1:
-                        mood = len(PEDRO_MOOD) - 1
-
-                    if round(mood) < 0:
-                        mood = 0
-
-                    mood_selector = PEDRO_MOOD[round(mood)]
 
                     async with self.session.post(
                             "https://api.openai.com/v1/chat/completions",
@@ -178,7 +179,8 @@ class OpenAiCompletion:
                                      },
                                     {"role": "user", "content": prompt}
                                 ],
-                            }
+                            "temperature": temperature,
+                            },
                     ) as chatgpt_request:
                         response = await chatgpt_request.text()
                         response_text = json.loads(response)['choices'][0]['message']['content']
@@ -194,10 +196,9 @@ class OpenAiCompletion:
                     headers=self.headers,
                     json={
                         "model": model,
-                        'prompt': prompt,
+                        'prompt': f"{mood_selector}\n\n{prompt}",
                         'max_tokens': self.max_tokens,
-                        'temperature': temperature,
-                        'top_p': 1,
+                        'temperature': temperature if temperature < 1 else 1,
                         'frequency_penalty': 1.0,
                         'presence_penalty': 2.0,
                     }
@@ -272,7 +273,7 @@ class OpenAiCompletion:
             only_davinci=False,
             biased=True,
             moderate=True,
-            temperature=0,
+            temperature=1,
             prompt_inject: T.Optional[str] = None,
             return_raw_text: bool = False,
             destroy_message: bool = False,
