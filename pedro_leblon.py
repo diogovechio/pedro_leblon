@@ -245,7 +245,7 @@ class FakePedro:
                         incoming_update: MessageReceived
 
                         if incoming_update is not None and incoming_update.message is not None:
-                            chat_id = str(incoming_update.message.chat.id)
+                            chat_id = incoming_update.message.chat.id
 
                             self.loop.create_task(
                                 self._store_messages_info(incoming_update)
@@ -271,7 +271,7 @@ class FakePedro:
 
             if message.text is not None and len(message.text) > 10:
                 await asyncio.sleep(3)
-                self.messages_in_memory[str(message.chat.id)].append(
+                self.messages_in_memory[message.chat.id].append(
                     f"{create_username(message.from_.first_name, message.from_.username)}: {message.text[0:90]}")
 
     @async_elapsed_time
