@@ -373,7 +373,7 @@ async def _tldr(data: ReactData) -> None:
             else:
                 chat = "\n".join(bot.messages_in_memory[data.message.chat.id]) + "."
 
-            prompt = "faça um curto resumo dessa conversa entre os amigos"
+            prompt = "em no máximo 120 palavras, faça um curto resumo dessa conversa entre os amigos"
 
             if random.random() < data.bot.config.random_params.words_react_frequency:
                 prompt += ", de maneira sensacionalista e irônica"
