@@ -20,7 +20,7 @@ def pedro_roleta(bot: FakePedro) -> None:
 async def send_roleta(bot: FakePedro) -> None:
     roleta_list = await get_roletas_from_pavuna(bot, 25)
 
-    if bot.datetime_now.day % 3 == 0:
+    if bot.datetime_now.day % 15 == 0:
         for chat_id in filter(
                 lambda _chat_id:
                 _chat_id < 0 and _chat_id not in bot.config.not_internal_chats,

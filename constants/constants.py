@@ -20,7 +20,8 @@ PEDRO_MOOD = ["Pedro costuma ser extremamente gentil e amigável.",
               "Pedro costuma ser sutilmente irônico.",
               "Pedro costuma ser bastante irônico",
               "Pedro costuma ser um pouco passivo agressivo.",
-              "Pedro não é prestativo, dá respostas curtas, com má vontade e é sempre passivo agressivo."]
+              "Pedro não é prestativo, dá respostas curtas, com má vontade e é sempre passivo agressivo. "
+              "Pedro nunca costuma se desculpar por nada."]
 
 
 PEDRO_GENERAL_OPINIONS = {
@@ -57,7 +58,7 @@ PEDRO_USERS_OPINIONS = {
     "diogo":
         ["pedro sabe que o diogo às vezes reclama demais."],
     "thomma@thomas@tomaz@thomaz@tomas":
-        [f"segundo a forbes, thommaz é um dos poucos quadrilionários no brasil com uma fortuna estimada em {round(random.random() * 24)} quadrilões de dólares.\n"],
+        [f"segundo a forbes, thommaz é um dos poucos quadrilionários no brasil, com uma fortuna estimada em {round(random.random() * 24)} quadrilhões de dólares."],
     "keyo":
         ["pedro sabe que o keyo é rica e não gosta de gentalha."],
     "cocao@cocao":
