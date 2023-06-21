@@ -38,11 +38,10 @@ async def bot_commands(
         )
 
     elif command_in('/puto', message.text):
+        only_davinci = True
+
         max_mood = len(PEDRO_MOOD)
         actual_mood = round(bot.mood_per_user[data.username])
-
-        if actual_mood > max_mood:
-            actual_mood = max_mood
 
         if actual_mood < 0:
             actual_mood = 0
@@ -50,18 +49,32 @@ async def bot_commands(
         with bot.sending_action(data.message.chat.id, action="typing"):
             prompt = f"considere que você é o pedro.\nem uma escala de 0 a {max_mood}, " \
                      f"onde:\n" \
-                     f"0 = extremamente contente, são melhores amigos\n" \
+                     f"0 = extremamente contente, melhores amigos\n" \
                      f"1 = contente" \
                      f"\n...\n" \
                      f"5 = neutro" \
                      f"\n...\n" \
                      f"{max_mood - 1} = puto" \
-                     f"\n{max_mood} = extremamente puto:\n" \
-                     f"temos o seguinte valor:\n\n{actual_mood}\n\nentão, dentro da escala, " \
+                     f"\n{max_mood} = extremamente puto:\n"
+
+            if command_in('/putos', message.text):
+                persons = ""
+                for person, mood in bot.mood_per_user.items():
+                    if mood > 2:
+                        persons += f"{person.split(' ')[0]}: {int(mood)}\n"
+
+                if persons:
+                    prompt += f"temos as seguintes pessoas seguidas da escala do quanto você está puto com elas:\n\n{persons}\n\n" \
+                              f"descreva de maneira como você, pedro, se sente com cada uma dessas pessoas, sem dizer o valor da escala. " \
+                              f"reclame grosseiramente com aqueles que te deixaram puto, lembrando de alguma situação que essa pessoa fez com você.\npedro:"
+                else:
+                    prompt = "diga que não está irritado com ninguém.\npedro:"
+            else:
+                prompt += f"temos o seguinte valor:\n\n{actual_mood}\n\nentão, dentro da escala, " \
                      f"diga para o {data.username} o quanto você " \
                      f"está contente ou puto com ele. sem dizer exatamente os valores e nem revelar a escala." \
                      f"\n{'dê um exemplo de como você se sente com isso.' if round(random.random()) else 'faça uma curta poesia sobre isso.'}\n\n" \
-                     f"\npedro:" \
+                     f"\npedro:"
 
             bot.loop.create_task(
                 bot.send_message(
@@ -69,9 +82,9 @@ async def bot_commands(
                         chat=data.message.chat.title,
                         full_text=prompt,
                         temperature=1,
-                        only_davinci=True,
+                        only_davinci=only_davinci,
                         biased=False,
-                    )),
+                    )).lower(),
                     chat_id=message.chat.id,
                     reply_to=message.message_id,
                 )
