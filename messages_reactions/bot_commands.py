@@ -60,7 +60,7 @@ async def bot_commands(
             if command_in('/putos', message.text):
                 persons = ""
                 for person, mood in bot.mood_per_user.items():
-                    if mood > 2:
+                    if mood > 3:
                         persons += f"{person.split(' ')[0]}: {int(mood)}\n"
 
                 if persons:
