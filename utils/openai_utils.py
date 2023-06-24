@@ -140,6 +140,7 @@ class OpenAiCompletion:
             only_davinci=False,
             temperature: int = 1,
             always_ironic=False,
+            biased=True
     ) -> str:
         async with asyncio.Semaphore(self.semaphore):
             if always_ironic:
@@ -196,7 +197,7 @@ class OpenAiCompletion:
                     headers=self.headers,
                     json={
                         "model": model,
-                        'prompt': f"{mood_selector}\n\n{prompt}",
+                        'prompt': f"{mood_selector if biased else ''}\n\n{prompt}",
                         'max_tokens': self.max_tokens,
                         'temperature': temperature,
                         'frequency_penalty': 1.0,
@@ -325,7 +326,8 @@ class OpenAiCompletion:
                         temperature=temperature,
                         model=model,
                         always_ironic=always_ironic,
-                        mood=mood
+                        mood=mood,
+                        biased=biased
                     ),
                     timeout=timeout
                 )

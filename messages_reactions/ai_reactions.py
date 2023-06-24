@@ -472,7 +472,7 @@ async def _critic_or_praise(data: ReactData) -> None:
 
         openai_text = await bot.openai.generate_message(
             message_username=data.username,
-            full_text=f"{prompt}\npedro:",
+            full_text=prompt,
             short_text=prompt,
             chat=data.message.chat.title,
             destroy_message=data.destroy_message,
