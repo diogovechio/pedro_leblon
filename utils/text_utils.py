@@ -184,7 +184,7 @@ async def normalize_openai_text(
 
                 if letter in (".", "!", "?", ":"):
                     idx_to_lower = i + 2
-                elif letter == '"':
+                elif letter in ('"', "\n"):
                     idx_to_lower = i + 1
         else:
             ai_message = original_message
