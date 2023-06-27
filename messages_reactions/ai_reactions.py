@@ -373,7 +373,7 @@ async def _tldr(data: ReactData) -> None:
             else:
                 chat = "\n".join(bot.messages_in_memory[data.message.chat.id]) + "."
 
-            prompt = "em no máximo 120 palavras, faça um curto resumo dessa conversa entre os amigos"
+            prompt = "faça um curto resumo dessa conversa entre você e os seus amigos"
 
             if random.random() < data.bot.config.random_params.words_react_frequency:
                 prompt += ", de maneira sensacionalista e irônica"
@@ -472,7 +472,7 @@ async def _critic_or_praise(data: ReactData) -> None:
 
         openai_text = await bot.openai.generate_message(
             message_username=data.username,
-            full_text=prompt,
+            full_text=f"{prompt}\npedro:",
             short_text=prompt,
             chat=data.message.chat.title,
             destroy_message=data.destroy_message,
