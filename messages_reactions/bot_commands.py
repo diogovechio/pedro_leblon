@@ -294,6 +294,7 @@ async def bot_commands(
         if (
                 message.reply_to_message.from_.id == message.from_.id
                 or "pedroleblon" in message.reply_to_message.from_.username
+                or message.reply_to_message.from_.is_bot
         ):
             bot.loop.create_task(
                 bot.delete_message(
@@ -334,7 +335,7 @@ async def bot_commands(
                                       f'{from_username} '
                                       f'por ter tentado deletar a mensagem do'
                                       f" {reply_username}. 'diga que pretende baní-lo do {message.chat.title}.\n\n"
-                                      f"pedro:'",
+                                      f"pedro:",
                             temperature=1,
                             only_davinci=True,
                             biased=True,
@@ -420,4 +421,3 @@ async def bot_commands(
                     parse_mode="HTML"
                 )
             )
-            
