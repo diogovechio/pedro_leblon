@@ -213,9 +213,9 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
                     destroy_message=data.destroy_message,
                     prompt_inject=None
                     if data.url_detector or data.destroy_message
-                    else f"fingindo ser o pedro, responda objetivamente a mensagem de "
-                         f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}, "
-                         f"não comente mensagens anteriores a dele:",
+                    else f"fingindo ser o pedro, responda a mensagem de "
+                         f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)} "
+                         f"em no máximo 160 caracteres, não comente mensagens anteriores a dele:",
                     biased=False if data.url_detector else True,
                     moderate=True,
                     remove_words_list=None,
@@ -593,9 +593,9 @@ async def _reply_reaction(data: ReactData) -> None:
                     full_text=f"{prompt_text}\npedro:",
                     short_text=prompt_text,
                     chat=data.message.chat.title,
-                    prompt_inject=f"fingindo ser o pedro, responda objetivamente a mensagem de "
-                     f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}, "
-                     f"não comente mensagens anteriores a dele:",
+                    prompt_inject=f"fingindo ser o pedro, responda a mensagem de "
+                     f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)} "
+                     f"em no máximo 120 caracteres, não comente mensagens anteriores a dele:",
                     moderate=False,
                     biased=True,
                     mood=bot.mood_per_user[data.username],
