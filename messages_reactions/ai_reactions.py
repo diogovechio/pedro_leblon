@@ -367,14 +367,14 @@ async def _tlsr(data: ReactData) -> None:
 
     with bot.sending_action(data.message.chat.id, user=data.message.from_.first_name, action="typing"):
         chat = "\n".join(bot.messages_in_memory[data.message.chat.id]) + "."
-        prompt = "em no máximo 7 tópicos de no máximo 7 palavras cada, " \
+        prompt = "em no máximo 5 tópicos de no máximo 7 palavras cada, " \
                  "faça um resumo dos principais temas da conversa abaixo"
 
         bot.loop.create_task(
             bot.send_message(
                 message_text=await bot.openai.generate_message(
                     message_username=data.username,
-                    full_text=f"{prompt}:\n\n{chat}",
+                    full_text=f"{prompt}:\n\n{chat.replace('tlsr', '')}",
                     chat=data.message.chat.title,
                     prompt_inject=None,
                     moderate=False,
