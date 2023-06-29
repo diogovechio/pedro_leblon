@@ -368,16 +368,8 @@ async def _tlsr(data: ReactData) -> None:
 
     with bot.sending_action(data.message.chat.id, user=data.message.from_.first_name, action="typing"):
         chat = "\n".join(bot.messages_in_memory[data.message.chat.id]) + "."
-        prompt = "diga o principal tema da conversa, e depois, em no máximo 5 tópicos de no máximo 7 palavras cada, " \
-                 "cite de maneira enumerada os outros temas discutidos na conversa. conforme esse exemplo:\n\n" \
-                 "Tema destaque:\n\n" \
-                 "Agradecimentos dos integrantes devido as ajudas do Pedro em relação a dúvidas de programação.\n\n" \
-                 "1. debate sobre linguagens de programação.\n" \
-                 "2. comentários sobre usos do Python.\n" \
-                 "3. lançamento da nova GeForce RTX 4060.\n" \
-                 "4. coleção Metal Gear Solid da Konami.\n" \
-                 "5. debate sobre a vacinação brasileira.\n\n" \
-                 "Segue abaixo a conversa"
+        prompt = "em no máximo 5 tópicos de no máximo 6 palavras cada, " \
+                 "cite de maneira enumerada os principais temas discutidos na conversa abaixo"
 
         bot.loop.create_task(
             bot.send_message(
