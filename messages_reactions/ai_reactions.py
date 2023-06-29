@@ -213,9 +213,10 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
                     destroy_message=data.destroy_message,
                     prompt_inject=None
                     if data.url_detector or data.destroy_message
-                    else f"fingindo ser o pedro, responda a mensagem de "
-                         f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)} "
-                         f"em no máximo 160 caracteres, não comente mensagens anteriores a dele:",
+                    else f"fingindo ser o pedro, responda objetivamente a mensagem de "
+                         f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}, "
+                         f"só ultrapasse 160 caracteres se for essencial para a sua resposta, "
+                         f"não comente mensagens anteriores a dele:",
                     biased=False if data.url_detector else True,
                     moderate=True,
                     remove_words_list=None,
@@ -368,7 +369,7 @@ async def _tlsr(data: ReactData) -> None:
     with bot.sending_action(data.message.chat.id, user=data.message.from_.first_name, action="typing"):
         chat = "\n".join(bot.messages_in_memory[data.message.chat.id]) + "."
         prompt = "em no máximo 5 tópicos de no máximo 7 palavras cada, " \
-                 "faça um resumo dos principais temas da conversa abaixo"
+                 "cite de maneira enumerada os principais temas discutidos na conversa abaixo"
 
         bot.loop.create_task(
             bot.send_message(
@@ -593,9 +594,10 @@ async def _reply_reaction(data: ReactData) -> None:
                     full_text=f"{prompt_text}\npedro:",
                     short_text=prompt_text,
                     chat=data.message.chat.title,
-                    prompt_inject=f"fingindo ser o pedro, responda a mensagem de "
-                     f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)} "
-                     f"em no máximo 120 caracteres, não comente mensagens anteriores a dele:",
+                    prompt_inject=f"fingindo ser o pedro, responda objetivamente a mensagem de "
+                     f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}, "
+                     f"só ultrapasse 120 caracteres se for essencial para a sua resposta,"
+                                  f" não comente mensagens anteriores a dele:",
                     moderate=False,
                     biased=True,
                     mood=bot.mood_per_user[data.username],
