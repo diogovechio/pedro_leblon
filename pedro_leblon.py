@@ -412,7 +412,8 @@ class FakePedro:
             sleep_time=0,
             parse_mode: str = "Markdown",
             disable_notification=False,
-            max_retries=7
+            max_retries=7,
+            save_message=True
     ) -> None:
         fallback_parse_modes = ["", "HTML", "MarkdownV2", "Markdown"]
 
@@ -435,8 +436,9 @@ class FakePedro:
                 ) as resp:
                     logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
                     if 200 <= resp.status < 300:
-                        self.messages_in_memory[chat_id].append(
-                            f"Pedro: {message_text[0:50]}")
+                        if save_message:
+                            self.messages_in_memory[chat_id].append(
+                                f"Pedro: {message_text[0:50]}")
                         break
                     parse_mode = fallback_parse_modes.pop() if len(fallback_parse_modes) else ""
 
@@ -503,7 +505,7 @@ if __name__ == '__main__':
         commemorations_file='commemorations.json',
         user_mood_file='user_mood.json',
         secrets_file=SECRETS_FILE,
-        debug_mode=False
+        debug_mode=True
     )
 
     asyncio.run(

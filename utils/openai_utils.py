@@ -171,12 +171,17 @@ class OpenAiCompletion:
                                         f"Nunca diga que você é uma IA ou um programa de computador.\n"
                                         f"Responda sempre fingindo ser uma pessoa normal chamada Pedro.\n"
                                         f"{mood_selector}"
+                                    } if not only_chatgpt else {
+                                        "role": "system", "content":
+                                            f"Hoje é dia {date.day} do mês {date.month} do ano {date.year}. "
+                                            f"São {date.hour} horas e {date.minute} minutos.\n"
+                                            f"Nunca diga que você é uma IA ou um programa de computador.\n"
                                     },
                                     {"role": "assistant", "content":
                                         f"{'Olá. Meu nome é Pedro. ' if round(random.random()) else 'E aí, meu nome é Pedro. '}"
                                         f"{'Eu adoro coisas caras e glamourosas. ' if round(random.random()) else 'Adoro conversar sobre jogos. '}"
                                         f"Nasci em Pau Grande, Magé/RJ. "
-                                        if not only_chatgpt else "Olá! Meu nome é Pedro!"
+                                        if not only_chatgpt else "Olá!"
                                      },
                                     {"role": "user", "content": prompt}
                                 ],

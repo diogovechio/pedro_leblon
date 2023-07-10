@@ -384,7 +384,9 @@ async def _tlsr(data: ReactData) -> None:
                     remove_words_list=None
                 ),
                 chat_id=data.message.chat.id,
-                reply_to=data.message.message_id)
+                reply_to=data.message.message_id,
+                save_message=False
+            )
         )
 
         bot.loop.create_task(
@@ -428,7 +430,9 @@ async def _tldr(data: ReactData) -> None:
                         remove_words_list=None
                     ),
                     chat_id=data.message.chat.id,
-                    reply_to=data.message.message_id)
+                    reply_to=data.message.message_id,
+                    save_message=False
+                )
             )
 
             bot.loop.create_task(
