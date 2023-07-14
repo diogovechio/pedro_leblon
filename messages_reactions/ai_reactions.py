@@ -29,7 +29,6 @@ async def openai_reactions(
        and not data.url_detector
        and data.bot.mocked_hour != data.bot.datetime_now.hour
        and not data.mock_chat
-       and data.bot.datetime_now.day % 4 == 0
     ):
         await _complain_swear_word(data=data)
 
