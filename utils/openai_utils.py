@@ -314,6 +314,8 @@ class OpenAiCompletion:
             prompt = f"reclame com {message_username} porque ele enviou uma mensagem com conteúdo " \
                      f"{' ,'.join([key for key, value in moderation_results['results'][0]['categories'].items() if value])}. " \
                      f"diga que ele poderá ser banido do {chat}."
+
+            only_davinci = True
         else:
             prompt = f"{prompt_inject}\n{prompt}" if prompt_inject else prompt
 
