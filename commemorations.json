@@ -272,7 +272,7 @@
         "for_chat": -632911267,
         "message": "lembrar de preencher a planilha de volumetria",
         "anniversary": "",
-        "last_celebration": "2023-06-01 20:24:07.294646"
+        "last_celebration": "2023-06-01 00:00:02.286291"
     },
     {
         "id": "2bf8429d-5947-43f5-bc53-31797e26c15f",
@@ -284,5 +284,60 @@
         "message": "lembrar de implementar um recurso para repetir lembretes todo mes",
         "anniversary": "",
         "last_celebration": "2023-05-06 19:13:21.628600"
+    },
+    {
+        "id": "96cbec14-753c-4aed-8bdb-04628c1d751f",
+        "frequency": "monthly",
+        "created_by": 8375482,
+        "created_at": "2023-05-06 20:01:13.932633",
+        "celebrate_at": "2023-05-06 00:00:00",
+        "for_chat": 8375482,
+        "message": "qualquer coisa",
+        "anniversary": "",
+        "last_celebration": "2023-05-06 20:01:22.899497"
+    },
+    {
+        "id": "b8ccc362-05b6-4d08-a416-6487afd93a2f",
+        "frequency": "monthly",
+        "created_by": 8375482,
+        "created_at": "2023-05-06 20:02:33.099695",
+        "celebrate_at": "2023-05-01 00:00:00",
+        "for_chat": -632911267,
+        "message": "fazer a planilha de billing",
+        "anniversary": "",
+        "last_celebration": "2023-06-01 00:00:02.286291"
+    },
+    {
+        "id": "3eca36e2-cfd4-4db7-8b50-f44d005c2b33",
+        "frequency": "monthly",
+        "created_by": 8375482,
+        "created_at": "2023-05-06 20:03:56.022041",
+        "celebrate_at": "2023-05-01 00:00:00",
+        "for_chat": -1001369599178,
+        "message": "oi come\u00e7ou um novo m\u00eas",
+        "anniversary": "",
+        "last_celebration": "2023-06-01 00:00:02.286291"
+    },
+    {
+        "id": "5c9059ce-2192-49c2-aad1-227a3736b127",
+        "frequency": "monthly",
+        "created_by": 8375482,
+        "created_at": "2023-05-06 20:04:09.136976",
+        "celebrate_at": "2023-05-31 00:00:00",
+        "for_chat": -1001369599178,
+        "message": "hoje \u00e9 o \u00faltimo dia do m\u00eas blz",
+        "anniversary": "",
+        "last_celebration": "2023-05-31 10:37:45.178602"
+    },
+    {
+        "id": "aed69c14-c838-4946-bd2f-a1eddedd7a12",
+        "frequency": "monthly",
+        "created_by": 8375482,
+        "created_at": "2023-05-06 20:04:29.975655",
+        "celebrate_at": "2023-05-31 00:00:00",
+        "for_chat": -632911267,
+        "message": "preenche a planilha de horas",
+        "anniversary": "",
+        "last_celebration": "2023-05-31 10:37:45.178602"
     }
 ]
