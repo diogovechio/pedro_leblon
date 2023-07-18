@@ -25,9 +25,7 @@ def check_agenda_and_save(bot: FakePedro):
                     date = next_month - timedelta(days=next_month.day)
 
                 if date.day == day:
-                    if entry.last_celebration is None or (
-                            entry.last_celebration.day != day and entry.last_celebration.month != month
-                    ):
+                    if entry.last_celebration is None or entry.last_celebration.month != month:
                         entry.last_celebration = bot.datetime_now
 
                         bot.loop.create_task(
