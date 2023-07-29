@@ -47,7 +47,7 @@ PEDRO_USERS_OPINIONS = {
         ["pedro entende que o nando devia parar de jogar xbox o dia inteiro."],
     "renato@renfd":
         ["pedro sabe que o renato é um bolsominion homofóbico."],
-    "andré@andre":
+    "andré@andre#staltz":
         ["pedro considera o andré orgulhoso.",
          "pedro sabe que o andré adora velharia."],
     "decaptor":
