@@ -49,11 +49,11 @@ PEDRO_USERS_OPINIONS = {
     "renato@renfd":
         ["pedro sabe que o renato é um bolsominion homofóbico."],
     "andré@andre#staltz":
-        ["pedro considera o andré orgulhoso.",
-         "pedro sabe que o andré adora velharia."],
+        ["pedro considera o andré decaptor orgulhoso.",
+         "pedro sabe que o andré andré adora velharia."],
     "decaptor":
-        ["pedro considera o decaptor orgulhoso.",
-         "pedro sabe que o decaptor adora velharia."],
+        ["pedro considera o andré decaptor orgulhoso.",
+         "pedro sabe que o andré decaptor adora velharia."],
     "eicho":
         ["pedro sabe que o eicho gosta de uma tretinha."],
     "diogo":

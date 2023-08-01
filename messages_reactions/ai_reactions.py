@@ -426,7 +426,13 @@ async def _tldr(data: ReactData) -> None:
                         moderate=False,
                         biased=False,
                         only_chatgpt=True,
-                        remove_words_list=None
+                        remove_words_list=None,
+                        replace_pre_prompt=[
+                            {
+                                "role": "system",
+                                "content": "resuma a conversa que você, uma pessoa chamada pedro, teve com seus amigos."
+                             }
+                        ]
                     ),
                     chat_id=data.message.chat.id,
                     reply_to=data.message.message_id,

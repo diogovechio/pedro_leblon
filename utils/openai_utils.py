@@ -140,7 +140,8 @@ class OpenAiCompletion:
             only_davinci=False,
             temperature: int = 1,
             always_ironic=False,
-            biased=True
+            biased=True,
+            replace_pre_prompt: T.Optional[T.List[dict]] = None
     ) -> str:
         async with asyncio.Semaphore(self.semaphore):
             if always_ironic:
@@ -159,34 +160,39 @@ class OpenAiCompletion:
                 if not only_davinci:
                     self.loop.create_task(telegram_logging(f"Using gpt-3.5-turbo - OpenAI usage: {self.openai_use}"))
 
+                    if not replace_pre_prompt:
+                        system = [
+                            {
+                                "role": "system", "content":
+                                f"Hoje é dia {date.day} do mês {date.month} do ano {date.year}. "
+                                f"São {date.hour} horas e {date.minute} minutos.\n"
+                                f"Nunca diga que você é uma IA ou um programa de computador.\n"
+                                f"Responda sempre de maneira direta e curta, sem comentários necessários, "
+                                f"fingindo ser uma pessoa normal chamada Pedro.\n"
+                                f"{mood_selector}"
+                             } if not only_chatgpt else {
+                                "role": "system", "content":
+                                    f"Hoje é dia {date.day} do mês {date.month} do ano {date.year}. "
+                                    f"São {date.hour} horas e {date.minute} minutos.\n"
+                                    f"Nunca diga que você é uma IA ou um programa de computador.\n"
+                            },
+                            {"role": "assistant", "content":
+                                f"{'Olá. Meu nome é Pedro. ' if round(random.random()) else 'E aí, meu nome é Pedro. '}"
+                                f"{'Eu adoro coisas caras e glamourosas. ' if round(random.random()) else 'Adoro conversar sobre jogos. '}"
+                                f"Nasci em Pau Grande, Magé/RJ. "
+                                if not only_chatgpt else "Olá!"
+                             }
+                        ]
+                    else:
+                        system = replace_pre_prompt
+
                     async with self.session.post(
                             "https://api.openai.com/v1/chat/completions",
                             headers=self.headers,
                             json={
-                                "model": "gpt-3.5-turbo-0613",
-                                'messages': [
-                                    {"role": "system", "content":
-                                        f"Hoje é dia {date.day} do mês {date.month} do ano {date.year}. "
-                                        f"São {date.hour} horas e {date.minute} minutos.\n"
-                                        f"Nunca diga que você é uma IA ou um programa de computador.\n"
-                                        f"Responda sempre de maneira direta e curta, sem comentários necessários, "
-                                        f"fingindo ser uma pessoa normal chamada Pedro.\n"
-                                        f"{mood_selector}"
-                                    } if not only_chatgpt else {
-                                        "role": "system", "content":
-                                            f"Hoje é dia {date.day} do mês {date.month} do ano {date.year}. "
-                                            f"São {date.hour} horas e {date.minute} minutos.\n"
-                                            f"Nunca diga que você é uma IA ou um programa de computador.\n"
-                                    },
-                                    {"role": "assistant", "content":
-                                        f"{'Olá. Meu nome é Pedro. ' if round(random.random()) else 'E aí, meu nome é Pedro. '}"
-                                        f"{'Eu adoro coisas caras e glamourosas. ' if round(random.random()) else 'Adoro conversar sobre jogos. '}"
-                                        f"Nasci em Pau Grande, Magé/RJ. "
-                                        if not only_chatgpt else "Olá!"
-                                     },
-                                    {"role": "user", "content": prompt}
-                                ],
-                            "temperature": temperature,
+                                "model": "gpt-3.5-turbo",
+                                "messages": [*system, {"role": "user", "content": prompt}],
+                                "temperature": temperature,
                             },
                     ) as chatgpt_request:
                         response = await chatgpt_request.text()
@@ -286,7 +292,8 @@ class OpenAiCompletion:
             destroy_message: bool = False,
             remove_words_list=None,
             always_ironic=False,
-            mood=0.0
+            mood=0.0,
+            replace_pre_prompt: T.Optional[T.List[dict]] = None
     ) -> str:
         datetime_now = datetime.datetime.utcnow() - datetime.timedelta(hours=3)
 
@@ -335,7 +342,8 @@ class OpenAiCompletion:
                         model=model,
                         always_ironic=always_ironic,
                         mood=mood,
-                        biased=biased
+                        biased=biased,
+                        replace_pre_prompt=replace_pre_prompt
                     ),
                     timeout=timeout
                 )
