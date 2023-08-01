@@ -149,7 +149,7 @@ class OpenAiCompletion:
             if round(mood) >= len(PEDRO_MOOD) - 1:
                 mood = len(PEDRO_MOOD) - 1
 
-            if round(mood) < 0:
+            if round(mood) < -2:
                 mood_selector = random.choice(PEDRO_IN_LOVE)
             else:
                 mood_selector = PEDRO_MOOD[round(mood)]
