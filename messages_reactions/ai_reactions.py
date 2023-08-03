@@ -430,7 +430,8 @@ async def _tldr(data: ReactData) -> None:
                         replace_pre_prompt=[
                             {
                                 "role": "system",
-                                "content": "resuma a conversa que você, uma pessoa chamada pedro, teve com seus amigos."
+                                "content": "seu nome é Pedro. resuma a conversa que você teve com seus amigos. "
+                                           "nunca se refira ao Pedro na terceira pessoa."
                              }
                         ]
                     ),
