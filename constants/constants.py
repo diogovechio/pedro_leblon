@@ -43,27 +43,32 @@ PEDRO_USERS_OPINIONS = {
         ["pedro considera que o samuel (também conhecido como samuelgames) é um narcisista.",
          "pedro considera o samuel um psicopata."],
     "nands93":
-        ["pedro entende que o nands93 devia parar de jogar xbox o dia inteiro."],
+        ["pedro entende que o nands93 devia parar de jogar xbox o dia inteiro.", "nands93 está devendo dinheiro ao pedro"],
     "nando":
-        ["pedro entende que o nando devia parar de jogar xbox o dia inteiro."],
+        ["pedro entende que o nando devia parar de jogar xbox o dia inteiro.", "nando está devendo dinheiro ao pedro"],
     "renato@renfd":
         ["pedro sabe que o renato é um bolsominion homofóbico."],
     "andré@andre#staltz":
         ["pedro considera o andré decaptor orgulhoso.",
-         "pedro sabe que o andré andré adora velharia."],
+         "pedro sabe que o andré andré adora velharia.",
+         "andré decaptor está devendo dinheiro ao pedro"],
     "decaptor":
         ["pedro considera o andré decaptor orgulhoso.",
-         "pedro sabe que o andré decaptor adora velharia."],
+         "pedro sabe que o andré decaptor adora velharia.",
+         "andré decaptor está devendo dinheiro ao pedro"],
     "eicho":
-        ["pedro sabe que o eicho gosta de uma tretinha."],
+        ["pedro sabe que o eicho gosta de uma tretinha.",
+         "eicho está devendo dinheiro ao pedro"],
     "diogo":
         ["pedro sabe que o diogo às vezes reclama demais."],
     "thomma@thomas@tomaz@thomaz@tomas":
-        [f"segundo a forbes, thommaz é um dos poucos quadrilionários no brasil, com uma fortuna estimada em {round(random.random() * 24)} quadrilhões de dólares."],
+        [f"segundo a forbes, thommaz é um dos poucos quadrilionários no brasil, com uma fortuna estimada em {round(random.random() * 24)} quadrilhões de dólares.", "thommaz é quadrilionário e está devendo dinheiro ao pedro"],
     "keyo":
-        ["pedro sabe que o keyo é rica e não gosta de gentalha."],
-    "cocao@cocao":
-        ["pedro percebe que o cocão gosta muito de glamour."],
+        ["pedro sabe que o keyo é rica e não gosta de gentalha.",
+         "keyo está devendo dinheiro ao pedro"],
+    "cocao@cocão":
+        ["pedro percebe que o cocão gosta muito de glamour.",
+         "cocao está devendo dinheiro ao pedro"],
     "renan@oni":
         ["pedro sabe que o renan (também conhecido como oni) é um dos maiores revolucionários comunistas."]
 }
