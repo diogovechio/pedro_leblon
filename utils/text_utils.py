@@ -194,39 +194,37 @@ async def normalize_openai_text(
                     idx_to_lower = i + 2
                 elif letter in ('"', "\n"):
                     idx_to_lower = i + 1
-        else:
-            ai_message = original_message
 
-        if ai_message.count(".") == 1 and ai_message[-1] == ".":
-            ai_message = ai_message.replace(".", "")
+            if ai_message.count(".") == 1 and ai_message[-1] == ".":
+                ai_message = ai_message.replace(".", "")
 
-        if clean_prompts:
-            for _, msg in clean_prompts.items():
-                ai_message = ai_message.replace(msg, '')
+            if clean_prompts:
+                for _, msg in clean_prompts.items():
+                    ai_message = ai_message.replace(msg, '')
 
-        ai_message = ai_message.replace("pedro: ", "rs, ")
+            ai_message = ai_message.replace("pedro: ", "rs, ")
 
-        if ai_message:
-            while any(word in ai_message[0] for word in ['.', ',', '?', '\n', ' ', '!']):
-                ai_message = ai_message[1:]
+            if ai_message:
+                while any(word in ai_message[0] for word in ['.', ',', '?', '\n', ' ', '!']):
+                    ai_message = ai_message[1:]
 
-            if '"' in ai_message[0] and '"' in ai_message[-1]:
-                ai_message = ai_message.replace('"', "")
+                if '"' in ai_message[0] and '"' in ai_message[-1]:
+                    ai_message = ai_message.replace('"', "")
 
-            if random.random() < 0.02 or any(word in ai_message for word in [
-                "uau,", "olha só", "que original", "puxa vida", "olha,", "sério mesmo", "que pena ", "desculp", "né?",
-                "tão educado", "esse sujeito", "esse ser ", "que interessante", "não é mesmo", "quem diria"
-            ]):
-                ai_message = ai_message.upper()
+                if random.random() < 0.02 or any(word in ai_message for word in [
+                    "uau,", "olha só", "que original", "puxa vida", "olha,", "sério mesmo", "que pena ", "desculp", "né?",
+                    "tão educado", "esse sujeito", "esse ser ", "que interessante", "não é mesmo", "quem diria"
+                ]):
+                    ai_message = ai_message.upper()
 
-            if command_in("ah,", ai_message) and round(random.random()):
-                ai_message = ai_message.replace("ah, ", "")
+                if command_in("ah,", ai_message) and round(random.random()):
+                    ai_message = ai_message.replace("ah, ", "")
 
-            return re.sub(' +', ' ', ai_message)
-        elif len(original_message):
-            return original_message.upper()
-        else:
-            return 'estou sem palavras' if round(random.random()) else 'tenho nada a dizer'
+                return re.sub(' +', ' ', ai_message)
+            elif len(original_message):
+                return original_message.upper()
+            else:
+                return 'estou sem palavras' if round(random.random()) else 'tenho nada a dizer'
     except Exception as exc:
         get_running_loop().create_task(telegram_logging(exc))
 
