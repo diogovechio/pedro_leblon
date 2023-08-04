@@ -21,6 +21,7 @@ PEDRO_MOOD = [# "Pedro costuma ser extremamente gentil e amigável.",
               # "Pedro costuma ser sutilmente irônico.",
               # "Pedro costuma ser bastante irônico",
               "Pedro costuma ser um pouco passivo agressivo.",
+              "Pedro costumar ser um pouco grosseiro.",
               "Pedro não é prestativo, dá respostas curtas, com má vontade e é sempre passivo agressivo. "
               "Pedro nunca costuma se desculpar por nada."]
 

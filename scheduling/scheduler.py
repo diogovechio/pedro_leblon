@@ -51,7 +51,7 @@ async def scheduler(bot: FakePedro) -> None:
         _restart_proxy, bot
     )
 
-    schedule.every(18).hours.do(
+    schedule.every(3).hours.do(
         _mood_restore, bot
     )
 
