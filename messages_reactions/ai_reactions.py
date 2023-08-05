@@ -1,15 +1,17 @@
+import datetime
 import random
 import re
+from collections import defaultdict
 
 from constants.constants import SWEAR_WORDS, OPENAI_REACT_WORDS, OPENAI_PROMPTS, OPENAI_TRASH_LIST, WEATHER_LIST, \
     CHATGPT_BS
 from data_classes.react_data import ReactData
 from utils.face_utils import put_list_of_faces_on_background
 from utils.logging_utils import async_elapsed_time
-from utils.openai_utils import return_dall_e_limit
+from utils.openai_utils import return_dall_e_limit, list_crop
 from utils.roleta_utils import get_roletas_from_pavuna, arrombado_classifier
 from utils.text_utils import command_in, create_username, message_destroyer
-from utils.weather_utils import weather_prompt, get_forecast
+from utils.weather_utils import weather_prompt, get_forecast, WEEKDAYS
 
 
 async def openai_reactions(
@@ -26,9 +28,9 @@ async def openai_reactions(
         data.bot.mood_per_user[data.username] += data.bot.config.mood_params.swearword
 
     if (swear_word_block := swear_word_detected
-       and not data.url_detector
-       and data.bot.mocked_hour != data.bot.datetime_now.hour
-       and not data.mock_chat
+                            and not data.url_detector
+                            and data.bot.mocked_hour != data.bot.datetime_now.hour
+                            and not data.mock_chat
     ):
         await _complain_swear_word(data=data)
 
@@ -62,6 +64,11 @@ async def openai_reactions(
         elif command_in("/tldr", data.message.text):
             await _tldr(data=data)
 
+        elif command_in("/nemli", data.message.text):
+            days = re.sub("\D", "", data.message.text)
+
+            await _nem_li(data=data, days=int(days) if days else 1)
+
         elif (
                 command_in("/critique", data.message.text) or
                 command_in("/elogie", data.message.text) or
@@ -81,7 +88,7 @@ async def openai_reactions(
             await _react_to_words(data=data)
 
         elif pedro_on_reply and not command_in("/del", data.message.text) and (
-            len(data.message.text.split(" ")) > 1 or "@" not in data.message.text[0]
+                len(data.message.text.split(" ")) > 1 or "@" not in data.message.text[0]
         ) and not data.mock_chat:
             await _reply_reaction(data=data)
 
@@ -242,7 +249,7 @@ async def _annoy_persona_non_grata(data: ReactData) -> None:
                 message_username=data.username,
                 chat=data.message.chat.title,
                 full_text=f"O {data.message.from_.first_name} disse: {data.input_text}.\n"
-                             f"pedro:",
+                          f"pedro:",
                 prompt_inject=OPENAI_PROMPTS['critique_negativamente'],
                 destroy_message=False
             ),
@@ -397,6 +404,69 @@ async def _tlsr(data: ReactData) -> None:
 
 
 @async_elapsed_time
+async def _nem_li(data: ReactData, days=5) -> None:
+    # todo var env
+    message_limit = 140
+
+    with data.bot.sending_action(data.message.chat.id, user=data.message.from_.first_name, action="typing"):
+        bot = data.bot
+        chats = bot.chats_in_memory
+
+        filtered_chats = defaultdict(list)
+        chats_texts = []
+
+        chat_counter = 0
+        for key, value in chats.items():
+            if str(data.message.chat.id) in key:
+                chat_counter += 1
+
+        message_limit_per_chat = int(message_limit / chat_counter)
+
+        for key, value in chats.items():
+            if str(data.message.chat.id) in key:
+                date = datetime.datetime.strptime(key.split(":")[-1], "%Y-%m-%d")
+                dif_days = (data.bot.datetime_now - date).days
+                if dif_days <= days:
+                    value = list_crop(value, message_limit_per_chat)
+                    filtered_chats[key] = [f"...{WEEKDAYS[date.weekday()]}..."] + value
+
+        for key, value in filtered_chats.items():
+            chats_texts = [*chats_texts, *value]
+
+        chat = "\n".join(chats_texts) + "."
+
+        prompt = "faça um resumo em poucas palavras da conversa abaixo "
+
+        if random.random() < data.bot.config.random_params.words_react_frequency:
+            prompt += ", de maneira sensacionalista e irônica"
+
+        bot.loop.create_task(
+            bot.send_message(
+                message_text=await bot.openai.generate_message(
+                    message_username=data.username,
+                    full_text=f"{prompt}:\n\n{chat}",
+                    chat=data.message.chat.title,
+                    prompt_inject=None,
+                    moderate=False,
+                    biased=False,
+                    only_chatgpt=True,
+                    remove_words_list=None,
+                    replace_pre_prompt=[
+                        {
+                            "role": "system",
+                            "content": "seu nome é Pedro. resuma a conversa que você teve com seus amigos. "
+                                       "nunca se refira ao Pedro na terceira pessoa."
+                        }
+                    ]
+                ),
+                chat_id=data.message.chat.id,
+                reply_to=data.message.message_id,
+                save_message=False
+            )
+        )
+
+
+@async_elapsed_time
 async def _tldr(data: ReactData) -> None:
     bot = data.bot
 
@@ -432,7 +502,7 @@ async def _tldr(data: ReactData) -> None:
                                 "role": "system",
                                 "content": "seu nome é Pedro. resuma a conversa que você teve com seus amigos. "
                                            "nunca se refira ao Pedro na terceira pessoa."
-                             }
+                            }
                         ]
                     ),
                     chat_id=data.message.chat.id,
@@ -605,8 +675,8 @@ async def _reply_reaction(data: ReactData) -> None:
                     short_text=prompt_text,
                     chat=data.message.chat.title,
                     prompt_inject=f"fingindo ser o pedro, responda objetivamente a mensagem de "
-                     f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}, "
-                     f"só ultrapasse 120 caracteres se for essencial para a sua resposta,"
+                                  f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}, "
+                                  f"só ultrapasse 120 caracteres se for essencial para a sua resposta,"
                                   f" não comente mensagens anteriores a dele:",
                     moderate=False,
                     biased=True,
@@ -629,14 +699,14 @@ async def _random_conversation(data: ReactData) -> None:
         chat = "\n".join(data.bot.messages_in_memory[data.message.chat.id][-25:])
 
         message = await bot.openai.generate_message(
-                    message_username='.',
-                    full_text=f"{chat}\npedro:",
-                    chat=data.message.chat.title,
-                    prompt_inject='considere que você é o "pedro", abaixo é uma conversa entre você e '
-                                  'seus amigos, comente algum dos assuntos criando uma curta resposta '
-                                  'para "pedro" no final: ',
-                    only_chatgpt=True,
-                    biased=True,
+            message_username='.',
+            full_text=f"{chat}\npedro:",
+            chat=data.message.chat.title,
+            prompt_inject='considere que você é o "pedro", abaixo é uma conversa entre você e '
+                          'seus amigos, comente algum dos assuntos criando uma curta resposta '
+                          'para "pedro" no final: ',
+            only_chatgpt=True,
+            biased=True,
         )
 
         if not any(word in message for word in CHATGPT_BS):
@@ -667,4 +737,3 @@ async def adjust_mood(data: ReactData):
     if message_tone == 0:
         if data.bot.mood_per_user[data.username] > 0.0:
             data.bot.mood_per_user[data.username] /= 2
-

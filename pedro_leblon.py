@@ -69,7 +69,7 @@ class FakePedro:
 
         self.messages_in_memory = defaultdict(lambda: MaxSizeList(130))  # legacy
         self.chats_in_memory = defaultdict(list)
-        self.chat_in_memory_max_load_days = 7
+        self.chat_in_memory_max_load_days = 14
 
         self.mood_per_user = defaultdict(lambda: 0.0)
 
@@ -200,6 +200,7 @@ class FakePedro:
         logging.info('Loading chats')
 
         chats = os.listdir("chat_logs")
+        self.chats_in_memory = defaultdict(list)
         for chat in chats:
             chat_dir = os.listdir(f"chat_logs/{chat}")
             for f in chat_dir:
@@ -288,7 +289,7 @@ class FakePedro:
             if message.text is not None:
                 date = str(self.datetime_now).split(' ')
                 day_now = date[0]
-                time_now = date[-1].split(".")[0]
+                time_now = (date[-1].split(".")[0])[:-3]
 
                 await asyncio.sleep(3)
                 if len(message.text) > 10:
@@ -296,7 +297,7 @@ class FakePedro:
                         f"{create_username(message.from_.first_name, message.from_.username)}: {message.text[0:90]}")  # legacy
 
                 self.chats_in_memory[f"{message.chat.id}:{day_now}"].append(
-                    f"{time_now} - {create_username(message.from_.first_name, message.from_.username)}: {message.text[0:90]}")
+                    f"{time_now} - {create_username(message.from_.first_name, message.from_.username)}: {message.text[0:85]}")
 
     @async_elapsed_time
     async def image_downloader(
@@ -529,7 +530,7 @@ if __name__ == '__main__':
         commemorations_file='commemorations.json',
         user_mood_file='user_mood.json',
         secrets_file=SECRETS_FILE,
-        debug_mode=True
+        debug_mode=False
     )
 
     asyncio.run(

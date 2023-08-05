@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import math
 import random
 import typing as T
 
@@ -431,3 +432,19 @@ async def list_reducer(l: list) -> list:
 
         return new_list
     return l
+
+
+def list_crop(l: list, max_size: int) -> list:
+    if not len(l):
+        return l
+
+    def round_up(n, decimals=0):
+        multiplier = 10 ** decimals
+        return math.ceil(n * multiplier) / multiplier
+
+    jump = int(round_up(len(l) / max_size))
+
+    new_list = []
+    for i in range(jump - 1, len(l), jump):
+        new_list.append(l[i])
+    return new_list

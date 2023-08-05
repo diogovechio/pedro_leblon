@@ -3,6 +3,10 @@ from pedro_leblon import FakePedro, telegram_logging
 
 def daily_routines(bot: FakePedro) -> None:
     try:
+        bot.loop.create_task(
+            bot.load_config_params()
+        )
+
         bot.mocked_today = False
 
         if bot.openai is not None:
