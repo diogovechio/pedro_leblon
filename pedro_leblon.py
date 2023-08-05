@@ -111,6 +111,7 @@ class FakePedro:
             from scheduling import scheduler
 
             Path('tmp').mkdir(exist_ok=True)
+            Path('chat_logs').mkdir(exist_ok=True)
             Path('face_lake').mkdir(exist_ok=True)
 
             self.loop = asyncio.get_running_loop()

@@ -59,15 +59,17 @@ async def openai_reactions(
             await _boring_pedro(data=data)
 
         elif command_in("/tlsr", data.message.text):
-            await _tlsr(data=data)
+            days = re.sub("\D", "", data.message.text)
 
-        elif command_in("/tldr", data.message.text):
-            await _tldr(data=data)
+            await _nem_li(data=data, days=int(days) if days else 1, topics=True)
 
         elif command_in("/nemli", data.message.text):
             days = re.sub("\D", "", data.message.text)
 
-            await _nem_li(data=data, days=int(days) if days else 1)
+            await _nem_li(data=data, days=int(days) if days else 1, topics=False)
+
+        elif command_in("/tldr", data.message.text):
+            await _tldr(data=data)
 
         elif (
                 command_in("/critique", data.message.text) or
@@ -404,7 +406,7 @@ async def _tlsr(data: ReactData) -> None:
 
 
 @async_elapsed_time
-async def _nem_li(data: ReactData, days=5) -> None:
+async def _nem_li(data: ReactData, days=5, topics=False) -> None:
     # todo var env
     message_limit = 140
 
@@ -435,10 +437,14 @@ async def _nem_li(data: ReactData, days=5) -> None:
 
         chat = "\n".join(chats_texts) + "."
 
-        prompt = "faça um resumo em poucas palavras da conversa abaixo "
+        if topics:
+            prompt = "em no máximo 7 tópicos de no máximo 6 palavras cada, " \
+                     "cite de maneira enumerada os principais temas discutidos na conversa abaixo"
+        else:
+            prompt = "faça um resumo em poucas palavras da conversa abaixo "
 
-        if random.random() < data.bot.config.random_params.words_react_frequency:
-            prompt += ", de maneira sensacionalista e irônica"
+            if random.random() < data.bot.config.random_params.words_react_frequency:
+                prompt += ", de maneira sensacionalista e irônica"
 
         bot.loop.create_task(
             bot.send_message(
