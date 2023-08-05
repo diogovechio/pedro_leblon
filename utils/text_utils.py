@@ -145,6 +145,7 @@ async def pre_biased_prompt(
     for entity in PEDRO_GENERAL_OPINIONS:
         if entity in full_text.lower():
             additional_text += random.choice(PEDRO_GENERAL_OPINIONS[entity])
+            additional_text += "\n"
 
     for entity_names, opinions in users_opinions.items():
         ignore = entity_names.split("#")
