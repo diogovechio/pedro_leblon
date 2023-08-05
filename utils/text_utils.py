@@ -160,6 +160,7 @@ async def pre_biased_prompt(
         for name in names_list:
             if name in last_words.lower() and ignore not in last_words.lower():
                 additional_text += random.choice(opinions)
+                additional_text += "\n"
                 break
 
     if len(additional_text):
