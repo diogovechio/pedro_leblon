@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from dataclasses import asdict
+from pathlib import Path
 
 from pedro_leblon import FakePedro, telegram_logging
 import json
@@ -90,6 +91,24 @@ def check_agenda_and_save(bot: FakePedro):
 
         with open("user_mood_tmp.json", "w", encoding="utf8") as file:
             file.write(user_mood)
+
+        for entry, value in bot.chats_in_memory.items():
+            dir_name = f'chat_logs/{entry.split(":")[0]}'
+            file_name = entry.split(":")[-1]
+            Path(dir_name).mkdir(exist_ok=True)
+
+            chat_json = json.dumps(value, indent=4)
+
+            tmp_dir = f"{dir_name}/{file_name}.tmp"
+            json_dir = f"{dir_name}/{file_name}.json"
+
+            with open(tmp_dir, "w", encoding="utf8") as file:
+                file.write(chat_json)
+
+            if os.path.exists(json_dir):
+                os.remove(json_dir)
+
+            os.rename(tmp_dir, json_dir)
 
         if os.path.exists("commemorations.json"):
             os.remove("commemorations.json")

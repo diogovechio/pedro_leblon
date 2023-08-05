@@ -67,7 +67,10 @@ class FakePedro:
         self.interacted_updates = MaxSizeList(400)
         self.interacted_messages_with_chat_id = MaxSizeList(400)
 
-        self.messages_in_memory = defaultdict(lambda: MaxSizeList(130))
+        self.messages_in_memory = defaultdict(lambda: MaxSizeList(130))  # legacy
+        self.chats_in_memory = defaultdict(list)
+        self.chat_in_memory_max_load_days = 7
+
         self.mood_per_user = defaultdict(lambda: 0.0)
 
         self.datetime_now = datetime.now() - timedelta(hours=3)
@@ -194,6 +197,19 @@ class FakePedro:
                         else:
                             logging.critical(f'NO EMBEDDINGS FOR {file}')
 
+        logging.info('Loading chats')
+
+        chats = os.listdir("chat_logs")
+        for chat in chats:
+            chat_dir = os.listdir(f"chat_logs/{chat}")
+            for f in chat_dir:
+                f_date = datetime.strptime(f.replace(".json", ""), "%Y-%m-%d")
+                dif_days = (self.datetime_now - f_date).days
+                if dif_days <= self.chat_in_memory_max_load_days:
+                    with open(f"chat_logs/{chat}/{f}", "r") as chat_text:
+                        json_chat = json.load(chat_text)
+                        self.chats_in_memory[f"{chat}:{f.replace('.json','')}"] = json_chat
+
         logging.info('Loading finished')
 
     async def _run_scheduler(self) -> None:
@@ -269,10 +285,18 @@ class FakePedro:
             self.interacted_messages_with_chat_id.append(f"{message.chat.id}:"
                                                          f"{message.message_id}")
 
-            if message.text is not None and len(message.text) > 10:
+            if message.text is not None:
+                date = str(self.datetime_now).split(' ')
+                day_now = date[0]
+                time_now = date[-1].split(".")[0]
+
                 await asyncio.sleep(3)
-                self.messages_in_memory[message.chat.id].append(
-                    f"{create_username(message.from_.first_name, message.from_.username)}: {message.text[0:90]}")
+                if len(message.text) > 10:
+                    self.messages_in_memory[message.chat.id].append(
+                        f"{create_username(message.from_.first_name, message.from_.username)}: {message.text[0:90]}")  # legacy
+
+                self.chats_in_memory[f"{message.chat.id}:{day_now}"].append(
+                    f"{time_now} - {create_username(message.from_.first_name, message.from_.username)}: {message.text[0:90]}")
 
     @async_elapsed_time
     async def image_downloader(
