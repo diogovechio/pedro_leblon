@@ -298,7 +298,7 @@ class FakePedro:
                         f"{create_username(message.from_.first_name, message.from_.username)}: {message.text[0:90]}")  # legacy
 
                 self.chats_in_memory[f"{message.chat.id}:{day_now}"].append(
-                    f"{time_now} - {create_username(message.from_.first_name, message.from_.username)}: {message.text[0:85]}")
+                    f"{time_now} - {message.from_.username if message.from_.username else message.from_.first_name}: {message.text[0:90]}")
 
     @async_elapsed_time
     async def image_downloader(
