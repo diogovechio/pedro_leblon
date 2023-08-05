@@ -55,7 +55,7 @@ async def get_opinions(bot: FakePedro) -> None:
             if response[0].isdigit():
                 if ":" in response:
                     text = response.split(":")[-1]
-                    name = (random.choice(((response.split(":")[0]).split("@")))).split("-")[-1]
+                    name = ((response.split(":")[0]).split("-")[-1]).replace("@", " ")
                     opinion = (f"{name}{text}.".lower()).strip()
 
                     username = users_names[idx]
