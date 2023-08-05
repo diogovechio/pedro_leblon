@@ -47,6 +47,7 @@ class FakePedro:
             bot_config_file: str,
             commemorations_file: str,
             user_mood_file: str,
+            user_opinions_file: str,
             secrets_file: str,
             polling_rate: int = 1,
             debug_mode=False
@@ -58,6 +59,7 @@ class FakePedro:
         self.config_file = bot_config_file
         self.commemorations_file = commemorations_file
         self.user_mood_file = user_mood_file
+        self.user_opinions_file = user_opinions_file
         self.commemorations: T.Optional[Commemorations] = None
         self.secrets_file = secrets_file
 
@@ -72,6 +74,7 @@ class FakePedro:
         self.chat_in_memory_max_load_days = 14
 
         self.mood_per_user = defaultdict(lambda: 0.0)
+        self.user_opinions = defaultdict(list)
 
         self.datetime_now = datetime.now() - timedelta(hours=3)
 
@@ -151,6 +154,9 @@ class FakePedro:
 
                 with open(self.user_mood_file, encoding='utf8') as mood_file:
                     self.mood_per_user.update(json.loads(mood_file.read()))
+
+                with open(self.user_opinions_file, encoding='utf8') as opinions_file:
+                    self.user_opinions.update(json.loads(opinions_file.read()))
 
                 bot_config.update(
                     json.loads(secret_file.read())
@@ -298,7 +304,7 @@ class FakePedro:
                         f"{create_username(message.from_.first_name, message.from_.username)}: {message.text[0:90]}")  # legacy
 
                 self.chats_in_memory[f"{message.chat.id}:{day_now}"].append(
-                    f"{time_now} - {message.from_.username if message.from_.username else message.from_.first_name}: {message.text[0:90]}")
+                    f"{create_username(message.from_.first_name, message.from_.username)}: {message.text[0:85]}")
 
     @async_elapsed_time
     async def image_downloader(
@@ -530,8 +536,9 @@ if __name__ == '__main__':
         bot_config_file='bot_configs.json',
         commemorations_file='commemorations.json',
         user_mood_file='user_mood.json',
+        user_opinions_file='user_opinions.json',
         secrets_file=SECRETS_FILE,
-        debug_mode=False
+        debug_mode=False,
     )
 
     asyncio.run(

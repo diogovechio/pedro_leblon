@@ -285,7 +285,7 @@ class OpenAiCompletion:
             chat="ASD",
             only_chatgpt=False,
             only_davinci=False,
-            biased=True,
+            users_opinions: T.Optional[dict] = None,
             moderate=True,
             temperature=1,
             prompt_inject: T.Optional[str] = None,
@@ -314,8 +314,9 @@ class OpenAiCompletion:
             model = await self._model_selector(message_username)
             prompt = (await pre_biased_prompt(
                 full_text=full_text,
-                last_words=short_text
-            ) if biased else full_text)
+                last_words=short_text,
+                users_opinions=users_opinions
+            ) if users_opinions else full_text)
 
         is_flagged, moderation_results = await self.is_flagged(prompt)
 
@@ -343,7 +344,7 @@ class OpenAiCompletion:
                         model=model,
                         always_ironic=always_ironic,
                         mood=mood,
-                        biased=biased,
+                        biased=users_opinions,
                         replace_pre_prompt=replace_pre_prompt
                     ),
                     timeout=timeout

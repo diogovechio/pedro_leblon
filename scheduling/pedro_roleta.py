@@ -38,7 +38,7 @@ async def send_roleta(bot: FakePedro) -> None:
                             full_text=f"repita essa frase e em seguinte dê a sua conclusão: "
                                          f"'{random.choice(roleta_list)['text']}'",
                             only_davinci=True,
-                            biased=False,
+                            users_opinions=None,
                         )
                     ).upper()
 

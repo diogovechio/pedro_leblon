@@ -157,7 +157,7 @@ async def create_caption(
             full_text=f"considerando que você é o pedro, diga ao {face_data.face_name} que você achou ele "
                          f"{face_data.emotion} nessa foto. faça um comentário sobre a foto.\n\npedro:",
             temperature=1.0,
-            biased=True
+            users_opinions=bot.user_opinions
         ) if face_data.emotion else await greeter(
             name=face_data.face_name,
             match_result=face_data.match_result,

@@ -74,6 +74,7 @@ def check_agenda_and_save(bot: FakePedro):
         new_agenda_data = asdict(bot.commemorations)
         user_forecast = json.dumps(bot.config.user_last_forecast)
         user_mood = json.dumps(bot.mood_per_user, indent=4)
+        user_opinions = json.dumps(bot.user_opinions, indent=4)
 
         for idx, _ in enumerate(new_agenda_data['data']):
             new_agenda_data['data'][idx]['created_at'] = str(new_agenda_data['data'][idx]['created_at'])
@@ -91,6 +92,9 @@ def check_agenda_and_save(bot: FakePedro):
 
         with open("user_mood_tmp.json", "w", encoding="utf8") as file:
             file.write(user_mood)
+
+        with open("user_opinions_tmp.json", "w", encoding="utf8") as file:
+            file.write(user_opinions)
 
         for entry, value in bot.chats_in_memory.items():
             dir_name = f'chat_logs/{entry.split(":")[0]}'
@@ -119,8 +123,12 @@ def check_agenda_and_save(bot: FakePedro):
         if os.path.exists("user_mood.json"):
             os.remove("user_mood.json")
 
+        if os.path.exists("user_opinions.json"):
+            os.remove("user_opinions.json")
+
         os.rename("commemorations_tmp.json", "commemorations.json")
         os.rename("forecast_tmp.json", "forecast_users.json")
         os.rename("user_mood_tmp.json", "user_mood.json")
+        os.rename("user_opinions_tmp.json", "user_opinions.json")
     except Exception as exc:
         bot.loop.create_task(telegram_logging(exc))

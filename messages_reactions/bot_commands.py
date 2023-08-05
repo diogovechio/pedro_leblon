@@ -83,7 +83,7 @@ async def bot_commands(
                         full_text=prompt,
                         temperature=1,
                         only_davinci=only_davinci,
-                        biased=False,
+                        users_opinions=bot.user_opinions
                     )).lower(),
                     chat_id=message.chat.id,
                     reply_to=message.message_id,
@@ -338,7 +338,7 @@ async def bot_commands(
                                       f"pedro:",
                             temperature=1,
                             only_davinci=True,
-                            biased=True,
+                            users_opinions=bot.user_opinions
                         )).upper(),
                         chat_id=message.chat.id,
                         reply_to=message.message_id,

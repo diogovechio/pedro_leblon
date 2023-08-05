@@ -11,6 +11,7 @@ from scheduling.check_pending_and_save import check_agenda_and_save
 from scheduling.commemorations import fixed_commemorations
 from scheduling.daily_reset import daily_routines
 from scheduling.pedro_roleta import pedro_roleta
+from scheduling.pedro_opinions import pedro_opinions
 from utils.logging_utils import telegram_logging
 
 
@@ -45,6 +46,10 @@ async def scheduler(bot: FakePedro) -> None:
 
     schedule.every(13).minutes.do(
         pedro_roleta, bot
+    )
+
+    schedule.every(2).days.do(
+        pedro_opinions, bot
     )
 
     schedule.every(3).minutes.do(

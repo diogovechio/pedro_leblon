@@ -135,14 +135,18 @@ async def message_destroyer(message_text: str, extra_text=True) -> str:
     return message_text
 
 
-async def pre_biased_prompt(full_text: str, last_words: str = "") -> str:
+async def pre_biased_prompt(
+        full_text: str,
+        users_opinions: T.Dict[str, T.List[str]],
+        last_words: str = ""
+) -> str:
     additional_text = ''
 
     for entity in PEDRO_GENERAL_OPINIONS:
         if entity in full_text.lower():
             additional_text += random.choice(PEDRO_GENERAL_OPINIONS[entity])
 
-    for entity_names, opinions in PEDRO_USERS_OPINIONS.items():
+    for entity_names, opinions in users_opinions.items():
         ignore = entity_names.split("#")
         if "#" in entity_names:
             entity_names = entity_names.split("#")[0]

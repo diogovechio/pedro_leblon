@@ -122,7 +122,7 @@ async def _complain_swear_word(data: ReactData) -> None:
                             random.random()) else OPENAI_PROMPTS['critique_reformule'],
                         remove_words_list=['pedro'],
                         only_davinci=True,
-                        biased=False,
+                        users_opinions=None,
                         temperature=1,
                     ),
                     chat_id=data.message.chat.id,
@@ -141,7 +141,7 @@ async def _forecast_detect(data: ReactData) -> bool:
         chat=data.message.chat.title,
         only_chatgpt=True,
         prompt_inject=None,
-        biased=False,
+        users_opinions=None,
         remove_words_list=['pedro'],
     )
     message_check = message_check.split('\n')
@@ -172,7 +172,7 @@ async def _forecast_detect(data: ReactData) -> bool:
                         only_chatgpt=True,
                         prompt_inject=OPENAI_PROMPTS['previsao_tempo'] if random.random() > 0.1 else OPENAI_PROMPTS[
                             'previsao_tempo_sensacionalista'],
-                        biased=False,
+                        users_opinions=None,
                         remove_words_list=['pedro'],
                     ),
                     chat_id=data.message.chat.id,
@@ -225,7 +225,7 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
                          f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}, "
                          f"só ultrapasse 160 caracteres se for essencial para a sua resposta, "
                          f"não comente mensagens anteriores a dele:",
-                    biased=False if data.url_detector else True,
+                    users_opinions=None if data.url_detector else bot.user_opinions,
                     moderate=True,
                     remove_words_list=None,
                     always_ironic=always_ironic,
@@ -360,7 +360,7 @@ async def _boring_pedro(data: ReactData) -> None:
                     chat=data.message.chat.title,
                     prompt_inject=None,
                     only_chatgpt=True,
-                    biased=False,
+                    users_opinions=None,
                     destroy_message=data.destroy_message,
                     remove_words_list=['/pedro'],
                     return_raw_text=True,
@@ -387,7 +387,7 @@ async def _tlsr(data: ReactData) -> None:
                     chat=data.message.chat.title,
                     prompt_inject=None,
                     moderate=False,
-                    biased=False,
+                    users_opinions=None,
                     only_chatgpt=True,
                     remove_words_list=None
                 ),
@@ -454,7 +454,7 @@ async def _nem_li(data: ReactData, days=5, topics=False) -> None:
                     chat=data.message.chat.title,
                     prompt_inject=None,
                     moderate=False,
-                    biased=False,
+                    users_opinions=None,
                     only_chatgpt=True,
                     remove_words_list=None,
                     replace_pre_prompt=[
@@ -500,7 +500,7 @@ async def _tldr(data: ReactData) -> None:
                         chat=data.message.chat.title,
                         prompt_inject=None,
                         moderate=False,
-                        biased=False,
+                        users_opinions=bot.user_opinions,
                         only_chatgpt=True,
                         remove_words_list=None,
                         replace_pre_prompt=[
@@ -603,7 +603,7 @@ async def _critic_or_praise(data: ReactData) -> None:
             prompt_inject="O",
             temperature=1,
             only_davinci=True,
-            biased=False,
+            users_opinions=None,
             remove_words_list=['asd']
         )
         message_text = openai_text.lower()
@@ -685,7 +685,7 @@ async def _reply_reaction(data: ReactData) -> None:
                                   f"só ultrapasse 120 caracteres se for essencial para a sua resposta,"
                                   f" não comente mensagens anteriores a dele:",
                     moderate=False,
-                    biased=True,
+                    users_opinions=bot.user_opinions,
                     mood=bot.mood_per_user[data.username],
                     always_ironic=data.limited_prompt
                 ),
@@ -712,7 +712,7 @@ async def _random_conversation(data: ReactData) -> None:
                           'seus amigos, comente algum dos assuntos criando uma curta resposta '
                           'para "pedro" no final: ',
             only_chatgpt=True,
-            biased=True,
+            users_opinions=bot.user_opinions,
         )
 
         if not any(word in message for word in CHATGPT_BS):
