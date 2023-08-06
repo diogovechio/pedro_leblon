@@ -4,7 +4,23 @@ from pedro_leblon import FakePedro, telegram_logging
 from utils.openai_utils import list_crop
 from utils.roleta_utils import get_roletas_from_pavuna
 
-NO_OPINION = ["wolo", "não há", "não tenho", "não encontrei", "mencionado", "citado", "mencionada", "citada"]
+NO_OPINION = [
+    "wolo",
+    "não há",
+    "não tenho",
+    "não encontrei",
+    "mencionado",
+    "citado",
+    "mencionada",
+    "citada",
+    "não tem informações",
+    "não há informações",
+    "não há informação",
+    "não tem informações",
+    "existe informação",
+    "existem informações",
+    "para opinar"
+]
 
 
 def pedro_opinions(bot: FakePedro) -> None:
@@ -21,7 +37,14 @@ async def get_opinions(bot: FakePedro) -> None:
     for key, chat in bot.chats_in_memory.items():
         messages = [*messages, *chat]
 
-    messages = list_crop(messages, 175)
+    chat_filtered = []
+    for x in [y for y in messages if len(y) > 2]:
+        if x[0].isdigit() and x[2] == ":":
+            chat_filtered.append(x[8:])
+        else:
+            chat_filtered.append(x)
+
+    messages = list_crop(chat_filtered, 175)
 
     messages = "\n".join(messages)
     users_names = [name for name in bot.user_opinions]
