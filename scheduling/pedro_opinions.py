@@ -21,7 +21,7 @@ async def get_opinions(bot: FakePedro) -> None:
     for key, chat in bot.chats_in_memory.items():
         messages = [*messages, *chat]
 
-    messages = list_crop(messages, 100)
+    messages = list_crop(messages, 175)
 
     messages = "\n".join(messages)
     users_names = [name for name in bot.user_opinions]
