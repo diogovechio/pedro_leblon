@@ -55,12 +55,12 @@ async def get_opinions(bot: FakePedro) -> None:
             if response[0].isdigit():
                 if ":" in response:
                     text = response.split(":")[-1]
-                    name = ((response.split(":")[0]).split("-")[-1]).replace("@", ", também conhecido como ,")
+                    name = ((response.split(":")[0]).split("-")[-1]).replace("@", ", também conhecido como ")
                     opinion = (f"{name}{text}.".lower()).strip()
 
                     username = users_names[idx]
 
                     if len(bot.user_opinions[username]) > 5:
-                        del bot.user_opinions[username][0]
+                        del bot.user_opinions[username][1]
 
                     bot.user_opinions[username].append(opinion)

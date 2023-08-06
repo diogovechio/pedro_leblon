@@ -303,8 +303,9 @@ class FakePedro:
                     self.messages_in_memory[message.chat.id].append(
                         f"{create_username(message.from_.first_name, message.from_.username)}: {message.text[0:90]}")  # legacy
 
-                self.chats_in_memory[f"{message.chat.id}:{day_now}"].append(
-                    f"{create_username(message.from_.first_name, message.from_.username)}: {message.text[0:95]}")
+                if "/" not in message.text[0]:
+                    self.chats_in_memory[f"{message.chat.id}:{day_now}"].append(
+                        f"{time_now} - {create_username(message.from_.first_name, message.from_.username)}: {message.text[0:95]}")
 
     @async_elapsed_time
     async def image_downloader(
@@ -538,7 +539,7 @@ if __name__ == '__main__':
         user_mood_file='user_mood.json',
         user_opinions_file='user_opinions.json',
         secrets_file=SECRETS_FILE,
-        debug_mode=True,
+        debug_mode=False,
     )
 
     asyncio.run(
