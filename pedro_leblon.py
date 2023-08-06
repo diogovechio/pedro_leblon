@@ -298,7 +298,7 @@ class FakePedro:
                 day_now = date[0]
                 time_now = (date[-1].split(".")[0])[:-3]
 
-                await asyncio.sleep(3)
+                await asyncio.sleep(1)
                 if len(message.text) > 10:
                     self.messages_in_memory[message.chat.id].append(
                         f"{create_username(message.from_.first_name, message.from_.username)}: {message.text[0:90]}")  # legacy
@@ -539,7 +539,7 @@ if __name__ == '__main__':
         user_mood_file='user_mood.json',
         user_opinions_file='user_opinions.json',
         secrets_file=SECRETS_FILE,
-        debug_mode=True,
+        debug_mode=False,
     )
 
     asyncio.run(
