@@ -4,6 +4,7 @@ import re
 import typing as T
 from asyncio import get_running_loop
 from bs4 import BeautifulSoup
+from unidecode import unidecode
 
 from pedro_leblon import telegram_logging
 from constants.constants import PEDRO_USERS_OPINIONS, PEDRO_GENERAL_OPINIONS
@@ -160,6 +161,7 @@ async def pre_biased_prompt(
             ignore = "wololololo"
 
         for name in names_list:
+            name = unidecode(name)
             if name in last_words.lower() and ignore not in last_words.lower() and len(opinions):
                 friends_names.append(name)
                 friends_text += random.choice(opinions) + "\n"
