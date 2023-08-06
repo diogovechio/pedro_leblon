@@ -61,12 +61,12 @@ async def openai_reactions(
         elif command_in("/tlsr", data.message.text):
             days = re.sub("\D", "", data.message.text)
 
-            await _nem_li(data=data, days=int(days) if days else 1, topics=True)
+            await _nem_li(data=data, days=int(days) if days else 0, topics=True)
 
         elif command_in("/nemli", data.message.text) or command_in("/tldr", data.message.text):
             days = re.sub("\D", "", data.message.text)
 
-            await _nem_li(data=data, days=int(days) if days else 1, topics=False)
+            await _nem_li(data=data, days=int(days) if days else 0, topics=False)
 
         elif (
                 command_in("/critique", data.message.text) or
@@ -405,7 +405,7 @@ async def _tlsr(data: ReactData) -> None:
 @async_elapsed_time
 async def _nem_li(data: ReactData, days=5, topics=False) -> None:
     # todo var env
-    message_limit = 140
+    message_limit = 175
     bot = data.bot
 
     with data.bot.sending_action(data.message.chat.id, user=data.message.from_.first_name, action="typing"):
@@ -445,7 +445,7 @@ async def _nem_li(data: ReactData, days=5, topics=False) -> None:
                 if str(data.message.chat.id) in key:
                     date = datetime.datetime.strptime(key.split(":")[-1], "%Y-%m-%d")
                     dif_days = (data.bot.datetime_now - date).days
-                    if dif_days < days:
+                    if dif_days <= days:
                         chat_filtered = []
                         for x in [y for y in value if len(y) > 2]:
                             if x[0].isdigit() and x[2] == ":":
