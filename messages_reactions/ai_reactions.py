@@ -688,10 +688,6 @@ async def _reply_reaction(data: ReactData) -> None:
 
     chat_messages = bot.messages_in_memory[data.message.chat.id][-3:]
 
-    short_text = ""
-    if len(chat_messages):
-        short_text = "\n".join([text.split(":")[-1] for text in chat_messages])
-
     with bot.sending_action(data.message.chat.id, action="typing"):
         chat = "\n".join(bot.messages_in_memory[data.message.chat.id][-10:])
         insert_pedro_msg = f"{chat}\npedro: {data.message.reply_to_message.text}"

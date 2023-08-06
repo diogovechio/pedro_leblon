@@ -280,7 +280,7 @@ class OpenAiCompletion:
     async def generate_message(
             self,
             full_text: str,
-            short_text="",
+            short_text="",  # deprecated
             message_username: T.Optional[str] = "",
             chat="ASD",
             only_chatgpt=False,
@@ -296,6 +296,8 @@ class OpenAiCompletion:
             mood=0.0,
             replace_pre_prompt: T.Optional[T.List[dict]] = None
     ) -> str:
+        short_text = full_text
+
         datetime_now = datetime.datetime.utcnow() - datetime.timedelta(hours=3)
 
         full_text = full_text.lower()
@@ -314,7 +316,7 @@ class OpenAiCompletion:
             model = await self._model_selector(message_username)
             prompt = (await pre_biased_prompt(
                 full_text=full_text,
-                last_words=short_text,
+                last_words=short_text,  # deprecated
                 users_opinions=users_opinions
             ) if users_opinions else full_text)
 

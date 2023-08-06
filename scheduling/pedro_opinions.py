@@ -4,6 +4,8 @@ from pedro_leblon import FakePedro, telegram_logging
 from utils.openai_utils import list_crop
 from utils.roleta_utils import get_roletas_from_pavuna
 
+NO_OPINION = ["wolo", "não há", "não tenho", "não encontrei"]
+
 
 def pedro_opinions(bot: FakePedro) -> None:
     try:
@@ -51,7 +53,7 @@ async def get_opinions(bot: FakePedro) -> None:
     response_parser = response.split("\n")
 
     for idx, response in enumerate(response_parser):
-        if "wolo" not in response.lower():
+        if not any(word in response.lower() for word in NO_OPINION):
             if response[0].isdigit():
                 if ":" in response:
                     text = response.split(":")[-1]
