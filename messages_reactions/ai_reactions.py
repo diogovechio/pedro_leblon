@@ -184,9 +184,6 @@ async def _forecast_detect(data: ReactData) -> bool:
 @async_elapsed_time
 async def _default_pedro(data: ReactData, always_ironic=False) -> None:
     bot = data.bot
-
-    short_text = data.input_text
-
     if data.url_detector:
         prompt_text = data.input_text
     else:
@@ -196,7 +193,6 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
 
         if len(chat_messages):
             chat_text = "\n".join(chat_messages[:-1 if data.message.text in chat_messages[-1] else len(chat_messages)])
-            short_text = "\n".join([text.split(":")[-1] for text in chat_messages])
 
         if data.message.reply_to_message:
             chat_text += f"\n{data.message.reply_to_message.from_.first_name}: {data.message.reply_to_message.text}\n"

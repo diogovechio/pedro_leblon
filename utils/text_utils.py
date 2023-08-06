@@ -147,6 +147,8 @@ async def pre_biased_prompt(
             additional_text += random.choice(PEDRO_GENERAL_OPINIONS[entity])
             additional_text += "\n"
 
+    friends_text = ""
+    friends_names = []
     for entity_names, opinions in users_opinions.items():
         ignore = entity_names.split("#")
         if "#" in entity_names:
@@ -159,9 +161,16 @@ async def pre_biased_prompt(
 
         for name in names_list:
             if name in last_words.lower() and ignore not in last_words.lower():
-                additional_text += random.choice(opinions)
-                additional_text += "\n"
+                friends_names.append(name)
+                friends_text += random.choice(opinions) + "\n"
                 break
+
+    if len(friends_names):
+        pre_text = "\n\nesses pessoas são amigas do pedro: "
+        pre_text += ", ".join(friends_names)
+        pre_text += ".\n\nessas são as opiniões do pedro sobre esses amigos:\n"
+        pre_text += friends_text
+        additional_text += pre_text
 
     if len(additional_text):
         return f"considere que o pedro tem essas opiniões:\n" \
