@@ -162,6 +162,8 @@ async def pre_biased_prompt(
 
         for name in names_list:
             name = unidecode(name)
+            last_words = unidecode(last_words)
+
             if name in last_words.lower() and ignore not in last_words.lower() and len(opinions):
                 friends_names.append(name)
                 friends_text += random.choice(opinions) + "\n"
