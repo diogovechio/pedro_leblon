@@ -445,7 +445,7 @@ async def _nem_li(data: ReactData, days=5, topics=False) -> None:
                 if str(data.message.chat.id) in key:
                     date = datetime.datetime.strptime(key.split(":")[-1], "%Y-%m-%d")
                     dif_days = (data.bot.datetime_now - date).days
-                    if dif_days <= days:
+                    if dif_days < days:
                         chat_filtered = []
                         for x in [y for y in value if len(y) > 2]:
                             if x[0].isdigit() and x[2] == ":":
@@ -685,8 +685,6 @@ async def _react_to_words(data: ReactData) -> None:
 @async_elapsed_time
 async def _reply_reaction(data: ReactData) -> None:
     bot = data.bot
-
-    chat_messages = bot.messages_in_memory[data.message.chat.id][-3:]
 
     with bot.sending_action(data.message.chat.id, action="typing"):
         chat = "\n".join(bot.messages_in_memory[data.message.chat.id][-10:])
