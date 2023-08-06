@@ -160,7 +160,7 @@ async def pre_biased_prompt(
             ignore = "wololololo"
 
         for name in names_list:
-            if name in last_words.lower() and ignore not in last_words.lower():
+            if name in last_words.lower() and ignore not in last_words.lower() and len(opinions):
                 friends_names.append(name)
                 friends_text += random.choice(opinions) + "\n"
                 break
