@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import logging
 import math
 import random
 import typing as T
@@ -141,7 +142,7 @@ class OpenAiCompletion:
             only_davinci=False,
             temperature: int = 1,
             always_ironic=False,
-            biased=True,
+            biased: T.Any = True,
             replace_pre_prompt: T.Optional[T.List[dict]] = None
     ) -> str:
         async with asyncio.Semaphore(self.semaphore):
@@ -199,6 +200,9 @@ class OpenAiCompletion:
                         response = await chatgpt_request.text()
                         response_text = json.loads(response)['choices'][0]['message']['content']
 
+                        logging_resp = response.replace(response_text, "...")
+                        logging.info(logging_resp)
+
                         self.loop.create_task(telegram_logging(f"gpt-3.5-turbo: {response_text} - mood: {mood} - {mood_selector}"))
                         self.loop.create_task(telegram_logging(prompt))
 
@@ -220,6 +224,9 @@ class OpenAiCompletion:
                 response_text = json.loads(await openai_request.text())['choices'][0]['text']
                 self.loop.create_task(telegram_logging(prompt))
                 self.loop.create_task(telegram_logging(f"{model}: {response_text}"))
+
+                logging_resp = response.replace(response_text, "...")
+                logging.info(logging_resp)
 
                 return response_text
 

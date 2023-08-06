@@ -4,7 +4,7 @@ from pedro_leblon import FakePedro, telegram_logging
 from utils.openai_utils import list_crop
 from utils.roleta_utils import get_roletas_from_pavuna
 
-NO_OPINION = ["wolo", "não há", "não tenho", "não encontrei"]
+NO_OPINION = ["wolo", "não há", "não tenho", "não encontrei", "mencionado", "citado", "mencionada", "citada"]
 
 
 def pedro_opinions(bot: FakePedro) -> None:
