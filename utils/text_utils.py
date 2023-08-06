@@ -168,7 +168,8 @@ async def pre_biased_prompt(
     if len(friends_names):
         pre_text = "\n\nesses pessoas são amigas do pedro: "
         pre_text += ", ".join(friends_names)
-        pre_text += ".\n\nessas são as opiniões do pedro sobre esses amigos:\n"
+        pre_text += ".\n\nessas são as opiniões do pedro sobre esses amigos. expresse o que sabe sobre eles sempre que " \
+                    "lhe for perguntado:\n"
         pre_text += friends_text
         additional_text += pre_text
 

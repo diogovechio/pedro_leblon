@@ -188,7 +188,7 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
         prompt_text = data.input_text
     else:
         chat_text = ""
-        chat_messages = bot.messages_in_memory[data.message.chat.id][-7:]
+        chat_messages = bot.messages_in_memory[data.message.chat.id][-5:]
         user_message = f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}: {data.input_text}\n"
 
         if len(chat_messages):
@@ -214,9 +214,9 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
                     destroy_message=data.destroy_message,
                     prompt_inject=None
                     if data.url_detector or data.destroy_message
-                    else f"fingindo ser o pedro, responda objetivamente a mensagem de "
-                         f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}, "
-                         f"só ultrapasse 160 caracteres se for essencial para a sua resposta, "
+                    else f"fingindo ser o pedro, responda objetivamente apenas a mensagem '{data.input_text}' enviada por "
+                         f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)} "
+                         f"no final da conversa. só ultrapasse 160 caracteres se for essencial para a sua resposta, "
                          f"não comente mensagens anteriores a dele:",
                     users_opinions=None if data.url_detector else bot.user_opinions,
                     moderate=True,
