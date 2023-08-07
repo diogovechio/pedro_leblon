@@ -489,7 +489,7 @@ async def _nem_li(data: ReactData, days=5, topics=False) -> None:
 
                 first_word = new_chat_title.split(" ")[0]
 
-                new_chat_title = new_chat_title.replace(first_word, "BLA")
+                new_chat_title = (new_chat_title.replace(first_word, "BLA")).replace('"', '')
 
                 bot.loop.create_task(
                     bot.set_chat_title(
