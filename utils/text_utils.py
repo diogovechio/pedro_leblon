@@ -150,6 +150,8 @@ async def pre_biased_prompt(
 
     friends_text = ""
     friends_names = []
+
+    counter = 0
     for entity_names, opinions in users_opinions.items():
         ignore = entity_names.split("#")
         if "#" in entity_names:
@@ -165,8 +167,10 @@ async def pre_biased_prompt(
             last_words = unidecode(last_words)
 
             if name in last_words.lower() and ignore not in last_words.lower() and len(opinions):
+                counter += 1
                 friends_names.append(name)
-                friends_text += random.choice(opinions) + "\n"
+                friends_text += f"{counter} - sobre {name}: "
+                friends_text += " ... ".join(opinions) + '\n\n'
                 break
 
     if len(friends_names):
