@@ -425,7 +425,7 @@ async def _nem_li(data: ReactData, days=5, topics=False) -> None:
                     reply_to=data.message.message_id)
             )
         else:
-            chats = bot.chats_in_memory
+            chats = dict(sorted(bot.chats_in_memory.items()))
 
             filtered_chats = defaultdict(list)
             chats_texts = []
@@ -451,7 +451,6 @@ async def _nem_li(data: ReactData, days=5, topics=False) -> None:
 
                         value = list_crop(chat_filtered, message_limit_per_chat)
                         filtered_chats[key] = [f"...{WEEKDAYS[date.weekday()]}..."] + value
-
             for key, value in filtered_chats.items():
                 chats_texts = [*chats_texts, *value]
 

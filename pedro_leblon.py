@@ -71,7 +71,7 @@ class FakePedro:
 
         self.messages_in_memory = defaultdict(lambda: MaxSizeList(130))  # legacy
         self.chats_in_memory = defaultdict(list)
-        self.chat_in_memory_max_load_days = 14
+        self.chat_in_memory_max_load_days = 180
 
         self.mood_per_user = defaultdict(lambda: 0.0)
         self.user_opinions = defaultdict(list)
