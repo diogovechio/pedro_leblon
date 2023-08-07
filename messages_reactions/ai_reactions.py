@@ -442,9 +442,7 @@ async def _nem_li(data: ReactData, days=5, topics=False) -> None:
                 if random.random() < data.bot.config.random_params.words_react_frequency:
                     prompt += ", de maneira sensacionalista e irônica"
 
-            bot.loop.create_task(
-                bot.send_message(
-                    message_text=await bot.openai.generate_message(
+            tldr = await bot.openai.generate_message(
                         message_username=data.username,
                         full_text=f"{prompt}:\n\n{chat}",
                         chat=data.message.chat.title,
@@ -460,12 +458,46 @@ async def _nem_li(data: ReactData, days=5, topics=False) -> None:
                                            "nunca se refira ao Pedro na terceira pessoa."
                             }
                         ]
-                    ),
+                    )
+
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=tldr,
                     chat_id=data.message.chat.id,
                     reply_to=data.message.message_id,
                     save_message=False
                 )
             )
+
+            if (
+                    not bot.mocked_today or random.random() < data.bot.config.random_params.words_react_frequency
+            ) and data.message.chat.id not in data.bot.config.not_internal_chats:
+                title_prompt = "com base no texto abaixo, sugira o nome de um chat em no máximo 4 palavras:\n\n"
+                title_prompt += tldr
+
+                new_chat_title = await bot.openai.generate_message(
+                    message_username=data.username,
+                    full_text=title_prompt,
+                    chat=data.message.chat.title,
+                    prompt_inject=None,
+                    only_chatgpt=True,
+                    users_opinions=None,
+                    destroy_message=data.destroy_message,
+                    remove_words_list=['/pedro'],
+                    return_raw_text=True,
+                )
+
+                first_word = new_chat_title.split(" ")[0]
+
+                new_chat_title = new_chat_title.replace(first_word, "BLA")
+
+                bot.loop.create_task(
+                    bot.set_chat_title(
+                        chat_id=data.message.chat.id,
+                        title=new_chat_title)
+                )
+
+                bot.mocked_today = True
 
 
 @async_elapsed_time

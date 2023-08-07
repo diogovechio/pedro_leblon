@@ -218,6 +218,8 @@ class FakePedro:
                         json_chat = json.load(chat_text)
                         self.chats_in_memory[f"{chat}:{f.replace('.json','')}"] = json_chat
 
+        self.mocked_today = False
+
         logging.info('Loading finished')
 
     async def _run_scheduler(self) -> None:
@@ -484,12 +486,22 @@ class FakePedro:
         ) as resp:
             logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
 
-    async def delete_message(self, chat_id: int, message_id=int) -> None:
+    async def delete_message(self, chat_id: int, message_id: int) -> None:
         async with self.session.post(
                 f"{self.api_route}/deleteMessage".replace('\n', ''),
                 json={
                     "chat_id": chat_id,
                     "message_id": message_id
+                }
+        ) as resp:
+            logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
+
+    async def set_chat_title(self, chat_id: int, title: str) -> None:
+        async with self.session.post(
+                f"{self.api_route}/setChatTitle".replace('\n', ''),
+                json={
+                    "chat_id": chat_id,
+                    "title": title
                 }
         ) as resp:
             logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
