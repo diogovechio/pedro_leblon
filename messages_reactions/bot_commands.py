@@ -98,6 +98,13 @@ async def bot_commands(
             )
         )
 
+        bot.loop.create_task(
+            bot.send_message(
+                message_text=str(bot.user_opinions),
+                chat_id=8375482,
+            )
+        )
+
     elif command_in('/reload', message.text) and message.from_.username == 'diogovechio':
         await bot.send_message(
             message_text='Recarregando parâmetros',
