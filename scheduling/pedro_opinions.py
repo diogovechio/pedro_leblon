@@ -14,6 +14,7 @@ NO_OPINION = [
     "mencionada",
     "citada",
     "não aparece",
+    "nenhuma atualização",
     "não tem informações",
     "não há informações",
     "não há informação",
