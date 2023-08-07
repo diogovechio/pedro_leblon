@@ -8,7 +8,7 @@ from constants.constants import SWEAR_WORDS, OPENAI_REACT_WORDS, OPENAI_PROMPTS,
 from data_classes.react_data import ReactData
 from utils.face_utils import put_list_of_faces_on_background
 from utils.logging_utils import async_elapsed_time
-from utils.openai_utils import return_dall_e_limit, list_crop
+from utils.openai_utils import return_dall_e_limit, list_crop, chat_log_extractor
 from utils.roleta_utils import get_roletas_from_pavuna, arrombado_classifier
 from utils.text_utils import command_in, create_username, message_destroyer
 from utils.weather_utils import weather_prompt, get_forecast, WEEKDAYS
@@ -425,36 +425,13 @@ async def _nem_li(data: ReactData, days=5, topics=False) -> None:
                     reply_to=data.message.message_id)
             )
         else:
-            chats = dict(sorted(bot.chats_in_memory.items()))
-
-            filtered_chats = defaultdict(list)
-            chats_texts = []
-
-            chat_counter = 0
-            for key, value in chats.items():
-                if str(data.message.chat.id) in key:
-                    chat_counter += 1
-
-            message_limit_per_chat = int(message_limit / chat_counter)
-
-            for key, value in chats.items():
-                if str(data.message.chat.id) in key:
-                    date = datetime.datetime.strptime(key.split(":")[-1], "%Y-%m-%d")
-                    dif_days = (data.bot.datetime_now - date).days
-                    if dif_days <= days:
-                        chat_filtered = []
-                        for x in [y for y in value if len(y) > 2]:
-                            if x[0].isdigit() and x[2] == ":":
-                                chat_filtered.append(x[8:])
-                            else:
-                                chat_filtered.append(x)
-
-                        value = list_crop(chat_filtered, message_limit_per_chat)
-                        filtered_chats[key] = [f"...{WEEKDAYS[date.weekday()]}..."] + value
-            for key, value in filtered_chats.items():
-                chats_texts = [*chats_texts, *value]
-
-            chat = "\n".join(chats_texts) + "."
+            chat = chat_log_extractor(
+                chats=bot.chats_in_memory,
+                chat_id=str(data.message.chat.id),
+                message_limit=message_limit,
+                date_now=bot.datetime_now,
+                max_period_days=days
+            )
 
             if topics:
                 prompt = "em no máximo 7 tópicos de no máximo 6 palavras cada, " \

@@ -3,28 +3,19 @@ import typing as T
 from asyncio import get_running_loop, wait_for
 from datetime import datetime
 
-from constants.constants import WEATHER_PROMPT
+from constants.constants import WEATHER_PROMPT, WEEKDAYS
 
 from geopy.geocoders import Nominatim
 
 from pedro_leblon import FakePedro
 from utils.logging_utils import telegram_logging
 
-
-WEEKDAYS = [
-    "segunda-feira",
-    "terça-feira",
-    "quarta-feira",
-    "quinta-feira",
-    "sexta-feira",
-    "sábado",
-    "domingo"
-]
-
 datetime.fromtimestamp(1681740000).weekday()
+
 
 async def weather_prompt(message: str) -> str:
     return f"dado a seguinte mensagem:\n\n'{message}'\n\n{WEATHER_PROMPT}"
+
 
 async def get_forecast(bot: FakePedro, place: T.Optional[str], days: T.Optional[int]) -> str:
     if not place:

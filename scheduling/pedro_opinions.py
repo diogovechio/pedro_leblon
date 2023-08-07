@@ -1,7 +1,7 @@
 import random
 
 from pedro_leblon import FakePedro, telegram_logging
-from utils.openai_utils import list_crop
+from utils.openai_utils import list_crop, chat_log_extractor
 from utils.roleta_utils import get_roletas_from_pavuna
 
 NO_OPINION = [
@@ -13,6 +13,7 @@ NO_OPINION = [
     "citado",
     "mencionada",
     "citada",
+    "não aparece",
     "não tem informações",
     "não há informações",
     "não há informação",
@@ -33,20 +34,13 @@ def pedro_opinions(bot: FakePedro) -> None:
 
 
 async def get_opinions(bot: FakePedro) -> None:
-    messages = []
-    for key, chat in bot.chats_in_memory.items():
-        messages = [*messages, *chat]
+    messages = chat_log_extractor(
+        chats=bot.chats_in_memory,
+        message_limit=175,
+        date_now=bot.datetime_now,
+        max_period_days=4
+    )
 
-    chat_filtered = []
-    for x in [y for y in messages if len(y) > 2]:
-        if x[0].isdigit() and x[2] == ":":
-            chat_filtered.append(x[8:])
-        else:
-            chat_filtered.append(x)
-
-    messages = list_crop(chat_filtered, 175)
-
-    messages = "\n".join(messages)
     users_names = [name for name in bot.user_opinions]
     user_list = [f"{key + 1} - {user.split('#')[0]}" for key, user in enumerate(users_names)]
     users = '\n'.join(user_list)
@@ -55,12 +49,12 @@ async def get_opinions(bot: FakePedro) -> None:
         "role": "system",
         "content": "finja ser pedro, um observador de uma conversa. "
                    "limite-se a dizer, de maneira enumerada e respeitando os números que lhe forem passados, "
-                   "a percepção de pedro para cada um com base na conversa abaixo."
+                   "a percepção de pedro para cada um com base na conversa abaixo. "
+                   "caso não encontre as mensagens da pessoa ou não tenha informações o suficiente, "
+                   "diga apenas WOLOLOLO pra ela"
     }
 
-    prompt = "pedro, o que voce pensa sobre cada uma dessas pessoas? caso não encontre as mensagens da pessoa ou " \
-             "não tenha informações o suficiente, " \
-             "diga apenas WOLOLOLO pra ela:"
+    prompt = "pedro, o que voce pensa sobre cada uma dessas pessoas?"
 
     response = await bot.openai.generate_message(
         full_text=f"{prompt}\n{users}\n\n{messages}\n\npedro:",

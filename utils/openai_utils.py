@@ -8,10 +8,11 @@ import typing as T
 import json
 from asyncio import get_running_loop
 import re
+from collections import defaultdict
 
 import aiohttp
 
-from constants.constants import OPENAI_PROMPTS, CHATGPT_BS, PEDROS_ROLETAS, PEDRO_MOOD, PEDRO_IN_LOVE
+from constants.constants import OPENAI_PROMPTS, CHATGPT_BS, PEDROS_ROLETAS, PEDRO_MOOD, PEDRO_IN_LOVE, WEEKDAYS
 from utils.logging_utils import telegram_logging, async_elapsed_time
 from utils.text_utils import pre_biased_prompt, message_destroyer, normalize_openai_text, html_paragraph_extractor, \
     youtube_caption_extractor
@@ -458,3 +459,45 @@ def list_crop(l: list, max_size: int) -> list:
     for i in range(jump - 1, len(l), jump):
         new_list.append(l[i])
     return new_list
+
+
+def chat_log_extractor(
+        chats: dict,
+        date_now: datetime,
+        message_limit: int = 140,
+        max_period_days: int = 0,
+        chat_id: T.Optional[str] = None,
+) -> str:
+    chats = dict(sorted(chats.items()))
+
+    filtered_chats = defaultdict(list)
+    chats_texts = []
+
+    chat_counter = 0
+    for key, value in chats.items():
+        if str(chat_id) in key:
+            chat_counter += 1
+
+    if chat_counter == 0:
+        message_limit_per_chat = int(message_limit / len(chats))
+    else:
+        message_limit_per_chat = int(message_limit / chat_counter)
+
+    for key, value in chats.items():
+        if str(chat_id) in key or not chat_id:
+            date = datetime.datetime.strptime(key.split(":")[-1], "%Y-%m-%d")
+            dif_days = (date_now - date).days
+            if dif_days <= max_period_days:
+                chat_filtered = []
+                for x in [y for y in value if len(y) > 2]:
+                    if x[0].isdigit() and x[2] == ":":
+                        chat_filtered.append(x[8:])
+                    else:
+                        chat_filtered.append(x)
+
+                value = list_crop(chat_filtered, message_limit_per_chat)
+                filtered_chats[key] = [f"...{WEEKDAYS[date.weekday()]}..."] + value
+    for key, value in filtered_chats.items():
+        chats_texts = [*chats_texts, *value]
+
+    return "\n".join(chats_texts) + "."

@@ -111,6 +111,16 @@ DRUNK_DECAPTOR_LIST = [
     'já vai arrumar problema com a polícia de novo?',
 ]
 
+WEEKDAYS = [
+    "segunda-feira",
+    "terça-feira",
+    "quarta-feira",
+    "quinta-feira",
+    "sexta-feira",
+    "sábado",
+    "domingo"
+]
+
 PEDROS_ROLETAS = ['rs', 'grosseria', 'WOLOLOLO', 'aff...', '*risos*', 'foi mal', 'polêmica', "💩"]
 
 ASK_PHOTOS = ['melhorar', 'fotos', 'foto', 'melhorou']

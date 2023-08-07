@@ -48,7 +48,7 @@ async def scheduler(bot: FakePedro) -> None:
         pedro_roleta, bot
     )
 
-    schedule.every().day.at("13:50").do(
+    schedule.every().day.at("13:07").do(
         pedro_opinions, bot
     )
 
