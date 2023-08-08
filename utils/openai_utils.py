@@ -361,7 +361,7 @@ class OpenAiCompletion:
                     timeout=timeout
                 )
 
-                if return_raw_text:
+                if return_raw_text or len(response) < 3:
                     return response
 
                 return await normalize_openai_text(
