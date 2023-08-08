@@ -222,7 +222,8 @@ class OpenAiCompletion:
                         'presence_penalty': 2.0,
                     }
             ) as openai_request:
-                response_text = json.loads(await openai_request.text())['choices'][0]['text']
+                response = await openai_request.text()
+                response_text = json.loads(response)['choices'][0]['text']
                 self.loop.create_task(telegram_logging(prompt))
                 self.loop.create_task(telegram_logging(f"{model}: {response_text}"))
 
