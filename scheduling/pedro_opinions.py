@@ -67,6 +67,10 @@ async def get_opinions(bot: FakePedro) -> None:
         replace_pre_prompt=[system]
     )
 
+    if response[0] != "1":
+        idx = response.find('1')
+        response = response[idx:]
+
     response_parser = response.split("\n")
 
     for idx, response in enumerate(response_parser):
