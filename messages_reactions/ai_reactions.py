@@ -3,6 +3,8 @@ import random
 import re
 from collections import defaultdict
 
+from unidecode import unidecode
+
 from constants.constants import SWEAR_WORDS, OPENAI_REACT_WORDS, OPENAI_PROMPTS, OPENAI_TRASH_LIST, WEATHER_LIST, \
     CHATGPT_BS
 from data_classes.react_data import ReactData
@@ -10,7 +12,7 @@ from utils.face_utils import put_list_of_faces_on_background
 from utils.logging_utils import async_elapsed_time
 from utils.openai_utils import return_dall_e_limit, list_crop, chat_log_extractor
 from utils.roleta_utils import get_roletas_from_pavuna, arrombado_classifier
-from utils.text_utils import command_in, create_username, message_destroyer
+from utils.text_utils import command_in, create_username, message_destroyer, remove_stopwords
 from utils.weather_utils import weather_prompt, get_forecast, WEEKDAYS
 
 
@@ -188,7 +190,7 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
         prompt_text = data.input_text
     else:
         chat_text = ""
-        chat_messages = bot.messages_in_memory[data.message.chat.id][-5:]
+        chat_messages = bot.messages_in_memory[data.message.chat.id][-4:]
         user_message = f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}: {data.input_text}\n"
 
         if len(chat_messages):
@@ -200,7 +202,8 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
         if data.destroy_message:
             prompt_text = user_message
         else:
-            prompt_text = f"{chat_text}\n{user_message}\npedro:"
+            chat_text = remove_stopwords(chat_text)
+            prompt_text = f"{unidecode(chat_text)}\n{user_message}\npedro:"
 
     with bot.sending_action(data.message.chat.id, action="typing", user=data.message.from_.first_name):
         bot.loop.create_task(
@@ -214,10 +217,9 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
                     destroy_message=data.destroy_message,
                     prompt_inject=None
                     if data.url_detector or data.destroy_message
-                    else f"fingindo ser o pedro, responda objetivamente apenas a mensagem '{data.input_text}' enviada por "
+                    else f"fingindo ser o pedro, responda objetivamente a mensagem '{data.input_text}' enviada por "
                          f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)} "
-                         f"no final da conversa. só ultrapasse 160 caracteres se for essencial para a sua resposta, "
-                         f"não comente mensagens anteriores a dele:",
+                         f"no final da conversa, não comente mensagens anteriores a dele:",
                     users_opinions=None if data.url_detector else bot.user_opinions,
                     moderate=True,
                     remove_words_list=None,

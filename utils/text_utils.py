@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from unidecode import unidecode
 
 from pedro_leblon import telegram_logging
-from constants.constants import PEDRO_USERS_OPINIONS, PEDRO_GENERAL_OPINIONS
+from constants.constants import PEDRO_USERS_OPINIONS, PEDRO_GENERAL_OPINIONS, STOPWORDS
 
 
 async def greeter(
@@ -182,6 +182,8 @@ async def pre_biased_prompt(
         additional_text += pre_text
 
     if len(additional_text):
+        additional_text = unidecode(remove_stopwords(additional_text))
+
         return f"considere que o pedro tem essas opiniões:\n" \
                f"{additional_text}\n" \
                f"segue abaixo a conversa:\n\n" \
@@ -275,3 +277,10 @@ def create_username(first_name: str, username: T.Optional[str]) -> str:
         user_name = f"{first_name} ({username})"
 
     return user_name
+
+
+def remove_stopwords(text: str) -> str:
+    for word in STOPWORDS:
+        text = text.replace(f" {word} ", "")
+
+    return text
