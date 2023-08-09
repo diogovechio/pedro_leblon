@@ -493,24 +493,15 @@ def chat_log_extractor(
         dif_days = (date_now - date).days
         chat_filtered = []
 
-        if not username:
-            if str(chat_id) in key or not chat_id:
-                if dif_days <= max_period_days:
-                    for x in [y for y in value if len(y) > 2]:
-                        if x[0].isdigit() and x[2] == ":":
-                            chat_filtered.append(x[8:])
-                        else:
-                            chat_filtered.append(x)
-
-                    chat_filtered = list_crop(chat_filtered, message_limit_per_chat)
-                    filtered_chats[key] = [f"...{WEEKDAYS[date.weekday()]}..."] + chat_filtered
-        else:
-            if str(chat_id) in key:
+        if str(chat_id) in key or not chat_id:
+            if username or dif_days <= max_period_days:
                 for x in [y for y in value if len(y) > 2]:
                     if x[0].isdigit() and x[2] == ":":
                         chat_filtered.append(x[8:])
                     else:
                         chat_filtered.append(x)
+                if not username:
+                    chat_filtered = list_crop(chat_filtered, message_limit_per_chat)
 
                 filtered_chats[key] = [f"...{WEEKDAYS[date.weekday()]}..."] + chat_filtered
 
@@ -537,5 +528,8 @@ def chat_log_extractor(
 
     if remove_accents:
         text = unidecode(text)
+
+    if len(text) < 100:
+        text = "...não houve uma conversa relevante aqui..."
 
     return text
