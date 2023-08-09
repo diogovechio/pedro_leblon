@@ -2,6 +2,7 @@ import datetime
 import random
 import re
 from collections import defaultdict
+import typing as T
 
 from unidecode import unidecode
 
@@ -63,12 +64,12 @@ async def openai_reactions(
         elif command_in("/tlsr", data.message.text):
             days = re.sub("\D", "", data.message.text)
 
-            await _nem_li(data=data, days=int(days) if days else 0, topics=True)
+            await _nem_li(data=data, days=int(days) if days else None, topics=True)
 
         elif command_in("/nemli", data.message.text) or command_in("/tldr", data.message.text):
             days = re.sub("\D", "", data.message.text)
 
-            await _nem_li(data=data, days=int(days) if days else 0, topics=False)
+            await _nem_li(data=data, days=int(days) if days else None, topics=False)
 
         elif (
                 command_in("/critique", data.message.text) or
@@ -401,7 +402,7 @@ async def _tlsr(data: ReactData) -> None:
 
 
 @async_elapsed_time
-async def _nem_li(data: ReactData, days=5, topics=False) -> None:
+async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> None:
     # todo var env
     message_limit = 175
     bot = data.bot
@@ -427,12 +428,14 @@ async def _nem_li(data: ReactData, days=5, topics=False) -> None:
                     reply_to=data.message.message_id)
             )
         else:
+            username = create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)
             chat = chat_log_extractor(
                 chats=bot.chats_in_memory,
                 chat_id=str(data.message.chat.id),
                 message_limit=message_limit,
                 date_now=bot.datetime_now,
-                max_period_days=days
+                max_period_days=days,
+                username=None if days else username
             )
 
             if topics:

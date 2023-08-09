@@ -471,6 +471,7 @@ def chat_log_extractor(
         chat_id: T.Optional[str] = None,
         stopwords_removal=True,
         remove_accents=True,
+        username: T.Optional[str] = None,
 ) -> str:
     chats = dict(sorted(chats.items()))
 
@@ -488,23 +489,48 @@ def chat_log_extractor(
         message_limit_per_chat = int(message_limit / chat_counter)
 
     for key, value in chats.items():
-        if str(chat_id) in key or not chat_id:
-            date = datetime.datetime.strptime(key.split(":")[-1], "%Y-%m-%d")
-            dif_days = (date_now - date).days
-            if dif_days <= max_period_days:
-                chat_filtered = []
+        date = datetime.datetime.strptime(key.split(":")[-1], "%Y-%m-%d")
+        dif_days = (date_now - date).days
+        chat_filtered = []
+
+        if not username:
+            if str(chat_id) in key or not chat_id:
+                if dif_days <= max_period_days:
+                    for x in [y for y in value if len(y) > 2]:
+                        if x[0].isdigit() and x[2] == ":":
+                            chat_filtered.append(x[8:])
+                        else:
+                            chat_filtered.append(x)
+
+                    chat_filtered = list_crop(chat_filtered, message_limit_per_chat)
+                    filtered_chats[key] = [f"...{WEEKDAYS[date.weekday()]}..."] + chat_filtered
+        else:
+            if str(chat_id) in key:
                 for x in [y for y in value if len(y) > 2]:
                     if x[0].isdigit() and x[2] == ":":
                         chat_filtered.append(x[8:])
                     else:
                         chat_filtered.append(x)
 
-                value = list_crop(chat_filtered, message_limit_per_chat)
-                filtered_chats[key] = [f"...{WEEKDAYS[date.weekday()]}..."] + value
+                filtered_chats[key] = [f"...{WEEKDAYS[date.weekday()]}..."] + chat_filtered
+
     for key, value in filtered_chats.items():
         chats_texts = [*chats_texts, *value]
 
-    text = "\n".join(chats_texts) + "."
+    if username:
+        last_idx = 0
+        username = username.lower()
+
+        for idx, msg in enumerate(chats_texts):
+            msg_user = (msg.split(":")[0]).lower()
+
+            if username in msg_user:
+                last_idx = idx
+
+        chats_texts = chats_texts[last_idx:]
+        chats_texts = list_crop(chats_texts, message_limit_per_chat)
+
+    text = ("\n".join(chats_texts)).lower() + "."
 
     if stopwords_removal:
         text = remove_stopwords(text)
