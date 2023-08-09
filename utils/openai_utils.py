@@ -11,6 +11,7 @@ import re
 from collections import defaultdict
 
 import aiohttp
+from unidecode import unidecode
 
 from constants.constants import OPENAI_PROMPTS, CHATGPT_BS, PEDROS_ROLETAS, PEDRO_MOOD, PEDRO_IN_LOVE, WEEKDAYS
 from utils.logging_utils import telegram_logging, async_elapsed_time
@@ -509,6 +510,6 @@ def chat_log_extractor(
         text = remove_stopwords(text)
 
     if remove_accents:
-        text = remove_accents
+        text = unidecode(text)
 
     return text
