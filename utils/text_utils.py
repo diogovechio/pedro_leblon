@@ -182,7 +182,7 @@ async def pre_biased_prompt(
         additional_text += pre_text
 
     if len(additional_text):
-        additional_text = unidecode(remove_stopwords(additional_text))
+        additional_text = unidecode(additional_text)
 
         return f"considere que o pedro tem essas opiniões:\n" \
                f"{additional_text}\n" \

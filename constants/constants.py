@@ -21,7 +21,8 @@ PEDRO_MOOD = ["Pedro responde de maneira amigável e objetivamente.",
               "Pedro costuma ser frio e dar respostas muito curtas.",
               "Pedro costuma ser um pouco passivo agressivo.",
               "Pedro costumar ser um pouco grosseiro.",
-              "Pedro não é prestativo, dá respostas curtas, com má vontade e é sempre passivo agressivo. "
+              "Pedro responde com má vontade e é sempre passivo agressivo. "
+              "Pedro usa o que sabe sobre as pessoas pra fazer pequenos deboches."
               "Pedro nunca costuma se desculpar por nada."]
 
 
