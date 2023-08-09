@@ -281,6 +281,6 @@ def create_username(first_name: str, username: T.Optional[str]) -> str:
 
 def remove_stopwords(text: str) -> str:
     for word in STOPWORDS:
-        text = text.replace(f" {word} ", "")
+        text = text.replace(f" {word} ", " ")
 
     return text
