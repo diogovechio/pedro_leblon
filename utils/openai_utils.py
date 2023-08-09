@@ -15,7 +15,7 @@ import aiohttp
 from constants.constants import OPENAI_PROMPTS, CHATGPT_BS, PEDROS_ROLETAS, PEDRO_MOOD, PEDRO_IN_LOVE, WEEKDAYS
 from utils.logging_utils import telegram_logging, async_elapsed_time
 from utils.text_utils import pre_biased_prompt, message_destroyer, normalize_openai_text, html_paragraph_extractor, \
-    youtube_caption_extractor
+    youtube_caption_extractor, remove_stopwords
 
 usage_mapping = {
     "ada": 0.02,
@@ -468,6 +468,8 @@ def chat_log_extractor(
         message_limit: int = 140,
         max_period_days: int = 0,
         chat_id: T.Optional[str] = None,
+        stopwords_removal=True,
+        remove_accents=True,
 ) -> str:
     chats = dict(sorted(chats.items()))
 
@@ -501,4 +503,12 @@ def chat_log_extractor(
     for key, value in filtered_chats.items():
         chats_texts = [*chats_texts, *value]
 
-    return "\n".join(chats_texts) + "."
+    text = "\n".join(chats_texts) + "."
+
+    if stopwords_removal:
+        text = remove_stopwords(text)
+
+    if remove_accents:
+        text = remove_accents
+
+    return text
