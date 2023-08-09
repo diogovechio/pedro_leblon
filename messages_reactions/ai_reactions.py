@@ -444,9 +444,6 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
             else:
                 prompt = "faça um resumo em poucas palavras da conversa abaixo "
 
-                if random.random() < data.bot.config.random_params.words_react_frequency:
-                    prompt += ", de maneira sensacionalista e irônica"
-
             tldr = await bot.openai.generate_message(
                         message_username=data.username,
                         full_text=f"{prompt}:\n\n{chat}",
