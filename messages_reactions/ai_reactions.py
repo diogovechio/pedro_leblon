@@ -443,7 +443,10 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
                 prompt = "em no máximo 7 tópicos de no máximo 6 palavras cada, " \
                          "cite de maneira enumerada os principais temas discutidos na conversa abaixo"
             else:
-                prompt = "faça um resumo em poucas palavras da conversa abaixo "
+                if days and days > 1:
+                    prompt = "faça um resumo da conversa abaixo "
+                else:
+                    prompt = "em no máximo 500 caracteres, faça um resumo da conversa abaixo "
 
             tldr = await bot.openai.generate_message(
                         message_username=data.username,
