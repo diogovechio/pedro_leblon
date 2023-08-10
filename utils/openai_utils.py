@@ -479,9 +479,14 @@ def chat_log_extractor(
     chats_texts = []
 
     chat_counter = 0
+
     for key, value in chats.items():
-        if str(chat_id) in key:
-            chat_counter += 1
+        date = datetime.datetime.strptime(key.split(":")[-1], "%Y-%m-%d")
+        dif_days = (date_now - date).days
+
+        if str(chat_id) in key or not chat_id:
+            if username or dif_days <= max_period_days:
+                chat_counter += 1
 
     if chat_counter == 0:
         message_limit_per_chat = int(message_limit / len(chats))

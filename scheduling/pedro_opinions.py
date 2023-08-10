@@ -37,9 +37,9 @@ def pedro_opinions(bot: FakePedro) -> None:
 async def get_opinions(bot: FakePedro) -> None:
     messages = chat_log_extractor(
         chats=bot.chats_in_memory,
-        message_limit=175,
+        message_limit=80,
         date_now=bot.datetime_now,
-        max_period_days=4
+        max_period_days=2
     )
 
     users_names = [name for name in bot.user_opinions]
