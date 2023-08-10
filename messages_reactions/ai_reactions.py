@@ -501,6 +501,8 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
                 if " " in new_chat_title:
                     first_word = new_chat_title.split(" ")[0]
                     new_chat_title = new_chat_title.replace(first_word, "BLA")
+                else:
+                    new_chat_title = "BLA " + new_chat_title
 
                 bot.loop.create_task(
                     bot.set_chat_title(
