@@ -435,6 +435,7 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
                 message_limit=message_limit,
                 date_now=bot.datetime_now,
                 max_period_days=days,
+                stopwords_removal=False,
                 username=None if days else username
             )
 
