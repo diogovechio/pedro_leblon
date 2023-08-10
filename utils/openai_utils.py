@@ -512,7 +512,7 @@ def chat_log_extractor(
         last_idx = 0
         username = username.lower()
 
-        for idx, msg in enumerate(chats_texts):
+        for idx, msg in enumerate(chats_texts[:-3]):
             msg_user = (msg.split(":")[0]).lower()
 
             if username in msg_user:
