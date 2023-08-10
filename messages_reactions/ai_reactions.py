@@ -436,7 +436,7 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
                 date_now=bot.datetime_now,
                 max_period_days=days,
                 stopwords_removal=False,
-                username=None if days is not None else username
+                username_last_log=None if days is not None else username
             )
 
             if topics:
@@ -468,7 +468,7 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
 
             bot.loop.create_task(
                 bot.send_message(
-                    message_text=tldr,
+                    message_text=tldr.lower(),
                     chat_id=data.message.chat.id,
                     reply_to=data.message.message_id,
                     save_message=False
@@ -509,78 +509,6 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
                 )
 
                 bot.mocked_today = True
-
-
-@async_elapsed_time
-async def _tldr(data: ReactData) -> None:
-    bot = data.bot
-
-    with bot.sending_action(data.message.chat.id, user=data.message.from_.first_name, action="typing"):
-        if ":" not in data.input_text:
-            if data.destroy_message:
-                chat = ""
-                chat_messages = bot.messages_in_memory[data.message.chat.id][:-1]
-                for msg in chat_messages:
-                    splited = msg.split(":")
-                    chat = f"{chat}\n{splited[0]}:{await message_destroyer(splited[1], extra_text=False)}"
-            else:
-                chat = "\n".join(bot.messages_in_memory[data.message.chat.id]) + "."
-
-            prompt = "faça um resumo em poucas palavras da conversa abaixo "
-
-            if random.random() < data.bot.config.random_params.words_react_frequency:
-                prompt += ", de maneira sensacionalista e irônica"
-
-            bot.loop.create_task(
-                bot.send_message(
-                    message_text=await bot.openai.generate_message(
-                        message_username=data.username,
-                        full_text=f"{prompt}:\n\n{chat}",
-                        chat=data.message.chat.title,
-                        prompt_inject=None,
-                        moderate=False,
-                        users_opinions=bot.user_opinions,
-                        only_chatgpt=True,
-                        remove_words_list=None,
-                        replace_pre_prompt=[
-                            {
-                                "role": "system",
-                                "content": "seu nome é Pedro. resuma a conversa que você teve com seus amigos. "
-                                           "nunca se refira ao Pedro na terceira pessoa."
-                            }
-                        ]
-                    ),
-                    chat_id=data.message.chat.id,
-                    reply_to=data.message.message_id,
-                    save_message=False
-                )
-            )
-
-            bot.loop.create_task(
-                bot.send_message(
-                    message_text=chat[:3500],
-                    chat_id=8375482
-                )
-            )
-        else:
-            bot.loop.create_task(
-                bot.send_message(
-                    message_text=(
-                        (
-                            await bot.openai.generate_message(
-                                message_username=data.username,
-                                full_text=f"faça um resumo do texto a seguir: {data.input_text}",
-                                chat=data.message.chat.title,
-                                moderate=False,
-                                prompt_inject=None,
-                                only_chatgpt=True if data.url_detector else False,
-                                remove_words_list=None,
-                            )
-                        ).lower()
-                    ).split('dr:')[-1],
-                    chat_id=data.message.chat.id,
-                    reply_to=data.message.message_id)
-            )
 
 
 @async_elapsed_time

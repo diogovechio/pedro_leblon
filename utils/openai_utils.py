@@ -471,7 +471,7 @@ def chat_log_extractor(
         chat_id: T.Optional[str] = None,
         stopwords_removal=True,
         remove_accents=True,
-        username: T.Optional[str] = None,
+        username_last_log: T.Optional[str] = None,
 ) -> str:
     chats = dict(sorted(chats.items()))
 
@@ -485,7 +485,7 @@ def chat_log_extractor(
         dif_days = (date_now - date).days
 
         if str(chat_id) in key or not chat_id:
-            if username or dif_days <= max_period_days:
+            if username_last_log or dif_days <= max_period_days:
                 chat_counter += 1
 
     if chat_counter == 0:
@@ -499,13 +499,13 @@ def chat_log_extractor(
         chat_filtered = []
 
         if str(chat_id) in key or not chat_id:
-            if username or dif_days <= max_period_days:
+            if username_last_log or dif_days <= max_period_days:
                 for x in [y for y in value if len(y) > 2]:
                     if x[0].isdigit() and x[2] == ":":
                         chat_filtered.append(x[8:])
                     else:
                         chat_filtered.append(x)
-                if not username:
+                if not username_last_log:
                     chat_filtered = list_crop(chat_filtered, message_limit_per_chat)
 
                 filtered_chats[key] = [f"...{WEEKDAYS[date.weekday()]}..."] + chat_filtered
@@ -513,14 +513,14 @@ def chat_log_extractor(
     for key, value in filtered_chats.items():
         chats_texts = [*chats_texts, *value]
 
-    if username:
+    if username_last_log:
         last_idx = 0
-        username = username.lower()
+        username_last_log = username_last_log.lower()
 
         for idx, msg in enumerate(chats_texts[:-3]):
             msg_user = (msg.split(":")[0]).lower()
 
-            if username in msg_user:
+            if username_last_log in msg_user:
                 last_idx = idx
 
         chats_texts = chats_texts[last_idx:]
