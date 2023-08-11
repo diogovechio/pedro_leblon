@@ -507,7 +507,8 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
                 bot.loop.create_task(
                     bot.set_chat_title(
                         chat_id=data.message.chat.id,
-                        title=new_chat_title)
+                        title=new_chat_title
+                    )
                 )
 
                 bot.mocked_today = True
