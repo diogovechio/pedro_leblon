@@ -160,7 +160,7 @@ async def pre_biased_prompt(
         if len(ignore) > 1:
             ignore = ignore[-1]
         else:
-            ignore = "wololololo"
+            ignore = "wol olo lolo"
 
         for name in names_list:
             name = unidecode(name)
@@ -170,7 +170,10 @@ async def pre_biased_prompt(
                 counter += 1
                 friends_names.append(name)
                 friends_text += f"{counter} - sobre {name}: "
-                friends_text += " ".join(opinions) + '\n\n'
+                friends_text += opinions[0]
+                if len(opinions) > 1:
+                    friends_text += random.choice(opinions[1:])
+                friends_text += '\n\n'
                 break
 
     if len(friends_names):
