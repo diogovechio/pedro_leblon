@@ -35,55 +35,56 @@ def pedro_opinions(bot: FakePedro) -> None:
 
 
 async def get_opinions(bot: FakePedro) -> None:
-    messages = chat_log_extractor(
-        chats=bot.chats_in_memory,
-        message_limit=80,
-        date_now=bot.datetime_now,
-        max_period_days=2
-    )
+    if bot.datetime_now.day % 3 == 0:
+        messages = chat_log_extractor(
+            chats=bot.chats_in_memory,
+            message_limit=160,
+            date_now=bot.datetime_now,
+            max_period_days=3
+        )
 
-    users_names = [name for name in bot.user_opinions]
-    user_list = [f"{key + 1} - {user.split('#')[0]}" for key, user in enumerate(users_names)]
-    users = '\n'.join(user_list)
+        users_names = [name for name in bot.user_opinions]
+        user_list = [f"{key + 1} - {user.split('#')[0]}" for key, user in enumerate(users_names)]
+        users = '\n'.join(user_list)
 
-    system = {
-        "role": "system",
-        "content": "finja ser pedro, um observador de uma conversa. "
-                   "limite-se a dizer, de maneira enumerada e respeitando os números que lhe forem passados, "
-                   "a percepção de pedro para cada um com base na conversa abaixo. "
-                   "caso não encontre nenhuma informação de uma pessoa na conversa, diga WOLOLOLO pra ela;"
-    }
+        system = {
+            "role": "system",
+            "content": "finja ser pedro, um observador de uma conversa. "
+                       "limite-se a dizer, de maneira enumerada e respeitando os números que lhe forem passados, "
+                       "a percepção de pedro para cada um com base na conversa abaixo. "
+                       "caso não encontre nenhuma informação de uma pessoa na conversa, diga WOLOLOLO pra ela;"
+        }
 
-    prompt = "pedro, o que voce pensa sobre cada uma dessas pessoas?"
+        prompt = "pedro, o que voce pensa sobre cada uma dessas pessoas?"
 
-    response = await bot.openai.generate_message(
-        full_text=f"{prompt}\n{users}\n\n{messages}\n\npedro:",
-        prompt_inject=None,
-        moderate=False,
-        users_opinions=None,
-        only_chatgpt=True,
-        remove_words_list=None,
-        temperature=0,
-        replace_pre_prompt=[system]
-    )
+        response = await bot.openai.generate_message(
+            full_text=f"{prompt}\n{users}\n\n{messages}\n\npedro:",
+            prompt_inject=None,
+            moderate=False,
+            users_opinions=None,
+            only_chatgpt=True,
+            remove_words_list=None,
+            temperature=0,
+            replace_pre_prompt=[system]
+        )
 
-    if response[0] != "1":
-        idx = response.find('1')
-        response = response[idx:]
+        if response[0] != "1":
+            idx = response.find('1')
+            response = response[idx:]
 
-    response_parser = response.split("\n")
+        response_parser = response.split("\n")
 
-    for idx, response in enumerate(response_parser):
-        if not any(word in response.lower() for word in NO_OPINION):
-            if response[0].isdigit():
-                if ":" in response:
-                    text = response.split(":")[-1]
-                    # name = ((response.split(":")[0]).split("-")[-1]).replace("@", ", também conhecido como ")
-                    opinion = (f"{text}".lower()).strip()
+        for idx, response in enumerate(response_parser):
+            if not any(word in response.lower() for word in NO_OPINION):
+                if response[0].isdigit():
+                    if ":" in response:
+                        text = response.split(":")[-1]
+                        # name = ((response.split(":")[0]).split("-")[-1]).replace("@", ", também conhecido como ")
+                        opinion = (f"{text}".lower()).strip()
 
-                    username = users_names[idx]
+                        username = users_names[idx]
 
-                    if len(bot.user_opinions[username]) >= 5:
-                        del bot.user_opinions[username][1]
+                        if len(bot.user_opinions[username]) >= 10:
+                            del bot.user_opinions[username][1]
 
-                    bot.user_opinions[username].append(opinion)
+                        bot.user_opinions[username].append(opinion)
