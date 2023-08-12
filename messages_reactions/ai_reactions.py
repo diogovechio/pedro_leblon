@@ -444,7 +444,7 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
                          "cite de maneira enumerada os principais temas discutidos na conversa abaixo"
             else:
                 if days and days > 1:
-                    prompt = "faça um curto resumo do que tem sido conversado"
+                    prompt = "faça um curto resumo da conversa"
                 else:
                     prompt = "em no máximo 500 caracteres, faça um resumo da conversa abaixo"
 
