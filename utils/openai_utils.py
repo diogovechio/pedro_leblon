@@ -508,7 +508,7 @@ def chat_log_extractor(
                 if not username_last_log:
                     chat_filtered = list_crop(chat_filtered, message_limit_per_chat)
 
-                filtered_chats[key] = [f"...{WEEKDAYS[date.weekday()]}..."] + chat_filtered
+                filtered_chats[key] = [f"...{WEEKDAYS[date.weekday()]} - {date.day}/{date.month}..."] + chat_filtered
 
     for key, value in filtered_chats.items():
         chats_texts = [*chats_texts, *value]
