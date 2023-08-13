@@ -11,7 +11,7 @@ from constants.constants import SWEAR_WORDS, OPENAI_REACT_WORDS, OPENAI_PROMPTS,
 from data_classes.react_data import ReactData
 from utils.face_utils import put_list_of_faces_on_background
 from utils.logging_utils import async_elapsed_time
-from utils.openai_utils import return_dall_e_limit, list_crop, chat_log_extractor
+from utils.openai_utils import return_dall_e_limit, list_crop, chat_log_extractor, chat_log_finder
 from utils.roleta_utils import get_roletas_from_pavuna, arrombado_classifier
 from utils.text_utils import command_in, create_username, message_destroyer, remove_stopwords
 from utils.weather_utils import weather_prompt, get_forecast, WEEKDAYS
@@ -408,7 +408,7 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
     bot = data.bot
 
     with data.bot.sending_action(data.message.chat.id, user=data.message.from_.first_name, action="typing"):
-        if ":" in data.input_text:
+        if data.message.reply_to_message:
             bot.loop.create_task(
                 bot.send_message(
                     message_text=(
@@ -426,6 +426,42 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
                     ).split('dr:')[-1],
                     chat_id=data.message.chat.id,
                     reply_to=data.message.message_id)
+            )
+        elif " " in data.input_text:
+            first_text = data.input_text.split(" ")[0]
+            message = data.input_text
+            message = message.replace(first_text, "").strip()
+
+            chat = chat_log_finder(
+                chats=bot.chats_in_memory,
+                chat_id=str(data.message.chat.id),
+                date_now=bot.datetime_now,
+                search_msg=message,
+            )
+
+            prompt = f'resuma o que foi falado sobre o tema "{message}" na conversa abaixo'
+
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=(await bot.openai.generate_message(
+                        message_username=data.username,
+                        full_text=f"{prompt}:\n\n{chat}",
+                        chat=data.message.chat.title,
+                        prompt_inject=None,
+                        moderate=False,
+                        users_opinions=None,
+                        only_chatgpt=True,
+                        remove_words_list=None,
+                        replace_pre_prompt=[
+                            {
+                                "role": "system",
+                                "content": "limite-se a resumir sobre o tema que lhe for passado."
+                            }
+                        ]
+                    )).lower(),
+                    chat_id=data.message.chat.id,
+                    reply_to=data.message.message_id,
+                )
             )
         else:
             username = create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)

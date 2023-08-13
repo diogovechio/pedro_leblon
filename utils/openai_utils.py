@@ -9,7 +9,7 @@ import json
 from asyncio import get_running_loop
 import re
 from collections import defaultdict
-
+from difflib import SequenceMatcher
 import aiohttp
 from unidecode import unidecode
 
@@ -536,5 +536,71 @@ def chat_log_extractor(
 
     if len(text) < 100:
         text = "...não houve uma conversa relevante aqui..."
+
+    return text
+
+
+def chat_log_finder(
+        chats: dict,
+        date_now: datetime,
+        search_msg: str,
+        chat_id: T.Optional[str] = None,
+        remove_accents=True,
+        threshold=0.9,
+        messages_before=2,
+        messages_after=5,
+        message_limit: int = 140,
+        max_period_days=10
+) -> str:
+    chats = dict(sorted(chats.items()))
+
+    message_len = len(search_msg)
+    chats_texts = []
+    filtered_chat = []
+    idx_found = []
+
+    for key, value in chats.items():
+        date = datetime.datetime.strptime(key.split(":")[-1], "%Y-%m-%d")
+        dif_days = (date_now - date).days
+        if str(chat_id) in key:
+            if dif_days <= max_period_days:
+                for x in [y for y in value if len(y) > 2]:
+                    if x[0].isdigit() and x[2] == ":":
+                        chats_texts.append(x[8:])
+                    else:
+                        chats_texts.append(x)
+
+    for i, chat_msg in enumerate(chats_texts):
+        username = chat_msg.split(":")[0]
+        chat_msg = chat_msg.replace(username, "")
+
+        limit = len(chat_msg)
+        first_idx = 0
+        string_end = 0
+
+        while string_end < limit:
+            string_end = message_len + first_idx
+            if SequenceMatcher(None, search_msg, chat_msg[first_idx:string_end]).ratio() >= threshold:
+                idx_found.append(i)
+                break
+            first_idx += 1
+
+    for i in idx_found:
+        try:
+            for new_msg in chats_texts[i-messages_before:i+messages_after]:
+                if new_msg not in filtered_chat:
+                    filtered_chat.append(new_msg)
+        except Exception as exc:
+            print("sem paciencia de tratar isso ", exc)
+
+    if not len(filtered_chat):
+        return "... aparentemente não falaram sobre esse tema ..."
+
+    filtered_chat = list_crop(filtered_chat, message_limit)
+
+    text = ("\n".join(filtered_chat)).lower() + "."
+
+    if remove_accents:
+        text = unidecode(text)
 
     return text
