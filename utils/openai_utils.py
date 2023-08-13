@@ -540,7 +540,8 @@ def chat_log_extractor(
     return text
 
 
-def chat_log_finder(
+@async_elapsed_time
+async def chat_log_finder(
         chats: dict,
         date_now: datetime,
         search_msg: str,
@@ -581,8 +582,14 @@ def chat_log_finder(
 
         while string_end < limit:
             string_end = message_len + first_idx
-            if SequenceMatcher(None, search_msg, chat_msg[first_idx:string_end]).ratio() >= threshold:
+            ratio = SequenceMatcher(None, search_msg, chat_msg[first_idx:string_end]).ratio()
+            if ratio >= threshold:
                 idx_found.append(i)
+                asyncio.create_task(
+                    telegram_logging(
+                        f"#similarity\n{chat_msg[first_idx:string_end]} - "
+                        f"{search_msg} - {ratio}")
+                )
                 break
             first_idx += 1
 

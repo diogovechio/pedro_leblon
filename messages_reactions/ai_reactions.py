@@ -432,7 +432,7 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
             message = data.input_text
             message = message.replace(first_text, "").strip()
 
-            chat = chat_log_finder(
+            chat = await chat_log_finder(
                 chats=bot.chats_in_memory,
                 chat_id=str(data.message.chat.id),
                 date_now=bot.datetime_now,
