@@ -545,7 +545,6 @@ def chat_log_finder(
         date_now: datetime,
         search_msg: str,
         chat_id: T.Optional[str] = None,
-        remove_accents=True,
         threshold=0.8,
         messages_before=2,
         messages_after=5,
@@ -558,6 +557,8 @@ def chat_log_finder(
     chats_texts = []
     filtered_chat = []
     idx_found = []
+
+    search_msg = unidecode(search_msg.lower())
 
     for key, value in chats.items():
         date = datetime.datetime.strptime(key.split(":")[-1], "%Y-%m-%d")
@@ -572,7 +573,7 @@ def chat_log_finder(
 
     for i, chat_msg in enumerate(chats_texts):
         username = chat_msg.split(":")[0]
-        chat_msg = chat_msg.replace(username, "")
+        chat_msg = unidecode((chat_msg.replace(username, "")).lower())
 
         limit = len(chat_msg)
         first_idx = 0
@@ -599,8 +600,5 @@ def chat_log_finder(
     filtered_chat = list_crop(filtered_chat, message_limit)
 
     text = ("\n".join(filtered_chat)).lower() + "."
-
-    if remove_accents:
-        text = unidecode(text)
 
     return text
