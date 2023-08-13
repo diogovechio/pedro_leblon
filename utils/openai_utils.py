@@ -549,6 +549,8 @@ async def chat_log_finder(
         messages_before=2,
         messages_after=5,
         message_limit: int = 140,
+        min_threshold=0.8,
+        threshold_discount=60,
         max_period_days=14
 ) -> str:
     chats = dict(sorted(chats.items()))
@@ -558,10 +560,10 @@ async def chat_log_finder(
     filtered_chat = []
     idx_found = []
 
-    if len(search_msg) < 6:
-        threshold = 0.95
-    else:
-        threshold = 0.8
+    t_discount = len(search_msg) / threshold_discount
+    threshold = 1.0 - t_discount
+    if threshold < min_threshold:
+        threshold = min_threshold
 
     search_msg = unidecode(search_msg.lower())
 
