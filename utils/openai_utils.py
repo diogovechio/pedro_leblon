@@ -546,11 +546,11 @@ def chat_log_finder(
         search_msg: str,
         chat_id: T.Optional[str] = None,
         remove_accents=True,
-        threshold=0.9,
+        threshold=0.8,
         messages_before=2,
         messages_after=5,
         message_limit: int = 140,
-        max_period_days=10
+        max_period_days=14
 ) -> str:
     chats = dict(sorted(chats.items()))
 
