@@ -546,7 +546,6 @@ async def chat_log_finder(
         date_now: datetime,
         search_msg: str,
         chat_id: T.Optional[str] = None,
-        threshold=0.8,
         messages_before=2,
         messages_after=5,
         message_limit: int = 140,
@@ -558,6 +557,11 @@ async def chat_log_finder(
     chats_texts = []
     filtered_chat = []
     idx_found = []
+
+    if len(search_msg) < 6:
+        threshold = 0.95
+    else:
+        threshold = 0.8
 
     search_msg = unidecode(search_msg.lower())
 

@@ -277,7 +277,7 @@ class FakePedro:
                                 self._store_messages_info(incoming_update)
                             )
 
-                            self.messages_tasks[chat_id].append(
+                            self.messages_tasks[str(chat_id)].append(
                                 self.loop.create_task(
                                     messages_coordinator(self, incoming_update)
                                 )
@@ -306,7 +306,8 @@ class FakePedro:
                         f"{create_username(message.from_.first_name, message.from_.username)}: {message.text[0:90]}")  # legacy
 
                 self.chats_in_memory[f"{message.chat.id}:{day_now}"].append(
-                    f"{time_now} - {create_username(message.from_.first_name, message.from_.username)}: {message.text[0:95]}")
+                    f"{time_now} -"
+                    f" {create_username(message.from_.first_name, message.from_.username)}: {message.text[0:140]}")
 
     @async_elapsed_time
     async def image_downloader(
@@ -557,7 +558,7 @@ if __name__ == '__main__':
         user_mood_file='user_mood.json',
         user_opinions_file='user_opinions.json',
         secrets_file=SECRETS_FILE,
-        debug_mode=True,
+        debug_mode=False,
     )
 
     asyncio.run(
