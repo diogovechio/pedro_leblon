@@ -20,13 +20,13 @@ async def telegram_logging(text: T.Union[str, Exception], chat_id=-704277411):
         text = "#exception\n" + text
     else:
         logging.info(text)
-        text = text[:2000]
+        text = text[:3800]
 
     session = aiohttp.ClientSession()
     api_route = f"https://api.telegram.org/bot{TOKEN}"
 
     async with asyncio.Semaphore(5):
-        await asyncio.sleep(5 + 10 * random())
+        await asyncio.sleep(3 + 10 * random())
         await session.post(
                 f"{api_route}/sendMessage".replace('\n', ''),
                 json={

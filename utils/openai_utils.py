@@ -547,7 +547,7 @@ async def chat_log_finder(
         search_msg: str,
         chat_id: T.Optional[str] = None,
         messages_before=2,
-        messages_after=5,
+        messages_after=8,
         message_limit: int = 140,
         min_threshold=0.8,
         threshold_discount=60,
@@ -591,11 +591,6 @@ async def chat_log_finder(
             ratio = SequenceMatcher(None, search_msg, chat_msg[first_idx:string_end]).ratio()
             if ratio >= threshold:
                 idx_found.append(i)
-                asyncio.create_task(
-                    telegram_logging(
-                        f"#similarity\n{chat_msg[first_idx:string_end]} - "
-                        f"{search_msg} - {ratio}")
-                )
                 break
             first_idx += 1
 
