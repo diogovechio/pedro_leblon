@@ -301,6 +301,14 @@ class FakePedro:
                 time_now = (date[-1].split(".")[0])[:-3]
 
                 await asyncio.sleep(1)
+
+                if message.caption:
+                    self.messages_in_memory[message.chat.id].append(
+                        f"{create_username(message.from_.first_name, message.from_.username)}: {message.caption[0:90]}")  # legacy
+                    self.chats_in_memory[f"{message.chat.id}:{day_now}"].append(
+                        f"{time_now} -"
+                        f" {create_username(message.from_.first_name, message.from_.username)}: {message.caption[0:140]}")
+
                 if len(message.text) > 10:
                     self.messages_in_memory[message.chat.id].append(
                         f"{create_username(message.from_.first_name, message.from_.username)}: {message.text[0:90]}")  # legacy

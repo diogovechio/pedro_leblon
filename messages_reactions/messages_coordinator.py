@@ -30,11 +30,6 @@ async def messages_coordinator(
             from_samuel=message.from_.is_premium
         )
 
-        if "@pedroleblonbot" in react_data.input_text:
-            bot.mood_per_user[react_data.username] += bot.config.mood_params.mentioned
-        else:
-            bot.mood_per_user[react_data.username] += 0.0
-
         if message.chat.id in bot.allowed_list:
             if str(message.from_.id) not in bot.config.ignore_users and message.from_.username not in bot.config.ignore_users:
                 if message.photo and message.chat.id not in bot.config.not_internal_chats:
