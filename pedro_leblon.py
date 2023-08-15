@@ -295,13 +295,14 @@ class FakePedro:
             self.interacted_messages_with_chat_id.append(f"{message.chat.id}:"
                                                          f"{message.message_id}")
 
-            if message.text is not None:
+            if message.text is not None or message.caption is not None:
                 date = str(self.datetime_now).split(' ')
                 day_now = date[0]
                 time_now = (date[-1].split(".")[0])[:-3]
 
                 await asyncio.sleep(1)
 
+                # todo refatorar isso quando tiver saco pelo amor de deus
                 if message.caption:
                     self.messages_in_memory[message.chat.id].append(
                         f"{create_username(message.from_.first_name, message.from_.username)}: {message.caption[0:90]}")  # legacy
@@ -309,13 +310,14 @@ class FakePedro:
                         f"{time_now} -"
                         f" {create_username(message.from_.first_name, message.from_.username)}: {message.caption[0:140]}")
 
-                if len(message.text) > 10:
-                    self.messages_in_memory[message.chat.id].append(
-                        f"{create_username(message.from_.first_name, message.from_.username)}: {message.text[0:90]}")  # legacy
+                elif message.text:
+                    if len(message.text) > 10:
+                        self.messages_in_memory[message.chat.id].append(
+                            f"{create_username(message.from_.first_name, message.from_.username)}: {message.text[0:90]}")  # legacy
 
-                self.chats_in_memory[f"{message.chat.id}:{day_now}"].append(
-                    f"{time_now} -"
-                    f" {create_username(message.from_.first_name, message.from_.username)}: {message.text[0:140]}")
+                    self.chats_in_memory[f"{message.chat.id}:{day_now}"].append(
+                        f"{time_now} -"
+                        f" {create_username(message.from_.first_name, message.from_.username)}: {message.text[0:140]}")
 
     @async_elapsed_time
     async def image_downloader(
