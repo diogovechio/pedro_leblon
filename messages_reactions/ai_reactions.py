@@ -203,7 +203,6 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
         if data.destroy_message:
             prompt_text = user_message
         else:
-            chat_text = remove_stopwords(chat_text)
             prompt_text = f"{unidecode(chat_text)}\n{user_message}\npedro:"
 
     with bot.sending_action(data.message.chat.id, action="typing", user=data.message.from_.first_name):
@@ -672,6 +671,7 @@ async def _reply_reaction(data: ReactData) -> None:
 
     with bot.sending_action(data.message.chat.id, action="typing"):
         chat = "\n".join(bot.messages_in_memory[data.message.chat.id][-10:])
+        chat = unidecode(remove_stopwords(chat))
         insert_pedro_msg = f"{chat}\npedro: {data.message.reply_to_message.text}"
         prompt_text = f"{insert_pedro_msg}\n{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}: {data.message.text}"
 
