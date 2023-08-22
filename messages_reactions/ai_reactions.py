@@ -480,10 +480,8 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
             else:
                 if not days or days < 2:
                     prompt = "em no máximo 500 caracteres, faça um resumo da conversa abaixo"
-                elif days < 8:
-                    prompt = "faça um resumo da conversa ao longo da semana"
                 else:
-                    prompt = "faça um resumo dessa conversa"
+                    prompt = "detalhando tudo o que foi conversado, faça um resumo da conversa abaixo"
 
             tldr = await bot.openai.generate_message(
                         message_username=data.username,

@@ -64,7 +64,7 @@ async def put_face_on_background(image: bytes, small_face=False) -> bytes:
     face = Image.open(temp_load)
 
     if not small_face:
-        random_size = round(100 + 125 * random.random())
+        random_size = round(80 + 175 * random.random())
         random_posx = round(0 + 300 * random.random())
         random_posy = round(0 + 300 * random.random())
     else:
@@ -99,7 +99,7 @@ async def put_list_of_faces_on_background(bot: FakePedro, names: T.List[str], sm
     background = Image.open("static/background.png")
     background = background.convert('RGBA')
 
-    random_size = round(120 + 25 * random.random())
+    random_size = round(80 + 25 * random.random())
     random_posx = round(10 + 5 * random.random())
 
     for i, name in enumerate(names):
