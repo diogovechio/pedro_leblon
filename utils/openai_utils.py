@@ -582,17 +582,14 @@ async def chat_log_finder(
         username = chat_msg.split(":")[0]
         chat_msg = unidecode((chat_msg.replace(username, "")).lower())
 
-        limit = len(chat_msg)
-        first_idx = 0
-        string_end = 0
+        words = chat_msg.split(" ")
 
-        while string_end < limit:
-            string_end = message_len + first_idx
-            ratio = SequenceMatcher(None, search_msg, chat_msg[first_idx:string_end]).ratio()
+        for word in words:
+            ratio = SequenceMatcher(None, search_msg, word[0:len(search_msg)]).ratio()
+
             if ratio >= threshold:
                 idx_found.append(i)
                 break
-            first_idx += 1
 
     for i in idx_found:
         try:
