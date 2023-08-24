@@ -143,8 +143,11 @@ async def pre_biased_prompt(
 ) -> str:
     additional_text = ''
 
+    consider = f"considere que o pedro tem essas opiniões:\n"
     for entity in PEDRO_GENERAL_OPINIONS:
         if entity in full_text.lower():
+            if consider not in additional_text:
+                additional_text += consider
             additional_text += random.choice(PEDRO_GENERAL_OPINIONS[entity])
             additional_text += "\n"
 
@@ -170,7 +173,10 @@ async def pre_biased_prompt(
                 counter += 1
                 friends_names.append(name)
                 friends_text += f"{counter} - sobre {name}: "
-                friends_text += " ".join(opinions)
+                friends_text += opinions[0]
+                if len(opinions) > 1:
+                    friends_text += " "
+                    friends_text += random.choice(opinions[1:])
                 friends_text += '\n\n'
                 break
 
@@ -185,8 +191,7 @@ async def pre_biased_prompt(
     if len(additional_text):
         additional_text = unidecode(additional_text)
 
-        return f"considere que o pedro tem essas opiniões:\n" \
-               f"{additional_text}\n" \
+        return f"{additional_text}\n" \
                f"segue abaixo a conversa:\n\n" \
                f"{full_text}"
 
