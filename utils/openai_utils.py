@@ -585,7 +585,8 @@ async def chat_log_finder(
         words = chat_msg.split(" ")
 
         for word in words:
-            ratio = SequenceMatcher(None, search_msg, word[0:len(search_msg)]).ratio()
+            ratio = SequenceMatcher(None, search_msg, chat_msg[0:len(search_msg)]).ratio()
+            chat_msg = (chat_msg.replace(word, "", 1)).strip()
 
             if ratio >= threshold:
                 idx_found.append(i)
