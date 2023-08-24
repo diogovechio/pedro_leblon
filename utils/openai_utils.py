@@ -13,7 +13,7 @@ from difflib import SequenceMatcher
 import aiohttp
 from unidecode import unidecode
 
-from constants.constants import OPENAI_PROMPTS, CHATGPT_BS, PEDROS_ROLETAS, PEDRO_MOOD, PEDRO_IN_LOVE, WEEKDAYS
+from constants.constants import OPENAI_PROMPTS, CHATGPT_BS, PEDROS_ROLETAS, PEDRO_MOOD, PEDRO_IN_LOVE, WEEKDAYS, MONTHS
 from utils.logging_utils import telegram_logging, async_elapsed_time
 from utils.text_utils import pre_biased_prompt, message_destroyer, normalize_openai_text, html_paragraph_extractor, \
     youtube_caption_extractor, remove_stopwords
@@ -508,7 +508,7 @@ def chat_log_extractor(
                 if not username_last_log:
                     chat_filtered = list_crop(chat_filtered, message_limit_per_chat)
 
-                filtered_chats[key] = [f"...{WEEKDAYS[date.weekday()]} - {date.day}/{date.month}..."] + chat_filtered
+                filtered_chats[key] = [f"\n#conversa de {WEEKDAYS[date.weekday()]} do dia {date.day} de {MONTHS[date.month]}#\n"] + chat_filtered
 
     for key, value in filtered_chats.items():
         chats_texts = [*chats_texts, *value]
