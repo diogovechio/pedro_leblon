@@ -3,7 +3,7 @@ import logging
 import os
 import random
 import sys
-from asyncio import AbstractEventLoop
+from asyncio import AbstractEventLoop, Semaphore
 
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -62,6 +62,8 @@ class FakePedro:
         self.user_opinions_file = user_opinions_file
         self.commemorations: T.Optional[Commemorations] = None
         self.secrets_file = secrets_file
+
+        self.semaphore = Semaphore(1)
 
         self.last_id = 0
         self.polling_rate = polling_rate
@@ -183,6 +185,8 @@ class FakePedro:
                 self.alpha_faces_files = []
                 self.faces_names = []
                 self.face_embeddings = []
+
+                self.semaphore = Semaphore(self.config.telegram_api_semaphore)
 
                 for (_, _, filenames) in os.walk(self.face_images_path):
                     self.faces_files.extend(filenames)
@@ -342,7 +346,7 @@ class FakePedro:
 
         for _ in range(max_retries):
             try:
-                async with asyncio.Semaphore(self.config.telegram_api_semaphore):
+                async with self.semaphore:
                     async with self.session.post(
                             url=f"{self.api_route}/sendPhoto".replace('\n', ''),
                             data=aiohttp.FormData(
@@ -365,7 +369,7 @@ class FakePedro:
     async def send_video(self, video: bytes, chat_id: int, reply_to=None, sleep_time=0) -> None:
         await asyncio.sleep(sleep_time)
 
-        async with asyncio.Semaphore(self.config.telegram_api_semaphore):
+        async with self.semaphore:
             async with self.session.post(
                     url=f"{self.api_route}/sendVideo".replace('\n', ''),
                     data=aiohttp.FormData(
@@ -386,7 +390,7 @@ class FakePedro:
             repeats=False
     ) -> None:
         while True:
-            async with asyncio.Semaphore(self.config.telegram_api_semaphore):
+            async with self.semaphore:
                 async with self.session.post(
                         url=f"{self.api_route}/sendChatAction".replace('\n', ''),
                         data=aiohttp.FormData(
@@ -406,7 +410,7 @@ class FakePedro:
     async def send_document(self, document: bytes, chat_id: int, caption=None, reply_to=None, sleep_time=0) -> None:
         await asyncio.sleep(sleep_time)
 
-        async with asyncio.Semaphore(self.config.telegram_api_semaphore):
+        async with self.semaphore:
             async with self.session.post(
                     url=f"{self.api_route}/sendDocument".replace('\n', ''),
                     data=aiohttp.FormData(
@@ -434,7 +438,7 @@ class FakePedro:
         if replace_token:
             url = f"https://api.telegram.org/bot{replace_token}"
 
-        async with asyncio.Semaphore(self.config.telegram_api_semaphore):
+        async with self.semaphore:
             async with self.session.post(
                     url=f"{url}/forwardMessage".replace('\n', ''),
                     data=aiohttp.FormData(
@@ -467,7 +471,7 @@ class FakePedro:
         for i in range(max_retries):
             if i == max_retries - 1:
                 message_text = await send_message_last_try(message_text)
-            async with asyncio.Semaphore(self.config.telegram_api_semaphore):
+            async with self.semaphore:
                 async with self.session.post(
                         f"{self.api_route}/sendMessage".replace('\n', ''),
                         json={

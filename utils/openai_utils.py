@@ -6,7 +6,7 @@ import random
 import typing as T
 
 import json
-from asyncio import get_running_loop
+from asyncio import get_running_loop, Semaphore
 import re
 from collections import defaultdict
 from difflib import SequenceMatcher
@@ -40,7 +40,7 @@ class OpenAiCompletion:
             force_model: T.Optional[str] = None,
     ):
         self.openai_use = 0
-        self.semaphore = semaphore
+        self.semaphore = Semaphore(semaphore)
         self.api_key = api_key
         self.max_tokens = max_tokens
         self.session = session
@@ -81,7 +81,7 @@ class OpenAiCompletion:
 
     @async_elapsed_time
     async def is_flagged(self, text: str) -> T.Tuple[bool, dict]:
-        async with asyncio.Semaphore(self.semaphore):
+        async with self.semaphore:
             async with self.session.post(
                     "https://api.openai.com/v1/moderations",
                     headers=self.headers,
@@ -147,7 +147,7 @@ class OpenAiCompletion:
             biased: T.Any = True,
             replace_pre_prompt: T.Optional[T.List[dict]] = None
     ) -> str:
-        async with asyncio.Semaphore(self.semaphore):
+        async with self.semaphore:
             if always_ironic:
                 mood = 100.0
 
@@ -241,7 +241,7 @@ class OpenAiCompletion:
         try:
             self.loop.create_task(telegram_logging(f"generate_image prompt: {text}"))
 
-            async with asyncio.Semaphore(self.semaphore):
+            async with self.semaphore:
                 async with self.session.post(
                         "https://api.openai.com/v1/images/generations",
                         headers=self.headers,
@@ -264,7 +264,7 @@ class OpenAiCompletion:
         try:
             self.loop.create_task(telegram_logging(f"edit_image prompt: {text}"))
 
-            async with asyncio.Semaphore(self.semaphore):
+            async with self.semaphore:
                 async with self.session.post(
                         "https://api.openai.com/v1/images/edits",
                         headers={
