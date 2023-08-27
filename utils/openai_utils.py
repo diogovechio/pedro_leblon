@@ -157,6 +157,8 @@ class OpenAiCompletion:
             if round(mood) < -2:
                 mood_selector = random.choice(PEDRO_IN_LOVE)
             else:
+                if mood < 0:
+                    mood = 0
                 mood_selector = PEDRO_MOOD[round(mood)]
                 temperature = 1
 

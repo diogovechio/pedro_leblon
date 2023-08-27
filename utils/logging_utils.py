@@ -13,8 +13,8 @@ from datetime import datetime
 from constants.constants import SECRETS_FILE
 
 TOKEN = json.loads(open(SECRETS_FILE).read())['secrets']['bot_token']
-
 SEMAPHORE = Semaphore(1)
+
 
 async def telegram_logging(text: T.Union[str, Exception], chat_id=-704277411):
     if isinstance(text, Exception):
