@@ -526,7 +526,7 @@ def chat_log_extractor(
                 last_idx = idx
 
         chats_texts = chats_texts[last_idx:]
-        chats_texts = list_crop(chats_texts, message_limit_per_chat)
+        chats_texts = list_crop(chats_texts, message_limit)
 
     text = ("\n".join(chats_texts)).lower() + "."
 
