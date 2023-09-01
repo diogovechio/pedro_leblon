@@ -1,4 +1,7 @@
+import asyncio
 import random
+import json
+from dataclasses import asdict
 
 from pedro_leblon import FakePedro, telegram_logging
 from utils.openai_utils import list_crop, chat_log_extractor
@@ -88,3 +91,6 @@ async def get_opinions(bot: FakePedro) -> None:
 
                         if len(opinion):
                             bot.user_opinions[username].append(opinion)
+
+        opinions_json = json.dumps(asdict(bot.user_opinions), indent=4)
+        asyncio.create_task(telegram_logging(opinions_json))

@@ -1,9 +1,11 @@
 import re
 from asyncio import Task
+from dataclasses import asdict
 from datetime import datetime
 import random
 import uuid
 import math
+import json
 
 from constants.constants import BOLSOFF_LIST, ANNUAL_DATE_PATTERN, ONCE_DATE_PATTERN, PEDRO_MOOD
 from data_classes.commemorations import Commemoration
@@ -94,14 +96,14 @@ async def bot_commands(
     elif command_in('/data', message.text):
         bot.loop.create_task(
             bot.send_message(
-                message_text=str(bot.mood_per_user),
+                message_text=json.dumps(asdict(bot.mood_per_user), indent=4),
                 chat_id=8375482,
             )
         )
 
         bot.loop.create_task(
             bot.send_message(
-                message_text=str(bot.user_opinions),
+                message_text=json.dumps(asdict(bot.user_opinions), indent=4),
                 chat_id=8375482,
             )
         )
