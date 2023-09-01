@@ -191,7 +191,7 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
         prompt_text = data.input_text
     else:
         chat_text = ""
-        chat_messages = bot.messages_in_memory[data.message.chat.id][-4:]
+        chat_messages = bot.messages_in_memory[data.message.chat.id][-3:]
         user_message = f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}: {data.input_text}\n"
 
         if len(chat_messages):
@@ -484,22 +484,22 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
                     prompt = "detalhando tudo o que foi conversado, faça um resumo da conversa abaixo"
 
             tldr = await bot.openai.generate_message(
-                        message_username=data.username,
-                        full_text=f"{prompt}:\n\n{chat}",
-                        chat=data.message.chat.title,
-                        prompt_inject=None,
-                        moderate=False,
-                        users_opinions=None,
-                        only_chatgpt=True,
-                        remove_words_list=None,
-                        replace_pre_prompt=[
-                            {
-                                "role": "system",
-                                "content": "seu nome é Pedro. resuma a conversa que você teve com seus amigos. "
-                                           "nunca se refira ao Pedro na terceira pessoa."
-                            }
-                        ]
-                    )
+                message_username=data.username,
+                full_text=f"{prompt}:\n\n{chat}",
+                chat=data.message.chat.title,
+                prompt_inject=None,
+                moderate=False,
+                users_opinions=None,
+                only_chatgpt=True,
+                remove_words_list=None,
+                replace_pre_prompt=[
+                    {
+                        "role": "system",
+                        "content": "seu nome é Pedro. resuma a conversa que você teve com seus amigos. "
+                                   "nunca se refira ao Pedro na terceira pessoa."
+                    }
+                ]
+            )
 
             bot.loop.create_task(
                 bot.send_message(

@@ -35,14 +35,14 @@ def pedro_opinions(bot: FakePedro) -> None:
 
 
 async def get_opinions(bot: FakePedro) -> None:
-    if bot.datetime_now.day % 3 == 0:
-        messages = chat_log_extractor(
-            chats=bot.chats_in_memory,
-            message_limit=160,
-            date_now=bot.datetime_now,
-            max_period_days=3
-        )
+    messages = chat_log_extractor(
+        chats=bot.chats_in_memory,
+        message_limit=100,
+        date_now=bot.datetime_now,
+        max_period_days=0
+    )
 
+    if len(messages) > 200:
         users_names = [name for name in bot.user_opinions]
         user_list = [f"{key + 1} - {user.split('#')[0]}" for key, user in enumerate(users_names)]
         users = '\n'.join(user_list)
@@ -83,7 +83,8 @@ async def get_opinions(bot: FakePedro) -> None:
 
                         username = users_names[idx]
 
-                        if len(bot.user_opinions[username]) >= 4:
+                        if len(bot.user_opinions[username]) >= 3:
                             del bot.user_opinions[username][1]
 
-                        bot.user_opinions[username].append(opinion)
+                        if len(opinion):
+                            bot.user_opinions[username].append(opinion)

@@ -4,7 +4,6 @@
     ],
     "nands93@nando": [
         "fala de xbox o dia inteiro. desempregado. mora em ramos rj. faz curso de programa\u00e7\u00e3o.",
-        "parece ser algu\u00e9m que passa bastante tempo sentado em frente ao computador.",
         "determinado, sofreu apag\u00e3o, chegou atrasado",
         "gosta de jogar e reclamar do calor."
     ],
@@ -15,70 +14,52 @@
     ],
     "decaptor@andre": [
         "morador de s\u00e3o caetano do sul. decaptor \u00e9 o apelido do andre. ele acha que staltz o deve mil reais. faz programa freelancer. orgulhoso e gosta de velharia. n\u00e3o gosta de webdevs, nem orienta\u00e7\u00e3o a objetos nem modernidades.",
-        "parece dever dinheiro para staltz.",
-        "parece ter um senso de humor e est\u00e1 envolvido em assuntos relacionados a processadores.",
-        "sempre enrola e faz partes do trabalho"
+        "parece estar falando sobre dinheiro e programa\u00e7\u00e3o, menciona placa e d\u00e1 destaque para a mudan\u00e7a completa.",
+        "andr\u00e9 fala bastante na conversa sobre diversos assuntos."
     ],
     "eicho": [
         "eicho adora uma tretinha."
     ],
     "diogo": [
         "mora no rio de janeiro. faz programa.",
-        "est\u00e1 fazendo v\u00e1rias perguntas e iniciando di\u00e1logos com o pedro.",
-        "enviou v\u00e1rias mensagens para pedro e est\u00e1 discutindo sobre pol\u00edtica e carros.",
-        "vai rir do starfield, falou sobre placa m\u00e3e com wifi e bluetooth embutidos"
+        "vai rir do starfield, falou sobre placa m\u00e3e com wifi e bluetooth embutidos",
+        "diogo \u00e9 bastante participativo na conversa, fazendo perguntas e interagindo com os outros."
     ],
     "thommaz@thom": [
         "tem muito dinheiro. morador de sp. m\u00fasico.",
-        "pedro sabe algo sobre seu dinheiro.",
-        "fala sobre m\u00fasica e pode ser um desenvolvedor de jogos.",
         "parece estar sendo acusado por diogo de n\u00e3o querer ajudar.",
-        "provavelmente quer jogar algo, mencionou outra coisa"
+        "thommaz conversa com andr\u00e9 sobre programa\u00e7\u00e3o e sintetizadores."
     ],
     "keyo": [
         "trabalha como garoto de programa. morador de s\u00e3o jos\u00e9 dos campos.",
-        "parece estar discutindo sobre pagar algo.",
-        "mencionou que n\u00e3o vai pagar nada pelo switch.",
         "envolve-se com piadas e interesses relacionados a alien\u00edgenas.",
-        "fala sobre jogos como skyrim e starfield."
+        "menciona zidane e tidus, criando padr\u00f5es."
     ],
     "cocao": [
         "adora glamour e simplicidade. faz programa. morador de barrinha sp.",
-        "fala sobre jogos e menciona o zullo.",
-        "parece estar falando sobre m\u00fasicas que curtiu e arquivou.",
         "mencionou a compara\u00e7\u00e3o de pc gamer com xss.",
         "fala sobre atmosfera e emagrecimento."
     ],
     "renanolf@oni": [
         "morador de sp. designer. socialista.",
-        "est\u00e1 discutindo pol\u00edtica e fazendo coment\u00e1rios sobre o brasil.",
-        "gosta de uma revista (n\u00e3o especificada qual).",
-        "parece ser algu\u00e9m que pode ter informa\u00e7\u00f5es erradas ou causar problemas.",
-        "fala sobre ciclones e energia."
+        "fala sobre ciclones e energia.",
+        "renan fala sobre um v\u00eddeo enviado por seu pai e sobre o game pass."
     ],
     "thais@thai5a": [
         "mora em curitiba. designer de jogos.",
-        "mencionou o jogo oniken e comentou sobre o relan\u00e7amento do ff7..",
-        "fala de forma descontra\u00edda.",
-        "fala sobre jesus vacationo",
-        "fala sobre trabalho e vendas."
+        "fala sobre um t\u00f3pico relacionado a \"gays grupo\" e argumentos."
     ],
     "danilo": [
         "mora em curitiba. designer de jogos. tem bastante experi\u00eancia com processadores intel, amd e pasta t\u00e9rmica."
     ],
     "yuush": [
         "morando na europa. \u00e9 professor de ingl\u00eas.",
-        "est\u00e1 fazendo coment\u00e1rios sobre alguma coisa que pedro n\u00e3o sabe.",
-        "est\u00e1 discutindo sobre morar em algum lugar que tenha trem, metr\u00f4 e praia.",
-        "virei coordenador e fala sobre povo de ti engolir goela abaixo",
         "pergunta sobre espectro pol\u00edtico e tratamento informal."
     ],
     "staltz": [
         "programador finland\u00eas conhecido por criar o cycle.js.",
-        "pedro sabe que existe algu\u00e9m chamado staltz na conversa e que diogo pede para pedro lembrar algo sobre ele relacionado a programador e framework.",
         "h\u00e1 uma discuss\u00e3o sobre ele dever dinheiro para andre (decaptor).",
-        "tem d\u00edvidas com andr\u00e9 decaptor.",
-        "mencionou jogos, falou sobre vida real e videogames"
+        "tem d\u00edvidas com andr\u00e9 decaptor."
     ],
     "guax": [
         "designer de jogos. furry. se mudou de bras\u00edlia para sp recentemente.",
@@ -86,16 +67,10 @@
     ],
     "yurisbv@yuri": [
         "parece estar trabalhando com vms..",
-        "est\u00e1 conversando com rodrigo sobre algo desconhecido para pedro.",
-        "mencionou algo sobre recursos cluster.",
-        "fala sobre servi\u00e7os de emiss\u00e3o de nfe",
         "fala sobre m\u00fasicas, programa\u00e7\u00e3o e linux."
     ],
     "rodrigo@rrangelvargas": [
         "comentou sobre inconformidades e encontrou um arquivo xlsx..",
-        "est\u00e1 conversando com yuri sobre algo desconhecido para pedro.",
-        "est\u00e1 envolvido em uma conversa t\u00e9cnica com yuri.",
-        "fala sobre encontrar exemplo de assunto para ver fluxo funcionando",
-        "mencionou otimizar script e algum erro com planilha"
+        "fala sobre encontrar exemplo de assunto para ver fluxo funcionando"
     ]
 }
