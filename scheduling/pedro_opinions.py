@@ -92,5 +92,5 @@ async def get_opinions(bot: FakePedro) -> None:
                         if len(opinion):
                             bot.user_opinions[username].append(opinion)
 
-        opinions_json = json.dumps(asdict(bot.user_opinions), indent=4)
+        opinions_json = json.dumps(bot.user_opinions, indent=4)
         asyncio.create_task(telegram_logging(opinions_json))

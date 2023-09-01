@@ -96,14 +96,14 @@ async def bot_commands(
     elif command_in('/data', message.text):
         bot.loop.create_task(
             bot.send_message(
-                message_text=json.dumps(asdict(bot.mood_per_user), indent=4),
+                message_text=json.dumps(bot.mood_per_user, indent=4),
                 chat_id=8375482,
             )
         )
 
         bot.loop.create_task(
             bot.send_message(
-                message_text=json.dumps(asdict(bot.user_opinions), indent=4),
+                message_text=json.dumps(bot.user_opinions, indent=4),
                 chat_id=8375482,
             )
         )
