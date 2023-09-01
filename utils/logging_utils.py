@@ -28,7 +28,6 @@ async def telegram_logging(text: T.Union[str, Exception], chat_id=-704277411):
     api_route = f"https://api.telegram.org/bot{TOKEN}"
 
     async with SEMAPHORE:
-        await asyncio.sleep(3 + 10 * random())
         await session.post(
                 f"{api_route}/sendMessage".replace('\n', ''),
                 json={
