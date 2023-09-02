@@ -274,9 +274,8 @@ async def _generate_image_command(data: ReactData) -> None:
                 ".", " ").replace(
                 "!", " ").replace(
                 "?", " ").replace(
-                "cocão", "cocao").replace(
                 "@", " ")
-            words_list = message_filtered.split(" ")
+            words_list = unidecode(message_filtered).split(" ")
 
             recognized_names = []
 
