@@ -40,7 +40,7 @@ def pedro_opinions(bot: FakePedro) -> None:
 async def get_opinions(bot: FakePedro) -> None:
     messages = chat_log_extractor(
         chats=bot.chats_in_memory,
-        message_limit=100,
+        message_limit=80,
         date_now=bot.datetime_now,
         max_period_days=0
     )
@@ -77,20 +77,25 @@ async def get_opinions(bot: FakePedro) -> None:
 
         response_parser = response.split("\n")
 
+        valids_splitters = (":", "-", ")")
+
         for idx, response in enumerate(response_parser):
             if not any(word in response.lower() for word in NO_OPINION):
                 if response[0].isdigit():
-                    if ":" in response:
-                        text = response.split(":")[-1]
-                        opinion = (f"{text}".lower()).strip()
+                    for splitter in valids_splitters:
+                        if splitter in response:
+                            text = response.split(splitter)[-1]
+                            opinion = (f"{text}".lower()).strip()
 
-                        username = users_names[idx]
+                            username = users_names[idx]
 
-                        if len(bot.user_opinions[username]) >= 3:
-                            del bot.user_opinions[username][1]
+                            if len(bot.user_opinions[username]) >= 3:
+                                del bot.user_opinions[username][1]
 
-                        if len(opinion):
-                            bot.user_opinions[username].append(opinion)
+                            if len(opinion):
+                                bot.user_opinions[username].append(opinion)
+
+                            break
 
         opinions_json = json.dumps(bot.user_opinions, indent=4)
         asyncio.create_task(telegram_logging(opinions_json))

@@ -1,76 +1,86 @@
 {
     "samuel@ sam ": [
-        "\u00e9 um narcisista."
+        "\u00e9 um narcisista.",
+        "pedro percebe samuel como narcisista.",
+        "pedro percebe samuel como uma pessoa narcisista."
     ],
     "nands93@nando": [
         "fala de xbox o dia inteiro. desempregado. mora em ramos rj. faz curso de programa\u00e7\u00e3o.",
-        "determinado, sofreu apag\u00e3o, chegou atrasado",
-        "gosta de jogar e reclamar do calor."
+        "pedro percebe nando como algu\u00e9m que fala sobre xbox o dia inteiro e est\u00e1 desempregado.",
+        "pedro n\u00e3o possui informa\u00e7\u00e3o sobre nando."
     ],
     "renato@renfd": [
         "Renato \u00e9 um bolsominion homof\u00f3bico.",
-        "parece n\u00e3o estar muito presente na conversa.",
-        "gosta de placas de v\u00eddeo e discute sobre fontes chinesas."
+        "gosta de placas de v\u00eddeo e discute sobre fontes chinesas.",
+        "pedro n\u00e3o possui informa\u00e7\u00e3o sobre renato."
     ],
     "decaptor@andre": [
         "morador de s\u00e3o caetano do sul. decaptor \u00e9 o apelido do andre. ele acha que staltz o deve mil reais. faz programa freelancer. orgulhoso e gosta de velharia. n\u00e3o gosta de webdevs, nem orienta\u00e7\u00e3o a objetos nem modernidades.",
-        "parece estar falando sobre dinheiro e programa\u00e7\u00e3o, menciona placa e d\u00e1 destaque para a mudan\u00e7a completa.",
-        "andr\u00e9 fala bastante na conversa sobre diversos assuntos."
+        "pedro tem uma percep\u00e7\u00e3o neutra de andr\u00e9.",
+        "pedro percebe andr\u00e9 como uma pessoa de confian\u00e7a."
     ],
     "eicho": [
-        "eicho adora uma tretinha."
+        "eicho adora uma tretinha.",
+        "pedro n\u00e3o possui informa\u00e7\u00e3o sobre eicho."
     ],
     "diogo": [
         "mora no rio de janeiro. faz programa.",
-        "vai rir do starfield, falou sobre placa m\u00e3e com wifi e bluetooth embutidos",
-        "diogo \u00e9 bastante participativo na conversa, fazendo perguntas e interagindo com os outros."
+        "pedro percebe diogo como uma pessoa de valor negativo (-0.825).",
+        "pedro n\u00e3o possui informa\u00e7\u00e3o sobre diogo."
     ],
     "thommaz@thom": [
         "tem muito dinheiro. morador de sp. m\u00fasico.",
-        "parece estar sendo acusado por diogo de n\u00e3o querer ajudar.",
-        "thommaz conversa com andr\u00e9 sobre programa\u00e7\u00e3o e sintetizadores."
+        "thommaz conversa com andr\u00e9 sobre programa\u00e7\u00e3o e sintetizadores.",
+        "pedro n\u00e3o possui informa\u00e7\u00e3o sobre thommaz."
     ],
     "keyo": [
         "trabalha como garoto de programa. morador de s\u00e3o jos\u00e9 dos campos.",
-        "envolve-se com piadas e interesses relacionados a alien\u00edgenas.",
-        "menciona zidane e tidus, criando padr\u00f5es."
+        "menciona zidane e tidus, criando padr\u00f5es.",
+        "pedro n\u00e3o possui informa\u00e7\u00e3o sobre keyo."
     ],
     "cocao": [
         "adora glamour e simplicidade. faz programa. morador de barrinha sp.",
-        "mencionou a compara\u00e7\u00e3o de pc gamer com xss.",
-        "fala sobre atmosfera e emagrecimento."
+        "fala sobre atmosfera e emagrecimento.",
+        "pedro n\u00e3o possui informa\u00e7\u00e3o sobre cocao."
     ],
     "renanolf@oni": [
         "morador de sp. designer. socialista.",
-        "fala sobre ciclones e energia.",
-        "renan fala sobre um v\u00eddeo enviado por seu pai e sobre o game pass."
+        "renan fala sobre um v\u00eddeo enviado por seu pai e sobre o game pass.",
+        "pedro n\u00e3o possui informa\u00e7\u00e3o sobre renanolf."
     ],
     "thais@thai5a": [
         "mora em curitiba. designer de jogos.",
-        "fala sobre um t\u00f3pico relacionado a \"gays grupo\" e argumentos."
+        "fala sobre um t\u00f3pico relacionado a \"gays grupo\" e argumentos.",
+        "pedro n\u00e3o possui informa\u00e7\u00e3o sobre thais."
     ],
     "danilo": [
-        "mora em curitiba. designer de jogos. tem bastante experi\u00eancia com processadores intel, amd e pasta t\u00e9rmica."
+        "mora em curitiba. designer de jogos. tem bastante experi\u00eancia com processadores intel, amd e pasta t\u00e9rmica.",
+        "danilo tamb\u00e9m est\u00e1 ativo na conversa, discutindo sobre detec\u00e7\u00e3o de mem\u00f3ria, temperaturas de processadores e outros assuntos relacionados a hardware.",
+        "pedro n\u00e3o possui informa\u00e7\u00e3o sobre danilo."
     ],
     "yuush": [
         "morando na europa. \u00e9 professor de ingl\u00eas.",
-        "pergunta sobre espectro pol\u00edtico e tratamento informal."
+        "pedro n\u00e3o possui informa\u00e7\u00f5es sobre yuush.",
+        "pedro n\u00e3o possui informa\u00e7\u00e3o sobre yuush."
     ],
     "staltz": [
         "programador finland\u00eas conhecido por criar o cycle.js.",
-        "h\u00e1 uma discuss\u00e3o sobre ele dever dinheiro para andre (decaptor).",
-        "tem d\u00edvidas com andr\u00e9 decaptor."
+        "tem d\u00edvidas com andr\u00e9 decaptor.",
+        "pedro n\u00e3o possui informa\u00e7\u00e3o sobre staltz."
     ],
     "guax": [
         "designer de jogos. furry. se mudou de bras\u00edlia para sp recentemente.",
-        "parece n\u00e3o estar na conversa."
+        "parece n\u00e3o estar na conversa.",
+        "pedro n\u00e3o possui informa\u00e7\u00e3o sobre guax."
     ],
     "yurisbv@yuri": [
         "parece estar trabalhando com vms..",
-        "fala sobre m\u00fasicas, programa\u00e7\u00e3o e linux."
+        "pedro destaca o nome yuri, mas n\u00e3o d\u00e1 uma percep\u00e7\u00e3o sobre ele.",
+        "pedro n\u00e3o possui informa\u00e7\u00e3o sobre yuri."
     ],
     "rodrigo@rrangelvargas": [
         "comentou sobre inconformidades e encontrou um arquivo xlsx..",
-        "fala sobre encontrar exemplo de assunto para ver fluxo funcionando"
+        "rodrigo, tamb\u00e9m conhecido como rrangelvargas, compartilha informa\u00e7\u00f5es sobre push, resolu\u00e7\u00e3o de problemas e outros assuntos t\u00e9cnicos. parece ser algu\u00e9m envolvido no desenvolvimento de software.",
+        "pedro n\u00e3o possui informa\u00e7\u00e3o sobre rodrigo."
     ]
 }
