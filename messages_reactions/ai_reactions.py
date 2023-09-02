@@ -269,7 +269,7 @@ async def _generate_image_command(data: ReactData) -> None:
         prompt = data.input_text[6:]
 
         if bot.dall_e_uses_today.count(data.message.from_.id) < bot.config.openai.dall_e_daily_limit:
-            message_filtered = data.message.text.lower().replace(
+            message_filtered = data.input_text.lower().replace(
                 ",", " ").replace(
                 ".", " ").replace(
                 "!", " ").replace(
