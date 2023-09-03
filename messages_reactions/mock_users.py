@@ -10,7 +10,7 @@ from utils.text_utils import message_miguxer
 async def mock_users(
         data: ReactData
 ) -> None:
-    #Todo: organizar a bagunça
+    # Todo: organizar a bagunça
     message = data.message
     bot = data.bot
 
@@ -114,7 +114,8 @@ async def mock_users(
 
         if 'lol' in message.text.lower() and random.random(
 
-        ) < bot.config.random_params.words_react_frequency and not bot.kardashian_gif != round(bot.datetime_now.hour / 18):
+        ) < bot.config.random_params.words_react_frequency and not bot.kardashian_gif != round(
+            bot.datetime_now.hour / 18):
             bot.loop.create_task(
                 bot.send_video(
                     video=open(f'gifs/kardashian_lol.mp4', 'rb').read(),
@@ -125,7 +126,8 @@ async def mock_users(
             )
             bot.kardashian_gif = round(bot.datetime_now.hour / 18)
 
-        if any(word in message.text.lower() for word in DECAPTOR_DISAPPOINTS) and not bot.kardashian_gif != round(bot.datetime_now.hour / 18):
+        if any(word in message.text.lower() for word in DECAPTOR_DISAPPOINTS) and not bot.kardashian_gif != round(
+                bot.datetime_now.hour / 18):
             bot.loop.create_task(
                 bot.send_video(
                     video=open(f'gifs/kardashian_disappointed.mp4', 'rb').read(),

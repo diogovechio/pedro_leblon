@@ -6,7 +6,7 @@
   },
   "random_params": {
     "random_mock_frequency": 0.02,
-    "words_react_frequency": 0.1,
+    "words_react_frequency": 1.1,
     "mock_drunk_decaptor_frequency": 0.03,
     "annoy_user_frequency": 0.3
   },

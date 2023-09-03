@@ -1,22 +1,30 @@
+import asyncio
 import json
 import logging
 import random
 import typing as T
 
 from pedro_leblon import FakePedro
+from utils.logging_utils import telegram_logging
 
 
 async def get_roletas_from_pavuna(
         bot: FakePedro,
-        min_chars=0
+        min_chars=0,
+        keyo=False,
 ) -> T.List[dict]:
-    # async with bot.session.get("https://keyo.me/bot/roleta.json") as roleta:
-    # return [
-    #     value['text'] for _, value in json.loads(
-    #         await roleta.content.read()
-    #     ).items()
-    #     if value['text'] is not None and len(value['text']) > min_chars
-    # ]
+    if keyo:
+        try:
+            async with bot.session.get("https://keyo.me/bot/roleta.json") as roleta:
+                return [
+                    value for _, value in json.loads(
+                        await roleta.content.read()
+                    ).items()
+                    if value['text'] is not None and len(value['text']) > min_chars
+                ]
+        except Exception as exc:
+            asyncio.create_task(telegram_logging(exc))
+
     with open("new_roletas.json", "rb") as roleta:
         return [
             value for _, value in json.loads(roleta.read()).items()
