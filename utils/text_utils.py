@@ -139,7 +139,7 @@ async def message_destroyer(message_text: str, extra_text=True) -> str:
 async def pre_biased_prompt(
         full_text: str,
         users_opinions: T.Dict[str, T.List[str]],
-        last_words: str = ""
+        user_message: str = ""
 ) -> str:
     additional_text = ''
 
@@ -167,9 +167,9 @@ async def pre_biased_prompt(
 
         for name in names_list:
             name = unidecode(name)
-            last_words = unidecode(last_words)
+            user_message = unidecode(user_message)
 
-            if name in last_words.lower() and ignore not in last_words.lower() and len(opinions):
+            if name in user_message.lower() and ignore not in user_message.lower() and len(opinions):
                 counter += 1
                 friends_names.append(name)
                 friends_text += f"{counter} - sobre {name}: "

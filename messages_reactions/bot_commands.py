@@ -341,7 +341,7 @@ async def bot_commands(
                 bot.loop.create_task(
                     bot.send_message(
                         message_text=(await bot.openai.generate_message(
-                            short_text=from_username + reply_username,
+                            user_message=from_username + reply_username,
                             chat=data.message.chat.title,
                             full_text=f'critique duramente o '
                                       f'{from_username} '

@@ -187,11 +187,13 @@ async def _forecast_detect(data: ReactData) -> bool:
 @async_elapsed_time
 async def _default_pedro(data: ReactData, always_ironic=False) -> None:
     bot = data.bot
+    user_message = ""
+
     if data.url_detector:
         prompt_text = data.input_text
     else:
         chat_text = ""
-        chat_messages = bot.messages_in_memory[data.message.chat.id][-3:]
+        chat_messages = bot.messages_in_memory[data.message.chat.id][-4:]
         user_message = f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}: {data.input_text}\n"
 
         if len(chat_messages):
@@ -211,7 +213,7 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
                 message_text=await bot.openai.generate_message(
                     message_username=data.message.from_.first_name,
                     full_text=prompt_text,
-                    short_text=prompt_text,
+                    user_message=user_message if user_message else prompt_text,
                     chat=data.message.chat.title,
                     only_chatgpt=True if data.url_detector else False,
                     destroy_message=data.destroy_message,
@@ -599,7 +601,7 @@ async def _critic_or_praise(data: ReactData) -> None:
         openai_text = await bot.openai.generate_message(
             message_username=data.username,
             full_text=f"{prompt}\npedro:",
-            short_text=prompt,
+            user_message=prompt,
             chat=data.message.chat.title,
             destroy_message=data.destroy_message,
             moderate=False if "/critique" in data.message.text.lower()[0:9] else True,
@@ -676,7 +678,7 @@ async def _reply_reaction(data: ReactData) -> None:
                 message_text=await bot.openai.generate_message(
                     message_username='.',
                     full_text=f"{prompt_text}\npedro:",
-                    short_text=prompt_text,
+                    user_message=prompt_text,
                     chat=data.message.chat.title,
                     prompt_inject=f"fingindo ser o pedro, responda objetivamente a mensagem de "
                                   f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}, "
