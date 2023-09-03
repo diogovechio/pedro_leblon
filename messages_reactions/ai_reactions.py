@@ -217,9 +217,8 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
                     destroy_message=data.destroy_message,
                     prompt_inject=None
                     if data.url_detector or data.destroy_message
-                    else f"fingindo ser o pedro, responda objetivamente a mensagem '{data.input_text}' enviada por "
-                         f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)} "
-                         f"no final da conversa, não comente mensagens anteriores a dele:",
+                    else f"fingindo ser o pedro, responda a mensagem '{data.input_text}' enviada por "
+                         f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}:",
                     users_opinions=None if data.url_detector else bot.user_opinions,
                     moderate=True,
                     remove_words_list=None,
