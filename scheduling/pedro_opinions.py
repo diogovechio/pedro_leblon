@@ -40,7 +40,7 @@ def pedro_opinions(bot: FakePedro) -> None:
 async def get_opinions(bot: FakePedro) -> None:
     messages = chat_log_extractor(
         chats=bot.chats_in_memory,
-        message_limit=120,
+        message_limit=140,
         date_now=bot.datetime_now,
         max_period_days=1
     )
@@ -58,7 +58,7 @@ async def get_opinions(bot: FakePedro) -> None:
                        "caso não encontre informação da pessoa na conversa, diga 'WOLOLOLO' para o número dela;"
         }
 
-        prompt = "pedro, o que voce pensa sobre cada uma dessas pessoas?"
+        prompt = "pedro, resuma cada uma dessas pessoas em 5 palavras:"
 
         response = await bot.openai.generate_message(
             full_text=f"{prompt}\n{users}\n\n{messages}\n\npedro:",
@@ -89,7 +89,7 @@ async def get_opinions(bot: FakePedro) -> None:
 
                             username = users_names[idx]
 
-                            if len(bot.user_opinions[username]) >= 3:
+                            if len(bot.user_opinions[username]) >= 5:
                                 del bot.user_opinions[username][1]
 
                             if len(opinion):
