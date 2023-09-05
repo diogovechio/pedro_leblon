@@ -193,7 +193,7 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
         prompt_text = data.input_text
     else:
         chat_text = ""
-        chat_messages = bot.messages_in_memory[data.message.chat.id][-4:]
+        chat_messages = bot.messages_in_memory[data.message.chat.id][-6:]
         user_message = f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}: {data.input_text}\n"
 
         if len(chat_messages):

@@ -55,7 +55,7 @@ async def get_opinions(bot: FakePedro) -> None:
             "content": "finja ser pedro, um observador de uma conversa. "
                        "limite-se a dizer, de maneira enumerada e respeitando os números que lhe forem passados, "
                        "a percepção de pedro para cada um com base na conversa abaixo. "
-                       "caso não encontre nenhuma informação de uma pessoa na conversa, diga WOLOLOLO pra ela;"
+                       "caso não encontre informação da pessoa na conversa, diga 'WOLOLOLO' para o número dela;"
         }
 
         prompt = "pedro, o que voce pensa sobre cada uma dessas pessoas?"
