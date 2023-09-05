@@ -173,10 +173,7 @@ async def pre_biased_prompt(
                 counter += 1
                 friends_names.append(name)
                 friends_text += f"{counter} - sobre {name}: "
-                friends_text += opinions[0]
-                if len(opinions) > 1:
-                    friends_text += " "
-                    friends_text += random.choice(opinions[1:])
+                friends_text += " ".join(opinions)
                 friends_text += '\n\n'
                 break
 

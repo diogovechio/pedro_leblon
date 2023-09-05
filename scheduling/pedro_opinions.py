@@ -89,7 +89,7 @@ async def get_opinions(bot: FakePedro) -> None:
 
                             username = users_names[idx]
 
-                            if len(bot.user_opinions[username]) >= 4:
+                            if len(bot.user_opinions[username]) >= 3:
                                 del bot.user_opinions[username][1]
 
                             if len(opinion):
