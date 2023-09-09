@@ -83,7 +83,7 @@ async def _pre_processor(
         message: TelegramMessage
 ) -> ReactData:
     url_detector = ""
-    input_text = message.text
+    input_text = message.text or message.caption
 
     username = create_username(first_name=message.from_.first_name, username=message.from_.username)
     destroy_message = message.chat.id in bot.config.mock_chats or (
