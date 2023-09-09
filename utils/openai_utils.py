@@ -13,7 +13,8 @@ from difflib import SequenceMatcher
 import aiohttp
 from unidecode import unidecode
 
-from constants.constants import OPENAI_PROMPTS, CHATGPT_BS, PEDROS_ROLETAS, PEDRO_MOOD, PEDRO_IN_LOVE, WEEKDAYS, MONTHS
+from constants.constants import OPENAI_PROMPTS, CHATGPT_BS, PEDROS_ROLETAS, PEDRO_MOOD, PEDRO_IN_LOVE, WEEKDAYS, MONTHS, \
+    SWEAR_WORDS
 from utils.logging_utils import telegram_logging, async_elapsed_time
 from utils.text_utils import pre_biased_prompt, message_destroyer, normalize_openai_text, html_paragraph_extractor, \
     youtube_caption_extractor, remove_stopwords
@@ -332,7 +333,9 @@ class OpenAiCompletion:
 
         is_flagged, moderation_results = await self.is_flagged(prompt)
 
-        if is_flagged and moderate:
+        if is_flagged and moderate and any(
+            block_word in user_message.lower() for block_word in SWEAR_WORDS
+        ):
             prompt = f"reclame com {message_username} porque ele enviou uma mensagem com conteúdo " \
                      f"{' ,'.join([key for key, value in moderation_results['results'][0]['categories'].items() if value])}. " \
                      f"diga que ele poderá ser banido do {chat}."

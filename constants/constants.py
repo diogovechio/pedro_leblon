@@ -149,7 +149,7 @@ MOCK_EDITS = ["editou pq", "eu vi oq vc escreveu", "preferia antes", "escreve di
 DECAPTOR_DISAPPOINTS = [' lula ', 'esquerdista', ' fato', 'venezuela', 'hipócrita', 'hipocrisia', 'hipocrita', 'dilma',
                         'imparcial']
 
-SWEAR_WORDS = [' viado', 'porra', 'fuck', 'cock', 'transar', 'buceta', 'boceta',
+SWEAR_WORDS = [' viado', 'porra', 'fuck', 'cock', 'transar', 'buceta', 'boceta', 'suicidio', 'mata ', 'matar', 'assassinar',
                       'piroca', 'pornô', 'porno', 'sexo', 'cu?', ' cu ', 'caralho', 'foder', 'pinto',
                       'cú', 'chupa meu', 'chupa um', 'penis', 'pênis', 'chupa o', 'o saco do']
 
