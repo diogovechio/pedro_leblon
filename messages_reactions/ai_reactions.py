@@ -225,7 +225,8 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
                     moderate=True,
                     remove_words_list=None,
                     always_ironic=always_ironic,
-                    mood=bot.mood_per_user[data.username]
+                    mood=bot.mood_per_user[data.username],
+                    user_mood_dict=bot.mood_per_user
                 ),
                 chat_id=data.message.chat.id,
                 reply_to=data.message.message_id
@@ -687,7 +688,8 @@ async def _reply_reaction(data: ReactData) -> None:
                     moderate=False,
                     users_opinions=bot.user_opinions,
                     mood=bot.mood_per_user[data.username],
-                    always_ironic=data.limited_prompt
+                    always_ironic=data.limited_prompt,
+                    user_mood_dict=bot.mood_per_user
                 ),
                 chat_id=data.message.chat.id,
                 reply_to=data.message.message_id

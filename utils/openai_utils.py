@@ -307,7 +307,8 @@ class OpenAiCompletion:
             remove_words_list=None,
             always_ironic=False,
             mood=0.0,
-            replace_pre_prompt: T.Optional[T.List[dict]] = None
+            replace_pre_prompt: T.Optional[T.List[dict]] = None,
+            user_mood_dict: T.Optional[dict[str, float]] = None
     ) -> str:
         datetime_now = datetime.datetime.utcnow() - datetime.timedelta(hours=3)
 
@@ -327,8 +328,9 @@ class OpenAiCompletion:
             model = await self._model_selector(message_username)
             prompt = (await pre_biased_prompt(
                 full_text=full_text,
-                user_message=user_message,  # deprecated
-                users_opinions=users_opinions
+                user_message=user_message,
+                users_opinions=users_opinions,
+                user_mood_dict=user_mood_dict,
             ) if users_opinions else full_text)
 
         is_flagged, moderation_results = await self.is_flagged(prompt)
@@ -475,8 +477,13 @@ def chat_log_extractor(
         stopwords_removal=True,
         remove_accents=True,
         username_last_log: T.Optional[str] = None,
+        ignore_chats_list: T.Optional[list[int]] = None
 ) -> str:
     chats = dict(sorted(chats.items()))
+
+    if ignore_chats_list:
+        chats = {key: value for key, value in chats.items()
+                 if int(key.split(":")[0]) not in ignore_chats_list}
 
     filtered_chats = defaultdict(list)
     chats_texts = []

@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from unidecode import unidecode
 
 from pedro_leblon import telegram_logging
-from constants.constants import PEDRO_USERS_OPINIONS, PEDRO_GENERAL_OPINIONS, STOPWORDS
+from constants.constants import PEDRO_USERS_OPINIONS, PEDRO_GENERAL_OPINIONS, STOPWORDS, PEDRO_MOOD
 
 
 async def greeter(
@@ -139,7 +139,8 @@ async def message_destroyer(message_text: str, extra_text=True) -> str:
 async def pre_biased_prompt(
         full_text: str,
         users_opinions: T.Dict[str, T.List[str]],
-        user_message: str = ""
+        user_message: str = "",
+        user_mood_dict: T.Optional[dict[str, float]] = None
 ) -> str:
     additional_text = ''
 
@@ -156,25 +157,32 @@ async def pre_biased_prompt(
 
     counter = 0
     for entity_names, opinions in users_opinions.items():
-        ignore = entity_names.split("#")
-        if "#" in entity_names:
-            entity_names = entity_names.split("#")[0]
         names_list = entity_names.split("@")
-        if len(ignore) > 1:
-            ignore = ignore[-1]
-        else:
-            ignore = "wol olo lolo"
 
         for name in names_list:
             name = unidecode(name)
             user_message = unidecode(user_message)
 
-            if name in user_message.lower() and ignore not in user_message.lower() and len(opinions):
+            if name in user_message.lower() and len(opinions):
                 counter += 1
                 friends_names.append(name)
                 friends_text += f"{counter} - sobre {name}: "
                 friends_text += ". ".join(opinions)
+
+                if user_mood_dict:
+                    for user in user_mood_dict:
+                        if name in user:
+                            mood_text = pedro_mood(
+                                actual_mood=user_mood_dict[user],
+                                max_mood=len(PEDRO_MOOD),
+                                username=name
+                            )
+
+                            friends_text += f". {mood_text}"
+                            break
+
                 friends_text += '\n\n'
+
                 break
 
     if len(friends_names):
@@ -286,3 +294,15 @@ def remove_stopwords(text: str) -> str:
         text = text.replace(f" {word} ", " ")
 
     return text
+
+
+def pedro_mood(actual_mood: float, max_mood: float, username: str) -> str:
+    if actual_mood <= 1.0:
+        return f"pedro gosta de {username}."
+
+    mood_scale = max_mood - actual_mood
+
+    if mood_scale > 0:
+        return f"pedro está chateado com {username}."
+    else:
+        return f"pedro está muito irritado com {username}."
