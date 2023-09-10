@@ -168,18 +168,18 @@ async def pre_biased_prompt(
                 friends_names.append(name)
                 friends_text += f"{counter} - sobre {name}: "
                 friends_text += ". ".join(opinions)
-
-                if user_mood_dict:
-                    for user in user_mood_dict:
-                        if name in user:
-                            mood_text = pedro_mood(
-                                actual_mood=user_mood_dict[user],
-                                max_mood=len(PEDRO_MOOD),
-                                username=name
-                            )
-
-                            friends_text += f". {mood_text}"
-                            break
+                #
+                # if user_mood_dict:
+                #     for user in user_mood_dict:
+                #         if name in user:
+                #             mood_text = pedro_mood(
+                #                 actual_mood=user_mood_dict[user],
+                #                 max_mood=len(PEDRO_MOOD),
+                #                 username=name
+                #             )
+                #
+                #             friends_text += f". {mood_text}"
+                #             break
 
                 friends_text += '\n\n'
 
