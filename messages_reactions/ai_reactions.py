@@ -513,7 +513,7 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
 
             if (
                     not bot.mocked_today or random.random() < data.bot.config.random_params.words_react_frequency
-            ) and data.message.chat.id not in data.bot.config.not_internal_chats and not topics:
+            ) and data.message.chat.id not in data.bot.config.not_internal_chats:
                 title_prompt = "com base no texto abaixo, sugira o nome de um chat em no máximo 4 palavras:\n\n"
                 title_prompt += tldr
 
@@ -540,10 +540,19 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
                 else:
                     new_chat_title = "BLA " + new_chat_title
 
+                chat_title = ""
+                for char in new_chat_title:
+                    if "1" in new_chat_title:
+                        new_chat_title.replace("1", "")
+                    if char.isdigit():
+                        break
+                    char: str
+                    chat_title += char
+
                 bot.loop.create_task(
                     bot.set_chat_title(
                         chat_id=data.message.chat.id,
-                        title=new_chat_title
+                        title=chat_title
                     )
                 )
 
