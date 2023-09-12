@@ -429,6 +429,7 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
             )
         elif " " in data.input_text:
             first_text = data.input_text.split(" ")[0]
+            days = re.sub("\D", "", first_text)
             message = data.input_text
             message = message.replace(first_text, "").strip()
 
@@ -437,6 +438,7 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
                 chat_id=str(data.message.chat.id),
                 date_now=bot.datetime_now,
                 search_msg=message,
+                max_period_days=int(days) if days else 0
             )
 
             prompt = f'resuma o que foi falado sobre o tema "{message}" na conversa abaixo'
