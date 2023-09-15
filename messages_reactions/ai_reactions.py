@@ -442,6 +442,10 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
             )
 
             prompt = f'resuma o que foi falado sobre o tema "{message}" na conversa abaixo'
+            for user in bot.user_opinions:
+                if message.lower() in user:
+                    prompt = f'resuma o que {user.split("@")[0]} tem falado na conversa abaixo'
+                    break
 
             bot.loop.create_task(
                 bot.send_message(
