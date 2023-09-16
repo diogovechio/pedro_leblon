@@ -589,6 +589,7 @@ async def chat_log_finder(
                         chats_texts.append(x)
 
     for i, chat_msg in enumerate(chats_texts):
+        chat_msg = chat_msg.replace("(", "").replace(")", "")
         username = chat_msg.split(":")[0]
         # chat_msg = unidecode((chat_msg.replace(username, "")).lower())
         chat_msg = unidecode(chat_msg).lower()
