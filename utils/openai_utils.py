@@ -149,6 +149,8 @@ class OpenAiCompletion:
             replace_pre_prompt: T.Optional[T.List[dict]] = None
     ) -> str:
         async with self.semaphore:
+            model = "gpt-3.5-turbo-instruct"
+
             if always_ironic:
                 mood = 100.0
 
@@ -221,9 +223,7 @@ class OpenAiCompletion:
                         "model": model,
                         'prompt': f"{mood_selector if biased else ''}\n\n{prompt}",
                         'max_tokens': self.max_tokens,
-                        'temperature': temperature,
-                        'frequency_penalty': 1.0,
-                        'presence_penalty': 2.0,
+                        'temperature': temperature
                     }
             ) as openai_request:
                 response = await openai_request.text()
