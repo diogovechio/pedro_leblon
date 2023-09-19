@@ -491,10 +491,10 @@ class FakePedro:
                             time_now = (date[-1].split(".")[0])[:-3]
 
                             self.chats_in_memory[f"{chat_id}:{day_now}"].append(
-                                f"{time_now} - Pedro: {message_text[0:95]}")
+                                f"{time_now} - Pedro: {message_text[0:150]}")
 
                             self.messages_in_memory[chat_id].append(
-                                f"Pedro: {message_text[0:50]}")
+                                f"Pedro: {message_text[0:150]}")
                         break
                     parse_mode = fallback_parse_modes.pop() if len(fallback_parse_modes) else ""
 
@@ -572,7 +572,7 @@ if __name__ == '__main__':
         user_mood_file='user_mood.json',
         user_opinions_file='user_opinions.json',
         secrets_file=SECRETS_FILE,
-        debug_mode=True,
+        debug_mode=False,
     )
 
     asyncio.run(

@@ -193,7 +193,7 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
         prompt_text = data.input_text
     else:
         chat_text = ""
-        chat_messages = bot.messages_in_memory[data.message.chat.id][-6:]
+        chat_messages = bot.messages_in_memory[data.message.chat.id][-4:]
         user_message = f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}: {data.input_text}\n"
 
         if len(chat_messages):
@@ -224,7 +224,6 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
                     users_opinions=None if data.url_detector else bot.user_opinions,
                     moderate=True,
                     remove_words_list=None,
-                    only_instruct=False if data.url_detector else True,
                     always_ironic=always_ironic,
                     mood=bot.mood_per_user[data.username],
                     user_mood_dict=bot.mood_per_user
@@ -705,7 +704,6 @@ async def _reply_reaction(data: ReactData) -> None:
                     users_opinions=bot.user_opinions,
                     mood=bot.mood_per_user[data.username],
                     always_ironic=data.limited_prompt,
-                    only_instruct=True,
                     user_mood_dict=bot.mood_per_user
                 ),
                 chat_id=data.message.chat.id,
