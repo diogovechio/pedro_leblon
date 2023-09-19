@@ -142,7 +142,7 @@ class OpenAiCompletion:
             mood: float,
             model: str = "ada",
             only_chatgpt=False,
-            only_davinci=False,
+            only_instruct=False,
             temperature: int = 1,
             always_ironic=False,
             biased: T.Any = True,
@@ -166,7 +166,7 @@ class OpenAiCompletion:
                 temperature = 1
 
             if "ada" not in model or only_chatgpt:
-                if not only_davinci:
+                if not only_instruct:
                     self.loop.create_task(telegram_logging(f"Using gpt-3.5-turbo - OpenAI usage: {self.openai_use}"))
 
                     if not replace_pre_prompt:
@@ -297,7 +297,7 @@ class OpenAiCompletion:
             message_username: T.Optional[str] = "",
             chat="ASD",
             only_chatgpt=False,
-            only_davinci=False,
+            only_instruct=False,
             users_opinions: T.Optional[dict] = None,
             moderate=True,
             temperature=1,
@@ -342,7 +342,7 @@ class OpenAiCompletion:
                      f"{' ,'.join([key for key, value in moderation_results['results'][0]['categories'].items() if value])}. " \
                      f"diga que ele poderá ser banido do {chat}."
 
-            only_davinci = True
+            only_instruct = True
         else:
             prompt = f"{prompt_inject}\n{prompt}" if prompt_inject else prompt
 
@@ -356,7 +356,7 @@ class OpenAiCompletion:
                         date=datetime_now,
                         prompt=prompt,
                         only_chatgpt=only_chatgpt,
-                        only_davinci=only_davinci,
+                        only_instruct=only_instruct,
                         temperature=temperature,
                         model=model,
                         always_ironic=always_ironic,

@@ -40,7 +40,7 @@ async def bot_commands(
         )
 
     elif command_in('/puto', message.text):
-        only_davinci = True
+        only_instruct = True
 
         max_mood = len(PEDRO_MOOD)
         actual_mood = round(bot.mood_per_user[data.username])
@@ -84,7 +84,7 @@ async def bot_commands(
                         chat=data.message.chat.title,
                         full_text=prompt,
                         temperature=1,
-                        only_davinci=only_davinci,
+                        only_instruct=only_instruct,
                         moderate=False,
                         users_opinions=None
                     )).lower(),
@@ -349,7 +349,7 @@ async def bot_commands(
                                       f" {reply_username}. 'diga que pretende baní-lo do {message.chat.title}.\n\n"
                                       f"pedro:",
                             temperature=1,
-                            only_davinci=True,
+                            only_instruct=True,
                             users_opinions=bot.user_opinions
                         )).upper(),
                         chat_id=message.chat.id,

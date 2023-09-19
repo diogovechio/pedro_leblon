@@ -121,7 +121,7 @@ async def _complain_swear_word(data: ReactData) -> None:
                         prompt_inject=OPENAI_PROMPTS['critique'] if round(
                             random.random()) else OPENAI_PROMPTS['critique_reformule'],
                         remove_words_list=['pedro'],
-                        only_davinci=True,
+                        only_instruct=True,
                         users_opinions=None,
                         temperature=1,
                     ),
@@ -224,6 +224,7 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
                     users_opinions=None if data.url_detector else bot.user_opinions,
                     moderate=True,
                     remove_words_list=None,
+                    only_instruct=True,
                     always_ironic=always_ironic,
                     mood=bot.mood_per_user[data.username],
                     user_mood_dict=bot.mood_per_user
@@ -419,7 +420,6 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
                                 chat=data.message.chat.title,
                                 moderate=False,
                                 prompt_inject=None,
-                                only_chatgpt=True if data.url_detector else False,
                                 remove_words_list=None,
                             )
                         ).lower()
@@ -623,7 +623,7 @@ async def _critic_or_praise(data: ReactData) -> None:
             moderate=False if "/critique" in data.message.text.lower()[0:9] else True,
             prompt_inject="O",
             temperature=1,
-            only_davinci=True,
+            only_instruct=True,
             users_opinions=None,
             remove_words_list=['asd']
         )
@@ -670,7 +670,7 @@ async def _react_to_words(data: ReactData) -> None:
                     message_username=data.username,
                     full_text=f"{data.input_text}\npedro:",
                     chat=data.message.chat.title,
-                    only_davinci=True,
+                    only_instruct=True,
                     prompt_inject=OPENAI_PROMPTS['fale'],
                 ),
                 chat_id=data.message.chat.id,
@@ -704,6 +704,7 @@ async def _reply_reaction(data: ReactData) -> None:
                     users_opinions=bot.user_opinions,
                     mood=bot.mood_per_user[data.username],
                     always_ironic=data.limited_prompt,
+                    only_instruct=True,
                     user_mood_dict=bot.mood_per_user
                 ),
                 chat_id=data.message.chat.id,
@@ -728,7 +729,7 @@ async def _random_conversation(data: ReactData) -> None:
             prompt_inject='considere que você é o "pedro", abaixo é uma conversa entre você e '
                           'seus amigos, comente algum dos assuntos criando uma curta resposta '
                           'para "pedro" no final: ',
-            only_chatgpt=True,
+            only_instruct=True,
             users_opinions=bot.user_opinions,
         )
 
