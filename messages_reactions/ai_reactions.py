@@ -761,4 +761,4 @@ async def adjust_mood(data: ReactData):
 
     if message_tone == 0:
         if data.bot.mood_per_user[data.username] > 0.0:
-            data.bot.mood_per_user[data.username] /= 2
+            data.bot.mood_per_user[data.username] /= 10
