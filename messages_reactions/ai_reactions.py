@@ -224,7 +224,7 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
                     users_opinions=None if data.url_detector else bot.user_opinions,
                     moderate=True,
                     remove_words_list=None,
-                    only_instruct=True,
+                    only_instruct=False if data.url_detector else True,
                     always_ironic=always_ironic,
                     mood=bot.mood_per_user[data.username],
                     user_mood_dict=bot.mood_per_user
@@ -420,6 +420,7 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
                                 chat=data.message.chat.title,
                                 moderate=False,
                                 prompt_inject=None,
+                                only_chatgpt=True if data.url_detector else False,
                                 remove_words_list=None,
                             )
                         ).lower()
