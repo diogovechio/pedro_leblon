@@ -238,7 +238,8 @@ async def normalize_openai_text(
                 for _, msg in clean_prompts.items():
                     ai_message = ai_message.replace(msg, '')
 
-            ai_message = ai_message.replace("pedro: ", "rs, ")
+            if ai_message.lower().strip().startswith("pedro:"):
+                ai_message = ai_message.replace("pedro: ", "rs, ")
 
             if ai_message:
                 while any(word in ai_message[0] for word in ['.', ',', '?', '\n', ' ', '!']):
@@ -253,7 +254,10 @@ async def normalize_openai_text(
                 if command_in("ah,", ai_message) and round(random.random()):
                     ai_message = ai_message.replace("ah, ", "")
 
-                return re.sub(' +', ' ', ai_message)
+                if ai_message.strip() != "null":
+                    return re.sub(' +', ' ', ai_message)
+                else:
+                    return original_message.upper()
             elif len(original_message):
                 return original_message.upper()
             else:
