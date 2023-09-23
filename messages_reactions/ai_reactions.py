@@ -632,7 +632,7 @@ async def _critic_or_praise(data: ReactData) -> None:
         for x in OPENAI_TRASH_LIST:
             message_text = message_text.replace(x, "")
 
-        if arrombado.lower() not in message_text and not data.message.from_.is_bot:
+        if arrombado.lower() not in message_text and not data.message.reply_to_message.from_.is_bot:
             message_text = f"{arrombado}, {message_text}"
 
         if random.random() < 0.25:
