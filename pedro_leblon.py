@@ -484,6 +484,7 @@ class FakePedro:
                         }
                 ) as resp:
                     logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
+
                     if 200 <= resp.status < 300:
                         if save_message:
                             date = str(self.datetime_now).split(' ')

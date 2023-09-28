@@ -254,10 +254,7 @@ async def normalize_openai_text(
                 if command_in("ah,", ai_message) and round(random.random()):
                     ai_message = ai_message.replace("ah, ", "")
 
-                if ai_message.strip() != "null":
-                    return re.sub(' +', ' ', ai_message)
-                else:
-                    return original_message.upper()
+                return re.sub(' +', ' ', ai_message)
             elif len(original_message):
                 return original_message.upper()
             else:
@@ -269,6 +266,8 @@ async def normalize_openai_text(
             return original_message.upper()
 
         return '@diogovechio dei pau vai ver o log'
+
+    return original_message
 
 
 def command_in(
