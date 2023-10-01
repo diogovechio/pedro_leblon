@@ -40,7 +40,7 @@ def pedro_opinions(bot: FakePedro) -> None:
 async def get_opinions(bot: FakePedro) -> None:
     messages = chat_log_extractor(
         chats=bot.chats_in_memory,
-        message_limit=150,
+        message_limit=100,
         date_now=bot.datetime_now,
         max_period_days=0,
         ignore_chats_list=bot.config.not_internal_chats
@@ -90,7 +90,7 @@ async def get_opinions(bot: FakePedro) -> None:
 
                             username = users_names[idx]
 
-                            if len(bot.user_opinions[username]) >= 5:
+                            if len(bot.user_opinions[username]) >= 8:
                                 del bot.user_opinions[username][0]
 
                             if len(opinion):
