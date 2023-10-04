@@ -40,7 +40,7 @@ def pedro_opinions(bot: FakePedro) -> None:
 async def get_opinions(bot: FakePedro) -> None:
     messages = chat_log_extractor(
         chats=bot.chats_in_memory,
-        message_limit=100,
+        message_limit=140,
         date_now=bot.datetime_now,
         max_period_days=0,
         ignore_chats_list=bot.config.not_internal_chats
