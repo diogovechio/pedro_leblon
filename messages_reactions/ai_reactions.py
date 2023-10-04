@@ -433,6 +433,9 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
             message = data.input_text
             message = (message.replace(first_text, "").strip()).lower()
 
+            if "@" in message[0]:
+                message = message.replace("@", "")
+
             chat = await chat_log_finder(
                 chats=bot.chats_in_memory,
                 chat_id=str(data.message.chat.id),
