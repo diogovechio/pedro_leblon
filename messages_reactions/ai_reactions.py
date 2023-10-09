@@ -43,6 +43,10 @@ async def openai_reactions(
                 or command_in('pedro?', data.message.text, text_end=True)
                 or "ペドロ" in data.message.text
                 or int(data.message.chat.id) > 0
+                or (
+                        "pedro" in data.message.text.lower()
+                        and random.random() < data.bot.config.random_params.words_react_frequency
+                )
         ) and not command_in('/pedro', data.message.text) and not pedro_on_reply and not data.limited_prompt:
             await _default_pedro(data=data)
 
