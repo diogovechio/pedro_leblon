@@ -413,11 +413,15 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
 
     with data.bot.sending_action(data.message.chat.id, user=data.message.from_.first_name, action="typing"):
         if data.message.reply_to_message:
+            prompt = "faça um resumo do texto a seguir:"
+            if topics:
+                prompt = "em no máximo 7 tópicos de no máximo 6 palavras cada, " + prompt
+
             tldr = (
                         (
                             await bot.openai.generate_message(
                                 message_username=data.username,
-                                full_text=f"faça um resumo do texto a seguir: {data.input_text}",
+                                full_text=f"{prompt} {data.input_text}",
                                 chat=data.message.chat.title,
                                 moderate=False,
                                 prompt_inject=None,
@@ -451,6 +455,9 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
             )
 
             prompt = f'resuma o que foi falado sobre o tema "{message}" na conversa abaixo'
+            if topics:
+                prompt = "em no máximo 7 tópicos de no máximo 6 palavras cada, " + prompt
+
             for user in bot.user_opinions:
                 if message.lower() in user:
                     prompt = f'resuma o que {user.split("@")[0]} tem falado na conversa abaixo'
