@@ -345,12 +345,13 @@ async def bot_commands(
                             chat=data.message.chat.title,
                             full_text=f'critique duramente o '
                                       f'{from_username} '
-                                      f'por ter tentado deletar a mensagem do'
+                                      f'por ter tentado deletar a mensagem "{message.text}" enviada por'
                                       f" {reply_username}. 'diga que pretende baní-lo do {message.chat.title}.\n\n"
                                       f"pedro:",
                             temperature=1,
                             only_instruct=True,
-                            users_opinions=bot.user_opinions
+                            users_opinions=None,
+                            prompt_inject="O",
                         )).upper(),
                         chat_id=message.chat.id,
                         reply_to=message.message_id,
