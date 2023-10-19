@@ -248,7 +248,7 @@ class OpenAiCompletion:
                 async with self.session.post(
                         "https://api.openai.com/v1/images/generations",
                         headers=self.headers,
-                        json={'prompt': text, 'n': 1, 'size': "1024x1024"}
+                        json={'prompt': text, 'n': 1, 'size': "256x256"}
                 ) as openai_request:
                     async with self.session.get(
                             json.loads(await openai_request.text())['data'][0]['url']
@@ -277,7 +277,7 @@ class OpenAiCompletion:
                             (
                                     ("image", square_png),
                                     ("prompt", text),
-                                    ("size", "1024x1024"),
+                                    ("size", "256x256"),
                             )
                         )
                 ) as openai_request:

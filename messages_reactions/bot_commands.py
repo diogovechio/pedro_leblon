@@ -128,7 +128,7 @@ async def bot_commands(
         )
 
     elif command_in('/stop', message.text):
-        for task in bot.messages_tasks[message.chat.id]:
+        for task in bot.messages_tasks[str(message.chat.id)]:
             task: Task
             task.cancel()
             del bot.messages_tasks[task]
