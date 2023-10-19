@@ -242,13 +242,15 @@ class OpenAiCompletion:
             text: str
     ) -> T.Optional[bytes]:
         try:
+            text = text.strip()
+
             self.loop.create_task(telegram_logging(f"generate_image prompt: {text}"))
 
             async with self.semaphore:
                 async with self.session.post(
                         "https://api.openai.com/v1/images/generations",
                         headers=self.headers,
-                        json={'prompt': text, 'n': 1, 'size': "256x256"}
+                        json={'prompt': text, 'n': 1, 'size': "512x512"}
                 ) as openai_request:
                     async with self.session.get(
                             json.loads(await openai_request.text())['data'][0]['url']
@@ -265,6 +267,8 @@ class OpenAiCompletion:
             square_png: bytes
     ) -> T.Optional[bytes]:
         try:
+            text = text.strip()
+
             self.loop.create_task(telegram_logging(f"edit_image prompt: {text}"))
 
             async with self.semaphore:
@@ -277,7 +281,7 @@ class OpenAiCompletion:
                             (
                                     ("image", square_png),
                                     ("prompt", text),
-                                    ("size", "256x256"),
+                                    ("size", "512x512"),
                             )
                         )
                 ) as openai_request:
