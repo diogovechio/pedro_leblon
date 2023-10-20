@@ -119,6 +119,7 @@ class FakePedro:
             Path('chat_logs').mkdir(exist_ok=True)
             Path('face_lake').mkdir(exist_ok=True)
             Path('image_tasks').mkdir(exist_ok=True)
+            Path('image_tasks_done').mkdir(exist_ok=True)
 
             self.loop = asyncio.get_running_loop()
             self.session = aiohttp.ClientSession(timeout=session_timeout)
