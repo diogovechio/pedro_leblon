@@ -276,9 +276,12 @@ async def _generate_image_command(data: ReactData) -> None:
             dall_uses_list=bot.dall_e_uses_today
         )
 
-        prompt = data.input_text[6:]
+        if data.message.reply_to_message and data.message.reply_to_message.text:
+            prompt = data.message.reply_to_message.text
+        else:
+            prompt = data.input_text[6:]
 
-        message_filtered = data.input_text.lower().replace(
+        message_filtered = prompt.lower().replace(
             ",", " ").replace(
             ".", " ").replace(
             "!", " ").replace(
