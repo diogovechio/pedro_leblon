@@ -292,7 +292,7 @@ async def _generate_image_command(data: ReactData) -> None:
             if word in bot.faces_names:
                 recognized_names.append(word)
 
-        if len(recognized_names):
+        if len(recognized_names) and data.message.chat.id not in data.bot.config.not_internal_chats:
             if bot.dall_e_uses_today.count(data.message.from_.id) < bot.config.openai.dall_e_daily_limit:
                 background = await put_list_of_faces_on_background(
                     bot, recognized_names, "-s" in data.message.text.lower())
