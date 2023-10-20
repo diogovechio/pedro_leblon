@@ -1,13 +1,17 @@
 import datetime
+import json
 import random
 import re
+import uuid
 from collections import defaultdict
 import typing as T
+from dataclasses import asdict
 
 from unidecode import unidecode
 
 from constants.constants import SWEAR_WORDS, OPENAI_REACT_WORDS, OPENAI_PROMPTS, OPENAI_TRASH_LIST, WEATHER_LIST, \
     CHATGPT_BS
+from data_classes.image_task import ImageTask
 from data_classes.react_data import ReactData
 from utils.face_utils import put_list_of_faces_on_background
 from utils.logging_utils import async_elapsed_time
@@ -274,22 +278,22 @@ async def _generate_image_command(data: ReactData) -> None:
 
         prompt = data.input_text[6:]
 
-        if bot.dall_e_uses_today.count(data.message.from_.id) < bot.config.openai.dall_e_daily_limit:
-            message_filtered = data.input_text.lower().replace(
-                ",", " ").replace(
-                ".", " ").replace(
-                "!", " ").replace(
-                "?", " ").replace(
-                "@", " ")
-            words_list = unidecode(message_filtered).split(" ")
+        message_filtered = data.input_text.lower().replace(
+            ",", " ").replace(
+            ".", " ").replace(
+            "!", " ").replace(
+            "?", " ").replace(
+            "@", " ")
+        words_list = unidecode(message_filtered).split(" ")
 
-            recognized_names = []
+        recognized_names = []
 
-            for word in words_list:
-                if word in bot.faces_names:
-                    recognized_names.append(word)
+        for word in words_list:
+            if word in bot.faces_names:
+                recognized_names.append(word)
 
-            if len(recognized_names):
+        if len(recognized_names):
+            if bot.dall_e_uses_today.count(data.message.from_.id) < bot.config.openai.dall_e_daily_limit:
                 background = await put_list_of_faces_on_background(
                     bot, recognized_names, "-s" in data.message.text.lower())
                 image = await bot.openai.edit_image(text=prompt, square_png=background)
@@ -312,35 +316,46 @@ async def _generate_image_command(data: ReactData) -> None:
                         )
                     )
             else:
-                image = await bot.openai.generate_image(text=data.input_text[6:])
-
-                if image is not None:
-                    bot.dall_e_uses_today.append(data.message.from_.id)
-                    bot.loop.create_task(
-                        bot.send_photo(
-                            image=image,
-                            caption=feedback,
-                            chat_id=data.message.chat.id,
-                            reply_to=data.message.message_id)
+                bot.loop.create_task(
+                    bot.send_message(
+                        message_text=f"{data.message.from_.first_name} você já gerou {bot.config.openai.dall_e_daily_limit} "
+                                     f"imagens hoje, agora só amanhã",
+                        chat_id=data.message.chat.id,
+                        reply_to=data.message.message_id
                     )
-                else:
-                    bot.loop.create_task(
-                        bot.send_message(
-                            message_text=f"veio nada",
+                )
+        else:
+            with open(f"image_tasks/{str(uuid.uuid4())}.json", "w") as new_task:
+                task_data = json.dumps(
+                    asdict(
+                        ImageTask(
+                            prompt=prompt,
                             chat_id=data.message.chat.id,
-                            reply_to=data.message.message_id
+                            message_id=data.message.message_id
+                            )
                         )
                     )
 
-        else:
-            bot.loop.create_task(
-                bot.send_message(
-                    message_text=f"{data.message.from_.first_name} você já gerou {bot.config.openai.dall_e_daily_limit} "
-                                 f"imagens hoje, agora só amanhã",
-                    chat_id=data.message.chat.id,
-                    reply_to=data.message.message_id
-                )
-            )
+                new_task.write(task_data)
+            # image = await bot.openai.generate_image(text=data.input_text[6:])
+            #
+            # if image is not None:
+            #     bot.dall_e_uses_today.append(data.message.from_.id)
+            #     bot.loop.create_task(
+            #         bot.send_photo(
+            #             image=image,
+            #             caption=feedback,
+            #             chat_id=data.message.chat.id,
+            #             reply_to=data.message.message_id)
+            #     )
+            # else:
+            #     bot.loop.create_task(
+            #         bot.send_message(
+            #             message_text=f"veio nada",
+            #             chat_id=data.message.chat.id,
+            #             reply_to=data.message.message_id
+            #         )
+            #     )
 
 
 @async_elapsed_time

@@ -118,6 +118,7 @@ class FakePedro:
             Path('tmp').mkdir(exist_ok=True)
             Path('chat_logs').mkdir(exist_ok=True)
             Path('face_lake').mkdir(exist_ok=True)
+            Path('image_tasks').mkdir(exist_ok=True)
 
             self.loop = asyncio.get_running_loop()
             self.session = aiohttp.ClientSession(timeout=session_timeout)
@@ -573,7 +574,7 @@ if __name__ == '__main__':
         user_mood_file='user_mood.json',
         user_opinions_file='user_opinions.json',
         secrets_file=SECRETS_FILE,
-        debug_mode=True,
+        debug_mode=False,
     )
 
     asyncio.run(
