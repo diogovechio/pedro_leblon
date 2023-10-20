@@ -295,34 +295,28 @@ async def _generate_image_command(data: ReactData) -> None:
             if word in bot.faces_names:
                 recognized_names.append(word)
 
-        if len(recognized_names) and data.message.chat.id not in data.bot.config.not_internal_chats:
-            if bot.dall_e_uses_today.count(data.message.from_.id) < bot.config.openai.dall_e_daily_limit:
-                background = await put_list_of_faces_on_background(
-                    bot, recognized_names, "-s" in data.message.text.lower())
-                image = await bot.openai.edit_image(text=prompt, square_png=background)
+        if (
+                len(recognized_names) and
+                data.message.chat.id not in data.bot.config.not_internal_chats and
+                bot.dall_e_uses_today.count(data.message.from_.id) < bot.config.openai.dall_e_daily_limit
+        ):
+            background = await put_list_of_faces_on_background(
+                bot, recognized_names, "-s" in data.message.text.lower())
+            image = await bot.openai.edit_image(text=prompt, square_png=background)
 
-                if image is not None:
-                    bot.dall_e_uses_today.append(data.message.from_.id)
-                    bot.loop.create_task(
-                        bot.send_photo(
-                            image=image,
-                            caption=feedback,
-                            chat_id=data.message.chat.id,
-                            reply_to=data.message.message_id)
-                    )
-                else:
-                    bot.loop.create_task(
-                        bot.send_message(
-                            message_text=f"veio nada",
-                            chat_id=data.message.chat.id,
-                            reply_to=data.message.message_id
-                        )
-                    )
+            if image is not None:
+                bot.dall_e_uses_today.append(data.message.from_.id)
+                bot.loop.create_task(
+                    bot.send_photo(
+                        image=image,
+                        caption=feedback,
+                        chat_id=data.message.chat.id,
+                        reply_to=data.message.message_id)
+                )
             else:
                 bot.loop.create_task(
                     bot.send_message(
-                        message_text=f"{data.message.from_.first_name} você já gerou {bot.config.openai.dall_e_daily_limit} "
-                                     f"imagens hoje, agora só amanhã",
+                        message_text=f"veio nada",
                         chat_id=data.message.chat.id,
                         reply_to=data.message.message_id
                     )
