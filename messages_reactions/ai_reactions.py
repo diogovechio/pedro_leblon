@@ -333,32 +333,17 @@ async def _generate_image_command(data: ReactData) -> None:
                 prompt = split[0]
                 args = split[1:]
 
-            system = {
-                "role": "system",
-                "content": "limite-se a confirmar o idioma do texto que lhe for informado a seguir."
-                            "\nvocê irá responder apenas uma das 3 opções:"
-                            "\n1 - português"
-                            "\n2 - inglês"
-                            "\n3 - outro idioma"
-            }
-
-            lang = await bot.openai.generate_message(
-                full_text=prompt,
-                prompt_inject=None,
-                moderate=False,
-                users_opinions=None,
-                only_chatgpt=True,
-                remove_words_list=None,
-                temperature=0,
-                replace_pre_prompt=[system]
-            )
-
-            if "portug" in unidecode(lang.lower()):
+            if "skip-translate" not in args:
                 system = {
                     "role": "system",
-                    "content": "repita a mensagem que receber traduzindo para inglês."
+                    "content": "limite-se a confirmar o idioma do texto que lhe for informado a seguir."
+                                "\nvocê irá responder apenas uma das 3 opções:"
+                                "\n1 - português"
+                                "\n2 - inglês"
+                                "\n3 - outro idioma"
                 }
-                prompt = await bot.openai.generate_message(
+
+                lang = await bot.openai.generate_message(
                     full_text=prompt,
                     prompt_inject=None,
                     moderate=False,
@@ -368,6 +353,22 @@ async def _generate_image_command(data: ReactData) -> None:
                     temperature=0,
                     replace_pre_prompt=[system]
                 )
+
+                if "portug" in unidecode(lang.lower()):
+                    system = {
+                        "role": "system",
+                        "content": "repita a mensagem que receber traduzindo para inglês."
+                    }
+                    prompt = await bot.openai.generate_message(
+                        full_text=prompt,
+                        prompt_inject=None,
+                        moderate=False,
+                        users_opinions=None,
+                        only_chatgpt=True,
+                        remove_words_list=None,
+                        temperature=0,
+                        replace_pre_prompt=[system]
+                    )
 
             with open(f"image_tasks/{str(uuid.uuid4())}.json", "w") as new_task:
                 task_data = json.dumps(

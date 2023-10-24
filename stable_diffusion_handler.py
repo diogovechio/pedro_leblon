@@ -9,7 +9,7 @@ import json
 import aiohttp
 import re
 
-SECRETS = json.loads(open("secrets.json").read())['secrets']
+SECRETS = json.loads(open(r"D:\OneDrive\repos\pedro_leblon\secrets.json").read())['secrets']
 
 TELEGRAM_URL = f"https://api.telegram.org/bot{SECRETS['bot_token']}"
 
@@ -48,7 +48,8 @@ async def is_taking_too_long(chat_id: int, max_loops=4, timeout=13):
 
 async def send_message(
     message_text: str,
-    chat_id: int
+    chat_id: int,
+    reply_to=None,
 ) -> None:
     async with aiohttp.ClientSession() as session:
         async with session.post(
@@ -56,6 +57,8 @@ async def send_message(
                 json={
                     "chat_id": chat_id,
                     'text': message_text,
+                    "reply_to_message_id": str(reply_to) if reply_to else '',
+                    "allow_sending_without_reply": True,
                 }
         ) as resp:
             print(resp.status)
@@ -149,47 +152,68 @@ async def main():
                                     try:
                                         task_data = json.loads((sftp.open(task)).read())
 
+                                        args = task_data["args"]
                                         prompt = task_data["prompt"].strip()
+                                        negative_prompt = ""
+                                        styles = [
+                                            "Fooocus V2",
+                                            "Default (Slightly Cinematic)"
+                                        ]
+                                        total_images = 1
 
                                         if len(prompt):
-                                            first_char_digit = prompt[0].isdigit()
+                                            for arg in args:
+                                                arg: str
+                                                if arg.startswith("amount"):
+                                                    total_images = int(re.sub("\D", "", arg))
+                                                    if total_images > 20:
+                                                        total_images = 20
 
-                                            negative_prompt = ""
+                                                if arg.startswith("negative"):
+                                                    negative_prompt = arg[8:].strip()
 
-                                            if "-" in prompt:
-                                                split = prompt.split("-")
-                                                prompt = split[0].strip()
-                                                negative_prompt = split[1].strip()
+                                                if arg.startswith("style"):
+                                                    if arg.strip() == "style off":
+                                                        styles = []
+                                                    else:
+                                                        arg = arg[5:]
+                                                        styles = arg.split(",")
+
+                                                        styles = [x.strip() for x in styles if x.strip() != "style"]
 
                                             payload = {
-                                                    "prompt": prompt[1:] if first_char_digit else prompt,
+                                                    "prompt": prompt,
                                                     "negative_prompt": negative_prompt,
+                                                    "style_selections": styles
                                                 }
 
                                             print(prompt)
+                                            print(styles)
+                                            print(total_images)
                                             print(negative_prompt)
 
                                             ok = False
 
                                             with sending_action(task_data["chat_id"]):
-                                                total_images = int(re.sub("\D", "", prompt.split(" ")[0])) if first_char_digit else 1
-                                                if total_images > 8:
-                                                    total_images = 8
-
                                                 for i in range(total_images):
                                                     async with session.post("http://127.0.0.1:8888/v1/generation/text-to-image",
                                                                             json=payload, ssl=False) as req:
 
-                                                        response = await req.json()
+                                                        if req.status == 422:
+                                                            ok = True
 
-                                                        image_b64 = response[0]["base64"].encode()
-                                                        image_b = base64.b64decode(image_b64)
+                                                            await send_message("deu pau", chat_id=task_data["chat_id"], reply_to=task_data["message_id"])
+                                                        else:
+                                                            response = await req.json()
 
-                                                    ok = await send_photo(
-                                                            image=image_b,
-                                                            chat_id=task_data["chat_id"],
-                                                            reply_to=task_data["message_id"] if i == 0 else None
-                                                        )
+                                                            image_b64 = response[0]["base64"].encode()
+                                                            image_b = base64.b64decode(image_b64)
+
+                                                            ok = await send_photo(
+                                                                    image=image_b,
+                                                                    chat_id=task_data["chat_id"],
+                                                                    reply_to=task_data["message_id"] if i == 0 else None
+                                                                )
 
                                             if ok:
                                                 break
