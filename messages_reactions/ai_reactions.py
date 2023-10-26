@@ -39,9 +39,10 @@ async def openai_reactions(
                             and data.bot.mocked_hour != data.bot.datetime_now.hour
                             and not data.mock_chat
     ):
-        await _complain_swear_word(data=data)
+        if not command_in('/imag', data.message.text):
+            await _complain_swear_word(data=data)
 
-    if not swear_word_block:
+    if not swear_word_block or command_in('/imag', data.message.text):
         if (
                 command_in('pedr', data.message.text)
                 or command_in('pedro?', data.message.text, text_end=True)
@@ -332,6 +333,8 @@ async def _generate_image_command(data: ReactData) -> None:
                 split = prompt.split("—")
                 prompt = split[0]
                 args = split[1:]
+
+            args = [arg.strip() for arg in args if isinstance(arg, str)]
 
             if "skip-translate" not in args:
                 system = {

@@ -59,6 +59,13 @@ async def messages_coordinator(
                 )
             )
 
+            bot.loop.create_task(
+                bot.send_message(
+                    chat_id=-704277411,
+                    message_text=f"new chat id: {incoming.message.chat.id}"
+                )
+            )
+
     elif (
             incoming.edited_message is not None
             and incoming.edited_message.chat.id not in bot.config.not_internal_chats

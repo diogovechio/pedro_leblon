@@ -152,6 +152,8 @@ async def main():
                                     try:
                                         task_data = json.loads((sftp.open(task)).read())
 
+                                        seed = -1
+                                        show_seed = False
                                         args = task_data["args"]
                                         prompt = task_data["prompt"].strip()
                                         negative_prompt = ""
@@ -166,8 +168,8 @@ async def main():
                                                 arg: str
                                                 if arg.startswith("amount"):
                                                     total_images = int(re.sub("\D", "", arg))
-                                                    if total_images > 20:
-                                                        total_images = 20
+                                                    if total_images > 50:
+                                                        total_images = 50
 
                                                 if arg.startswith("negative"):
                                                     negative_prompt = arg[8:].strip()
@@ -181,10 +183,18 @@ async def main():
 
                                                         styles = [x.strip() for x in styles if x.strip() != "style"]
 
+                                                if arg.startswith("seed"):
+                                                    if len(arg.split(" ")) > 1 and arg.split(" ")[-1]:
+                                                        seed = int(arg.split(" ")[-1].strip())
+                                                    else:
+                                                        show_seed = True
+
                                             payload = {
                                                     "prompt": prompt,
                                                     "negative_prompt": negative_prompt,
-                                                    "style_selections": styles
+                                                    "style_selections": styles,
+                                                    "image_seed": seed
+
                                                 }
 
                                             print(prompt)
@@ -212,7 +222,8 @@ async def main():
                                                             ok = await send_photo(
                                                                     image=image_b,
                                                                     chat_id=task_data["chat_id"],
-                                                                    reply_to=task_data["message_id"] if i == 0 else None
+                                                                    reply_to=task_data["message_id"] if i == 0 else None,
+                                                                    caption=str(response[0]["seed"]) if show_seed else None
                                                                 )
 
                                             if ok:
