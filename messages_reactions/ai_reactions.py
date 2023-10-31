@@ -360,7 +360,7 @@ async def _generate_image_command(data: ReactData) -> None:
                 if "portug" in unidecode(lang.lower()):
                     system = {
                         "role": "system",
-                        "content": "repita a mensagem que receber traduzindo para inglês."
+                        "content": "reescreva a mensagem a seguir em inglês:"
                     }
                     prompt = await bot.openai.generate_message(
                         full_text=prompt,
