@@ -136,6 +136,8 @@ async def main():
 
     print(f"Available VRAM: {free_vram}GB")
 
+    await asyncio.sleep(15)
+
     while True:
         try:
             with pysftp.Connection(host='159.89.85.47', username='root', password=SECRETS["ftp_pass"], cnopts=cnopts) as sftp:
@@ -144,7 +146,7 @@ async def main():
                         tasks = sftp.listdir()
 
                         if len(tasks) == 0:
-                            await asyncio.sleep(10)
+                            await asyncio.sleep(5)
 
                         async with aiohttp.ClientSession() as session:
                             for task in tasks:
@@ -239,8 +241,6 @@ async def main():
 
                                 if ok:
                                     sftp.remove(task)
-
-                                await asyncio.sleep(10)
 
         except Exception as exc:
             print(exc)

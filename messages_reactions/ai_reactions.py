@@ -599,48 +599,48 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
                 )
             )
 
-        if data.message.chat.id not in data.bot.config.not_internal_chats:
-            title_prompt = "com base no texto abaixo, sugira o nome de um chat em no máximo 4 palavras:\n\n"
-            title_prompt += tldr
+    if data.message.chat.id not in data.bot.config.not_internal_chats:
+        title_prompt = "com base no texto abaixo, sugira o nome de um chat em no máximo 4 palavras:\n\n"
+        title_prompt += tldr
 
-            new_chat_title = await bot.openai.generate_message(
-                message_username=data.username,
-                full_text=title_prompt,
-                chat=data.message.chat.title,
-                prompt_inject=None,
-                only_chatgpt=True,
-                users_opinions=None,
-                destroy_message=data.destroy_message,
-                remove_words_list=['/pedro'],
-                return_raw_text=True,
+        new_chat_title = await bot.openai.generate_message(
+            message_username=data.username,
+            full_text=title_prompt,
+            chat=data.message.chat.title,
+            prompt_inject=None,
+            only_chatgpt=True,
+            users_opinions=None,
+            destroy_message=data.destroy_message,
+            remove_words_list=['/pedro'],
+            return_raw_text=True,
+        )
+
+        if '"' in new_chat_title:
+            idx = new_chat_title.find('"')
+            new_chat_title = new_chat_title[idx + 1:]
+            new_chat_title = new_chat_title.replace('"', "")
+
+        if " " in new_chat_title:
+            first_word = new_chat_title.split(" ")[0]
+            new_chat_title = new_chat_title.replace(first_word, "BLA")
+        else:
+            new_chat_title = "BLA " + new_chat_title
+
+        chat_title = ""
+        for char in new_chat_title:
+            if "1" in new_chat_title:
+                new_chat_title.replace("1", "")
+            if char.isdigit():
+                break
+            char: str
+            chat_title += char
+
+        bot.loop.create_task(
+            bot.set_chat_title(
+                chat_id=data.message.chat.id,
+                title=chat_title
             )
-
-            if '"' in new_chat_title:
-                idx = new_chat_title.find('"')
-                new_chat_title = new_chat_title[idx + 1:]
-                new_chat_title = new_chat_title.replace('"', "")
-
-            if " " in new_chat_title:
-                first_word = new_chat_title.split(" ")[0]
-                new_chat_title = new_chat_title.replace(first_word, "BLA")
-            else:
-                new_chat_title = "BLA " + new_chat_title
-
-            chat_title = ""
-            for char in new_chat_title:
-                if "1" in new_chat_title:
-                    new_chat_title.replace("1", "")
-                if char.isdigit():
-                    break
-                char: str
-                chat_title += char
-
-            bot.loop.create_task(
-                bot.set_chat_title(
-                    chat_id=data.message.chat.id,
-                    title=chat_title
-                )
-            )
+        )
 
 
 @async_elapsed_time
