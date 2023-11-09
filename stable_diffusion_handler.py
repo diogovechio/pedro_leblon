@@ -150,6 +150,8 @@ async def main():
 
                         async with aiohttp.ClientSession() as session:
                             for task in tasks:
+                                ok = False
+
                                 for _ in range(8):
                                     try:
                                         task_data = json.loads((sftp.open(task)).read())
@@ -205,8 +207,6 @@ async def main():
                                             print(styles)
                                             print(total_images)
                                             print(negative_prompt)
-
-                                            ok = False
 
                                             with sending_action(task_data["chat_id"]):
                                                 for i in range(total_images):

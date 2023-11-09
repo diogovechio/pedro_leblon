@@ -121,23 +121,36 @@ async def _complain_swear_word(data: ReactData) -> None:
         with bot.sending_action(data.message.chat.id, action="typing"):
             bot.mocked_hour = bot.datetime_now.hour
 
-            bot.loop.create_task(
-                bot.send_message(
-                    message_text=await bot.openai.generate_message(
-                        message_username=data.username,
-                        full_text=data.input_text,
-                        chat=data.message.chat.title,
-                        prompt_inject=OPENAI_PROMPTS['critique'] if round(
-                            random.random()) else OPENAI_PROMPTS['critique_reformule'],
-                        remove_words_list=['pedro'],
-                        only_instruct=True,
-                        users_opinions=None,
-                        temperature=1,
-                    ),
-                    chat_id=data.message.chat.id,
-                    sleep_time=1 + (round(random.random()) * 4),
-                    reply_to=data.message.message_id)
-            )
+            mock_message = await bot.openai.generate_message(
+                            message_username=data.username,
+                            full_text=data.input_text,
+                            chat=data.message.chat.title,
+                            prompt_inject=OPENAI_PROMPTS['critique'] if round(
+                                random.random()) else OPENAI_PROMPTS['critique_reformule'],
+                            remove_words_list=['pedro'],
+                            only_instruct=True,
+                            users_opinions=None,
+                            temperature=1,
+                        )
+
+            if round(random.random()):
+                bot.loop.create_task(
+                    bot.send_message(
+                        message_text=mock_message,
+                        chat_id=data.message.chat.id,
+                        sleep_time=1 + (round(random.random()) * 4),
+                        reply_to=data.message.message_id)
+                )
+            else:
+                audio = await data.bot.openai.text_to_speech(mock_message)
+
+                data.bot.loop.create_task(
+                    data.bot.send_audio(
+                        audio=audio,
+                        chat_id=data.message.chat.id,
+                        reply_to=data.message.message_id
+                    )
+                )
 
 
 @async_elapsed_time

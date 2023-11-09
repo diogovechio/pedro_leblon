@@ -11,6 +11,7 @@ import re
 from collections import defaultdict
 from difflib import SequenceMatcher
 import aiohttp
+from openai import OpenAI
 from unidecode import unidecode
 
 from constants.constants import OPENAI_PROMPTS, CHATGPT_BS, PEDROS_ROLETAS, PEDRO_MOOD, PEDRO_IN_LOVE, WEEKDAYS, MONTHS, \
@@ -50,12 +51,23 @@ class OpenAiCompletion:
         self.curie_daily_limit = curie_daily_limit
         self.ada_only_users = only_ada_users
 
+        self.shitty_client = OpenAI(api_key=self.api_key)
+
         self.loop = get_running_loop()
 
         self.headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self.api_key}"
         }
+
+    async def text_to_speech(self, text: str, voice: T.Literal["alloy"] = "alloy") -> bytes:
+        response = self.shitty_client.audio.speech.create(
+            model="tts-1",
+            voice=voice,
+            input=text
+        )
+
+        return response.content
 
     async def _model_selector(
             self,

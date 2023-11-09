@@ -38,13 +38,26 @@ async def words_reactions(
                 and data.message.chat.id not in data.bot.config.not_internal_chats
         ):
             roletas = await get_roletas_from_pavuna(data.bot, keyo=True)
-            data.bot.loop.create_task(
-                data.bot.send_message(
-                    message_text=random.choice(roletas)['text'].lower(),
-                    chat_id=data.message.chat.id,
-                    sleep_time=2 + round(random.random() * 5)
+
+            chosen_roleta = random.choice(roletas)['text'].lower()
+
+            if len(chosen_roleta) > 100 or round(random.random()):
+                data.bot.loop.create_task(
+                    data.bot.send_message(
+                        message_text=chosen_roleta,
+                        chat_id=data.message.chat.id,
+                        sleep_time=2 + round(random.random() * 5)
+                    )
                 )
-            )
+            else:
+                audio = await data.bot.openai.text_to_speech(chosen_roleta)
+
+                data.bot.loop.create_task(
+                    data.bot.send_audio(
+                        audio=audio,
+                        chat_id=data.message.chat.id,
+                    )
+                )
 
     if (
             data.bot.config.ask_photos and any(word in data.message.text.lower() for word in ASK_PHOTOS)

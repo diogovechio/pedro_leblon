@@ -385,6 +385,23 @@ class FakePedro:
             ) as resp:
                 logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
 
+    async def send_audio(self, audio: bytes, chat_id: int, reply_to=None, sleep_time=0) -> None:
+        await asyncio.sleep(sleep_time)
+
+        async with self.semaphore:
+            async with self.session.post(
+                    url=f"{self.api_route}/sendAudio".replace('\n', ''),
+                    data=aiohttp.FormData(
+                        (
+                                ("chat_id", str(chat_id)),
+                                ("audio", audio),
+                                ("reply_to_message_id", str(reply_to) if reply_to else ''),
+                                ('allow_sending_without_reply', 'true'),
+                        )
+                    )
+            ) as resp:
+                logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
+
     async def send_action(
             self,
             chat_id: int,
@@ -575,7 +592,7 @@ if __name__ == '__main__':
         user_mood_file='user_mood.json',
         user_opinions_file='user_opinions.json',
         secrets_file=SECRETS_FILE,
-        debug_mode=True,
+        debug_mode=False,
     )
 
     asyncio.run(
