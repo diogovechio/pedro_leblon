@@ -4,7 +4,9 @@ import logging
 import math
 import random
 import typing as T
+from io import BytesIO
 
+import librosa
 import json
 from asyncio import get_running_loop, Semaphore
 import re
@@ -60,12 +62,17 @@ class OpenAiCompletion:
             "Authorization": f"Bearer {self.api_key}"
         }
 
-    async def text_to_speech(self, text: str, voice: T.Literal["alloy"] = "alloy") -> bytes:
+    async def text_to_speech(self, text: str, voice: T.Literal["shimmer"] = "shimmer", pitch_steps=4) -> bytes:
         response = self.shitty_client.audio.speech.create(
             model="tts-1",
             voice=voice,
             input=text
         )
+
+        # b_io = BytesIO(response.content)
+        #
+        # y, sr = librosa.load(b_io, sr=16000)
+        # y_shifted = librosa.effects.pitch_shift(y, sr=sr, n_steps=pitch_steps)
 
         return response.content
 
