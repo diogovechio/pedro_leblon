@@ -56,6 +56,7 @@ async def words_reactions(
                     data.bot.send_audio(
                         audio=audio,
                         chat_id=data.message.chat.id,
+                        reply_to=data.message.message_id
                     )
                 )
 

@@ -244,7 +244,7 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
                     else f"fingindo ser o pedro, responda a mensagem '{data.input_text}' enviada por "
                          f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}:",
                     users_opinions=None if data.url_detector else bot.user_opinions,
-                    moderate=True,
+                    moderate=True if not data.url_detector else False,
                     remove_words_list=None,
                     always_ironic=always_ironic,
                     mood=bot.mood_per_user[data.username],
