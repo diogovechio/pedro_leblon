@@ -67,6 +67,9 @@ async def openai_reactions(
         elif command_in('/imag', data.message.text) and not data.mock_chat:
             await _generate_image_command(data=data)
 
+        elif command_in('/echo', data.message.text) and not data.mock_chat:
+            await _generate_audio_command(data=data)
+
         elif command_in("/pedro", data.message.text) and not data.mock_chat:
             await _boring_pedro(data=data)
 
@@ -133,24 +136,13 @@ async def _complain_swear_word(data: ReactData) -> None:
                             temperature=1,
                         )
 
-            if round(random.random()):
-                bot.loop.create_task(
-                    bot.send_message(
-                        message_text=mock_message,
-                        chat_id=data.message.chat.id,
-                        sleep_time=1 + (round(random.random()) * 4),
-                        reply_to=data.message.message_id)
-                )
-            else:
-                audio = await data.bot.openai.text_to_speech(mock_message)
-
-                data.bot.loop.create_task(
-                    data.bot.send_audio(
-                        audio=audio,
-                        chat_id=data.message.chat.id,
-                        reply_to=data.message.message_id
-                    )
-                )
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=mock_message,
+                    chat_id=data.message.chat.id,
+                    sleep_time=1 + (round(random.random()) * 4),
+                    reply_to=data.message.message_id)
+            )
 
 
 @async_elapsed_time
@@ -654,6 +646,28 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
                 title=chat_title
             )
         )
+
+
+@async_elapsed_time
+async def _generate_audio_command(data: ReactData) -> None:
+    if data.message.reply_to_message:
+        text = data.message.reply_to_message.text
+    elif data.message.caption:
+        text = data.message.caption
+    elif data.message.text:
+        text = data.message.text
+    else:
+        return
+
+    audio = await data.bot.openai.text_to_speech(text)
+
+    data.bot.loop.create_task(
+        data.bot.send_audio(
+            audio=audio,
+            chat_id=data.message.chat.id,
+            reply_to=data.message.message_id
+        )
+    )
 
 
 @async_elapsed_time

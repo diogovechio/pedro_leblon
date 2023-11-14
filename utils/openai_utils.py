@@ -62,7 +62,7 @@ class OpenAiCompletion:
             "Authorization": f"Bearer {self.api_key}"
         }
 
-    async def text_to_speech(self, text: str, voice: T.Literal["shimmer"] = "shimmer", pitch_steps=4) -> bytes:
+    async def text_to_speech(self, text: str, voice: T.Literal["shimmer"] = "onys", pitch_steps=4) -> bytes:
         response = self.shitty_client.audio.speech.create(
             model="tts-1",
             voice=voice,
