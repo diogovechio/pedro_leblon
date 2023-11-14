@@ -390,11 +390,11 @@ class FakePedro:
 
         async with self.semaphore:
             async with self.session.post(
-                    url=f"{self.api_route}/sendAudio".replace('\n', ''),
+                    url=f"{self.api_route}/sendVoice".replace('\n', ''),
                     data=aiohttp.FormData(
                         (
                                 ("chat_id", str(chat_id)),
-                                ("audio", audio),
+                                ("voice", audio),
                                 ("reply_to_message_id", str(reply_to) if reply_to else ''),
                                 ('allow_sending_without_reply', 'true'),
                         )
@@ -592,7 +592,7 @@ if __name__ == '__main__':
         user_mood_file='user_mood.json',
         user_opinions_file='user_opinions.json',
         secrets_file=SECRETS_FILE,
-        debug_mode=True,
+        debug_mode=False,
     )
 
     asyncio.run(
