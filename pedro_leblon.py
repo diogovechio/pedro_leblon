@@ -592,7 +592,7 @@ if __name__ == '__main__':
         user_mood_file='user_mood.json',
         user_opinions_file='user_opinions.json',
         secrets_file=SECRETS_FILE,
-        debug_mode=False,
+        debug_mode=True,
     )
 
     asyncio.run(
