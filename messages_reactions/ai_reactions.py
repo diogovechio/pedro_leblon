@@ -650,12 +650,12 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
 
 @async_elapsed_time
 async def _generate_audio_command(data: ReactData) -> None:
-    if data.message.reply_to_message:
+    if data.message.reply_to_message and data.message.reply_to_message.text:
         text = data.message.reply_to_message.text
     elif data.message.caption:
         text = data.message.caption
     elif data.message.text:
-        text = data.message.text
+        text = " ".join(data.message.text.split(" ")[1:])
     else:
         return
 
