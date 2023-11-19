@@ -273,6 +273,25 @@ async def bot_commands(
                 )
             )
 
+    elif command_in('/me', message.text):
+        user_mood = 0
+
+        for name, mood in bot.mood_per_user.items():
+            username = create_username(message.from_.first_name, message.from_.username)
+            if username == name:
+                user_mood = int(mood)
+
+        bot.loop.create_task(
+            bot.send_message(
+                message_text=f"<b>ID: </b>{message.from_.id}\n"
+                             f"<b>Chat ID: </b>{message.chat.id}\n"
+                             f"<b>Meu ódio por você: </b>{user_mood}",
+                chat_id=message.chat.id,
+                reply_to=message.message_id,
+                parse_mode="HTML"
+            )
+        )
+
     elif command_in('/agenda', message.text):
         agendas = []
 

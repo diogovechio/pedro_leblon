@@ -22,7 +22,7 @@ async def messages_coordinator(
     if incoming.message is not None:
         message = incoming.message
 
-        from_debug_chats = message.chat.id in (-20341310, 8375482)
+        from_debug_chats = message.chat.id in (-20341310, 8375482, -4098496372)
 
         react_data = await _pre_processor(
             bot=bot,
