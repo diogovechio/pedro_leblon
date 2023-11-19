@@ -92,7 +92,7 @@ async def send_action(
                     )
                 )
             ) as resp:
-                print(resp)
+                print(resp.status)
 
         await asyncio.sleep(round(5 + (random.random() * 2)))
 

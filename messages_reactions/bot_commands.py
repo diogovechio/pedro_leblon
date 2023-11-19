@@ -249,7 +249,7 @@ async def bot_commands(
             elif frequency == "monthly":
                 celebration = datetime.strptime(f"{message_split[-1]}/{bot.datetime_now.month}/{bot.datetime_now.year}", "%d/%m/%Y")
 
-            text = message.text.lower().replace(message_split[-1], '').replace(message_split[0], '').strip()
+            text = message.text.replace(message_split[-1], '').replace(message_split[0], '').strip()
 
             bot.commemorations.data.append(
                 Commemoration(
