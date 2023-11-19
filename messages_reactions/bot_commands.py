@@ -283,12 +283,12 @@ async def bot_commands(
 
         bot.loop.create_task(
             bot.send_message(
-                message_text=f"<b>ID: </b>{message.from_.id}\n"
-                             f"<b>Chat ID: </b>{message.chat.id}\n"
-                             f"<b>Meu ódio por você: </b>{user_mood}",
+                message_text=f"*ID:* `{message.from_.id}`\n"
+                             f"*Chat ID:* `{message.chat.id}`\n"
+                             f"*Meu ódio por você:* `{user_mood}`",
                 chat_id=message.chat.id,
                 reply_to=message.message_id,
-                parse_mode="HTML"
+                parse_mode="Markdown"
             )
         )
 

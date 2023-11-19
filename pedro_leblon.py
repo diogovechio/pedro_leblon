@@ -179,7 +179,7 @@ class FakePedro:
                     force_model=self.config.openai.force_model
                 )
 
-                self.allowed_list = [8375482, -704277411, -884201527, -20341310] if self.debug_mode else [
+                self.allowed_list = [8375482, -704277411, -884201527, -20341310, -4098496372] if self.debug_mode else [
                     *[value.id for value in self.config.allowed_ids]]
                 self.api_route = f"https://api.telegram.org/bot{self.config.secrets.bot_token}"
 
@@ -592,7 +592,7 @@ if __name__ == '__main__':
         user_mood_file='user_mood.json',
         user_opinions_file='user_opinions.json',
         secrets_file=SECRETS_FILE,
-        debug_mode=False,
+        debug_mode=True,
     )
 
     asyncio.run(
