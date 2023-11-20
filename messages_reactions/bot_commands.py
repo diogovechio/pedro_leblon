@@ -216,6 +216,15 @@ async def bot_commands(
                         )
                     )
 
+    elif command_in('/styles', message.text):
+        bot.loop.create_task(
+            bot.send_document(
+                document=open("styles.pdf", "rb").read(),
+                chat_id=message.chat.id,
+                reply_to=message.message_id,
+            )
+        )
+
     elif command_in('/agendar', message.text):
         frequency = None
 

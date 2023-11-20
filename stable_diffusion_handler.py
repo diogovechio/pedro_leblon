@@ -128,6 +128,15 @@ cnopts = pysftp.CnOpts()
 cnopts.hostkeys = None
 
 
+def style_convert(style: str) -> str:
+    style = style.replace("-", " ")
+    style = style.replace("3d", "3D")
+    style = style.title()
+    style = style.replace("Sai ", "SAI ")
+    print(style)
+    return style
+
+
 async def main():
     asyncio.create_task(reset_verbose_timeout())
 
@@ -195,6 +204,8 @@ async def main():
                                                         seed = int(arg.split(" ")[-1].strip())
                                                     else:
                                                         show_seed = True
+
+                                            styles = [style_convert(style) for style in styles]
 
                                             payload = {
                                                     "prompt": prompt,
