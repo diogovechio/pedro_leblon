@@ -221,7 +221,15 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
         else:
             prompt_text = f"{unidecode(chat_text)}\n{user_message}\npedro:"
 
-    with bot.sending_action(data.message.chat.id, action="typing", user=data.message.from_.first_name):
+    user = ""
+    if (
+            data.message and data.message.text and "?" in data.message.text
+    ) or (
+            data.message.reply_to_message and data.message.reply_to_message.text
+    ):
+        user = data.message.from_.first_name
+
+    with bot.sending_action(data.message.chat.id, action="typing", user=user):
         bot.loop.create_task(
             bot.send_message(
                 message_text=await bot.openai.generate_message(

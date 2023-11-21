@@ -21,9 +21,8 @@ nvmlInit()
 h = nvmlDeviceGetHandleByIndex(0)
 
 
-async def is_taking_too_long(chat_id: int, max_loops=4, timeout=13):
+async def is_taking_too_long(chat_id: int, max_loops=3, timeout=13):
     messages = [f"to fazendo a imagem que vc pediu",
-                "diogo deve ter me colocado em modo low vram de novo",
                 "ja vou mandar",
                 f"só 1 minuto"]
 

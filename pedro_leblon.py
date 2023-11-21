@@ -547,10 +547,9 @@ class FakePedro:
         ) as resp:
             logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
 
-    async def is_taking_too_long(self, chat_id: int, user="", max_loops=3, timeout=10):
+    async def is_taking_too_long(self, chat_id: int, user="", max_loops=2, timeout=20):
         if user:
             messages = [f"{user.lower()} ja vou te responder",
-                        "humanos escrevem mais rápido",
                         "meu cérebro tá devagar hoje",
                         f"só 1 minuto {user.lower()}"]
 
