@@ -39,19 +39,16 @@ async def openai_reactions(
                             and not data.bot.mocked_today
                             and not data.mock_chat
     ):
-        await _complain_swear_word(data=data)
+        if not command_in('/imag', data.message.text):
+            await _complain_swear_word(data=data)
 
-    if not swear_word_block:
+    if not swear_word_block or command_in('/imag', data.message.text):
         if (
                 command_in('pedr', data.message.text)
-                or command_in('pedro?', data.message.text, text_end=True)
+                or command_in('pedro', data.message.text, text_end=True)
                 or "ペドロ" in data.message.text
                 or int(data.message.chat.id) > 0
-                or (
-                        "pedro" in data.message.text.lower()
-                        and random.random() < data.bot.config.random_params.words_react_frequency
-                )
-        ) and not command_in('/pedro', data.message.text) and not pedro_on_reply and not data.limited_prompt:
+        ) and not command_in('/', data.message.text) and not pedro_on_reply and not data.limited_prompt:
             await _default_pedro(data=data)
 
         elif data.limited_prompt and command_in('pedro,', data.message.text):
@@ -65,6 +62,9 @@ async def openai_reactions(
 
         elif command_in('/imag', data.message.text) and not data.mock_chat:
             await _generate_image_command(data=data)
+
+        elif command_in('/echo', data.message.text) and not data.mock_chat:
+            await _generate_audio_command(data=data)
 
         elif command_in("/pedro", data.message.text) and not data.mock_chat:
             await _boring_pedro(data=data)
@@ -120,19 +120,21 @@ async def _complain_swear_word(data: ReactData) -> None:
         with bot.sending_action(data.message.chat.id, action="typing"):
             bot.mocked_today = True
 
+            mock_message = await bot.openai.generate_message(
+                            message_username=data.username,
+                            full_text=data.input_text,
+                            chat=data.message.chat.title,
+                            prompt_inject=OPENAI_PROMPTS['critique'] if round(
+                                random.random()) else OPENAI_PROMPTS['critique_reformule'],
+                            remove_words_list=['pedro'],
+                            only_instruct=True,
+                            users_opinions=None,
+                            temperature=1,
+                        )
+
             bot.loop.create_task(
                 bot.send_message(
-                    message_text=await bot.openai.generate_message(
-                        message_username=data.username,
-                        full_text=data.input_text,
-                        chat=data.message.chat.title,
-                        prompt_inject=OPENAI_PROMPTS['critique'] if round(
-                            random.random()) else OPENAI_PROMPTS['critique_reformule'],
-                        remove_words_list=['pedro'],
-                        only_instruct=True,
-                        users_opinions=None,
-                        temperature=1,
-                    ),
+                    message_text=mock_message,
                     chat_id=data.message.chat.id,
                     sleep_time=1 + (round(random.random()) * 4),
                     reply_to=data.message.message_id)
@@ -215,7 +217,15 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
         else:
             prompt_text = f"{unidecode(chat_text)}\n{user_message}\npedro:"
 
-    with bot.sending_action(data.message.chat.id, action="typing", user=data.message.from_.first_name):
+    user = ""
+    if (
+            data.message and data.message.text and "?" in data.message.text
+    ) or (
+            data.message.reply_to_message and data.message.reply_to_message.text
+    ):
+        user = data.message.from_.first_name
+
+    with bot.sending_action(data.message.chat.id, action="typing", user=user):
         bot.loop.create_task(
             bot.send_message(
                 message_text=await bot.openai.generate_message(
@@ -230,7 +240,7 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
                     else f"fingindo ser o pedro, responda a mensagem '{data.input_text}' enviada por "
                          f"{create_username(first_name=data.message.from_.first_name, username=data.message.from_.username)}:",
                     users_opinions=None if data.url_detector else bot.user_opinions,
-                    moderate=True,
+                    moderate=True if not data.url_detector else False,
                     remove_words_list=None,
                     always_ironic=always_ironic,
                     mood=bot.mood_per_user[data.username],
@@ -276,9 +286,12 @@ async def _generate_image_command(data: ReactData) -> None:
             dall_uses_list=bot.dall_e_uses_today
         )
 
-        prompt = data.input_text[6:]
+        if data.message.reply_to_message and data.message.reply_to_message.text:
+            prompt = data.message.reply_to_message.text
+        else:
+            prompt = data.input_text[6:]
 
-        message_filtered = data.input_text.lower().replace(
+        message_filtered = prompt.lower().replace(
             ",", " ").replace(
             ".", " ").replace(
             "!", " ").replace(
@@ -292,46 +305,91 @@ async def _generate_image_command(data: ReactData) -> None:
             if word in bot.faces_names:
                 recognized_names.append(word)
 
-        if len(recognized_names):
-            if bot.dall_e_uses_today.count(data.message.from_.id) < bot.config.openai.dall_e_daily_limit:
-                background = await put_list_of_faces_on_background(
-                    bot, recognized_names, "-s" in data.message.text.lower())
-                image = await bot.openai.edit_image(text=prompt, square_png=background)
+        if (
+                len(recognized_names) and
+                data.message.chat.id not in data.bot.config.not_internal_chats and
+                bot.dall_e_uses_today.count(data.message.from_.id) < bot.config.openai.dall_e_daily_limit
+        ):
+            background = await put_list_of_faces_on_background(
+                bot, recognized_names, "-s" in data.message.text.lower())
+            image = await bot.openai.edit_image(text=prompt, square_png=background)
 
-                if image is not None:
-                    bot.dall_e_uses_today.append(data.message.from_.id)
-                    bot.loop.create_task(
-                        bot.send_photo(
-                            image=image,
-                            caption=feedback,
-                            chat_id=data.message.chat.id,
-                            reply_to=data.message.message_id)
-                    )
-                else:
-                    bot.loop.create_task(
-                        bot.send_message(
-                            message_text=f"veio nada",
-                            chat_id=data.message.chat.id,
-                            reply_to=data.message.message_id
-                        )
-                    )
+            if image is not None:
+                bot.dall_e_uses_today.append(data.message.from_.id)
+                bot.loop.create_task(
+                    bot.send_photo(
+                        image=image,
+                        caption=feedback,
+                        chat_id=data.message.chat.id,
+                        reply_to=data.message.message_id)
+                )
             else:
                 bot.loop.create_task(
                     bot.send_message(
-                        message_text=f"{data.message.from_.first_name} você já gerou {bot.config.openai.dall_e_daily_limit} "
-                                     f"imagens hoje, agora só amanhã",
+                        message_text=f"veio nada",
                         chat_id=data.message.chat.id,
                         reply_to=data.message.message_id
                     )
                 )
         else:
+            args = []
+
+            if "--" in prompt:
+                split = prompt.split("--")
+                prompt = split[0]
+                args = split[1:]
+            elif "—" in prompt:
+                split = prompt.split("—")
+                prompt = split[0]
+                args = split[1:]
+
+            args = [arg.strip() for arg in args if isinstance(arg, str)]
+
+            if "skip-translate" not in args:
+                system = {
+                    "role": "system",
+                    "content": "limite-se a confirmar o idioma do texto que lhe for informado a seguir."
+                                "\nvocê irá responder apenas uma das 3 opções:"
+                                "\n1 - português"
+                                "\n2 - inglês"
+                                "\n3 - outro idioma"
+                }
+
+                lang = await bot.openai.generate_message(
+                    full_text=prompt,
+                    prompt_inject=None,
+                    moderate=False,
+                    users_opinions=None,
+                    only_chatgpt=True,
+                    remove_words_list=None,
+                    temperature=0,
+                    replace_pre_prompt=[system]
+                )
+
+                if "portug" in unidecode(lang.lower()):
+                    system = {
+                        "role": "system",
+                        "content": "reescreva a mensagem a seguir em inglês:"
+                    }
+                    prompt = await bot.openai.generate_message(
+                        full_text=prompt,
+                        prompt_inject=None,
+                        moderate=False,
+                        users_opinions=None,
+                        only_chatgpt=True,
+                        remove_words_list=None,
+                        temperature=0,
+                        replace_pre_prompt=[system]
+                    )
+
             with open(f"image_tasks/{str(uuid.uuid4())}.json", "w") as new_task:
                 task_data = json.dumps(
                     asdict(
                         ImageTask(
                             prompt=prompt,
                             chat_id=data.message.chat.id,
-                            message_id=data.message.message_id
+                            message_id=data.message.message_id,
+                            args=args
                             )
                         )
                     )
@@ -550,48 +608,70 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
                 )
             )
 
-        if data.message.chat.id not in data.bot.config.not_internal_chats:
-            title_prompt = "com base no texto abaixo, sugira o nome de um chat em no máximo 4 palavras:\n\n"
-            title_prompt += tldr
+    if data.message.chat.id not in data.bot.config.not_internal_chats:
+        title_prompt = "com base no texto abaixo, sugira o nome de um chat em no máximo 4 palavras:\n\n"
+        title_prompt += tldr
 
-            new_chat_title = await bot.openai.generate_message(
-                message_username=data.username,
-                full_text=title_prompt,
-                chat=data.message.chat.title,
-                prompt_inject=None,
-                only_chatgpt=True,
-                users_opinions=None,
-                destroy_message=data.destroy_message,
-                remove_words_list=['/pedro'],
-                return_raw_text=True,
+        new_chat_title = await bot.openai.generate_message(
+            message_username=data.username,
+            full_text=title_prompt,
+            chat=data.message.chat.title,
+            prompt_inject=None,
+            only_chatgpt=True,
+            users_opinions=None,
+            destroy_message=data.destroy_message,
+            remove_words_list=['/pedro'],
+            return_raw_text=True,
+        )
+
+        if '"' in new_chat_title:
+            idx = new_chat_title.find('"')
+            new_chat_title = new_chat_title[idx + 1:]
+            new_chat_title = new_chat_title.replace('"', "")
+
+        if " " in new_chat_title:
+            first_word = new_chat_title.split(" ")[0]
+            new_chat_title = new_chat_title.replace(first_word, "BLA")
+        else:
+            new_chat_title = "BLA " + new_chat_title
+
+        chat_title = ""
+        for char in new_chat_title:
+            if "1" in new_chat_title:
+                new_chat_title.replace("1", "")
+            if char.isdigit():
+                break
+            char: str
+            chat_title += char
+
+        bot.loop.create_task(
+            bot.set_chat_title(
+                chat_id=data.message.chat.id,
+                title=chat_title
             )
+        )
 
-            if '"' in new_chat_title:
-                idx = new_chat_title.find('"')
-                new_chat_title = new_chat_title[idx + 1:]
-                new_chat_title = new_chat_title.replace('"', "")
 
-            if " " in new_chat_title:
-                first_word = new_chat_title.split(" ")[0]
-                new_chat_title = new_chat_title.replace(first_word, "BLA")
-            else:
-                new_chat_title = "BLA " + new_chat_title
+@async_elapsed_time
+async def _generate_audio_command(data: ReactData) -> None:
+    if data.message.reply_to_message and data.message.reply_to_message.text:
+        text = data.message.reply_to_message.text
+    elif data.message.caption:
+        text = data.message.caption
+    elif data.message.text:
+        text = " ".join(data.message.text.split(" ")[1:])
+    else:
+        return
 
-            chat_title = ""
-            for char in new_chat_title:
-                if "1" in new_chat_title:
-                    new_chat_title.replace("1", "")
-                if char.isdigit():
-                    break
-                char: str
-                chat_title += char
+    audio = await data.bot.openai.text_to_speech(text)
 
-            bot.loop.create_task(
-                bot.set_chat_title(
-                    chat_id=data.message.chat.id,
-                    title=chat_title
-                )
-            )
+    data.bot.loop.create_task(
+        data.bot.send_audio(
+            audio=audio,
+            chat_id=data.message.chat.id,
+            reply_to=data.message.message_id
+        )
+    )
 
 
 @async_elapsed_time

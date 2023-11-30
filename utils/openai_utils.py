@@ -4,13 +4,16 @@ import logging
 import math
 import random
 import typing as T
+from io import BytesIO
 
+import librosa
 import json
 from asyncio import get_running_loop, Semaphore
 import re
 from collections import defaultdict
 from difflib import SequenceMatcher
 import aiohttp
+from openai import OpenAI
 from unidecode import unidecode
 
 from constants.constants import OPENAI_PROMPTS, CHATGPT_BS, PEDROS_ROLETAS, PEDRO_MOOD, PEDRO_IN_LOVE, WEEKDAYS, MONTHS, \
@@ -50,12 +53,28 @@ class OpenAiCompletion:
         self.curie_daily_limit = curie_daily_limit
         self.ada_only_users = only_ada_users
 
+        self.shitty_client = OpenAI(api_key=self.api_key)
+
         self.loop = get_running_loop()
 
         self.headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self.api_key}"
         }
+
+    async def text_to_speech(self, text: str, voice: T.Literal["onyx"] = "onyx", pitch_steps=4) -> bytes:
+        response = self.shitty_client.audio.speech.create(
+            model="tts-1",
+            voice=voice,
+            input=text
+        )
+
+        # b_io = BytesIO(response.content)
+        #
+        # y, sr = librosa.load(b_io, sr=16000)
+        # y_shifted = librosa.effects.pitch_shift(y, sr=sr, n_steps=pitch_steps)
+
+        return response.content
 
     async def _model_selector(
             self,
@@ -281,7 +300,7 @@ class OpenAiCompletion:
                             (
                                     ("image", square_png),
                                     ("prompt", text),
-                                    ("size", "512x512"),
+                                    ("size", "256x256"),
                             )
                         )
                 ) as openai_request:

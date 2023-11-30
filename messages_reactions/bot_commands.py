@@ -216,6 +216,15 @@ async def bot_commands(
                         )
                     )
 
+    elif command_in('/styles', message.text):
+        bot.loop.create_task(
+            bot.send_document(
+                document=open("styles.pdf", "rb").read(),
+                chat_id=message.chat.id,
+                reply_to=message.message_id,
+            )
+        )
+
     elif command_in('/agendar', message.text):
         frequency = None
 
@@ -249,7 +258,7 @@ async def bot_commands(
             elif frequency == "monthly":
                 celebration = datetime.strptime(f"{message_split[-1]}/{bot.datetime_now.month}/{bot.datetime_now.year}", "%d/%m/%Y")
 
-            text = message.text.lower().replace(message_split[-1], '').replace(message_split[0], '').strip()
+            text = message.text.replace(message_split[-1], '').replace(message_split[0], '').strip()
 
             bot.commemorations.data.append(
                 Commemoration(
@@ -272,6 +281,25 @@ async def bot_commands(
                     parse_mode="HTML"
                 )
             )
+
+    elif command_in('/me', message.text):
+        user_mood = 0
+
+        for name, mood in bot.mood_per_user.items():
+            username = create_username(message.from_.first_name, message.from_.username)
+            if username == name:
+                user_mood = int(mood)
+
+        bot.loop.create_task(
+            bot.send_message(
+                message_text=f"*ID:* `{message.from_.id}`\n"
+                             f"*Chat ID:* `{message.chat.id}`\n"
+                             f"*Meu ódio por você:* `{user_mood}`",
+                chat_id=message.chat.id,
+                reply_to=message.message_id,
+                parse_mode="Markdown"
+            )
+        )
 
     elif command_in('/agenda', message.text):
         agendas = []
@@ -345,7 +373,7 @@ async def bot_commands(
                             chat=data.message.chat.title,
                             full_text=f'critique duramente o '
                                       f'{from_username} '
-                                      f'por ter tentado deletar a mensagem "{message.text}" enviada por'
+                                      f'por ter tentado deletar a mensagem "{message.reply_to_message.text}" enviada por'
                                       f" {reply_username}. 'diga que pretende baní-lo do {message.chat.title}.\n\n"
                                       f"pedro:",
                             temperature=1,

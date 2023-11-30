@@ -179,7 +179,7 @@ class FakePedro:
                     force_model=self.config.openai.force_model
                 )
 
-                self.allowed_list = [8375482, -704277411, -884201527, -20341310] if self.debug_mode else [
+                self.allowed_list = [8375482, -704277411, -884201527, -20341310, -4098496372] if self.debug_mode else [
                     *[value.id for value in self.config.allowed_ids]]
                 self.api_route = f"https://api.telegram.org/bot{self.config.secrets.bot_token}"
 
@@ -385,6 +385,23 @@ class FakePedro:
             ) as resp:
                 logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
 
+    async def send_audio(self, audio: bytes, chat_id: int, reply_to=None, sleep_time=0) -> None:
+        await asyncio.sleep(sleep_time)
+
+        async with self.semaphore:
+            async with self.session.post(
+                    url=f"{self.api_route}/sendVoice".replace('\n', ''),
+                    data=aiohttp.FormData(
+                        (
+                                ("chat_id", str(chat_id)),
+                                ("voice", audio),
+                                ("reply_to_message_id", str(reply_to) if reply_to else ''),
+                                ('allow_sending_without_reply', 'true'),
+                        )
+                    )
+            ) as resp:
+                logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
+
     async def send_action(
             self,
             chat_id: int,
@@ -530,10 +547,9 @@ class FakePedro:
         ) as resp:
             logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
 
-    async def is_taking_too_long(self, chat_id: int, user="", max_loops=3, timeout=10):
+    async def is_taking_too_long(self, chat_id: int, user="", max_loops=2, timeout=20):
         if user:
             messages = [f"{user.lower()} ja vou te responder",
-                        "humanos escrevem mais rápido",
                         "meu cérebro tá devagar hoje",
                         f"só 1 minuto {user.lower()}"]
 
@@ -575,7 +591,7 @@ if __name__ == '__main__':
         user_mood_file='user_mood.json',
         user_opinions_file='user_opinions.json',
         secrets_file=SECRETS_FILE,
-        debug_mode=False,
+        debug_mode=True,
     )
 
     asyncio.run(
