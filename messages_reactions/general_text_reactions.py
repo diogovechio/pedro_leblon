@@ -75,6 +75,17 @@ async def words_reactions(
 
             data.bot.asked_for_photo = round(data.bot.datetime_now.hour / 8)
 
+    if (random.random() < data.bot.config.random_params.random_mock_frequency and not data.bot.mocked_today) or "xiiii" in data.input_text.lower():
+        data.bot.loop.create_task(
+            data.bot.set_message_reaction(
+                message_id=data.message.message_id,
+                chat_id=data.message.chat.id,
+                reaction='💩',
+            )
+        )
+
+        data.bot.mocked_today = True
+
     if (
             random.random() < data.bot.config.random_params.words_react_frequency
             and data.bot.config.rss_feed.games != ""

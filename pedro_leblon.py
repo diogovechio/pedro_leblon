@@ -343,6 +343,21 @@ class FakePedro:
                         else:
                             logging.critical(f"Image download failed: {download_request.status}")
 
+    async def set_message_reaction(self, message_id: int, chat_id: int, reaction=None, sleep_time=0, is_big=True) -> None:
+        await asyncio.sleep(sleep_time)
+
+        async with self.semaphore:
+            async with self.session.post(
+                    url=f"{self.api_route}/setMessageReaction".replace('\n', ''),
+                    json={
+                            "chat_id": str(chat_id),
+                            "message_id": message_id,
+                            "reaction": [{"type": "emoji", "emoji": reaction}],
+                            "is_big": is_big
+                        }
+            ) as resp:
+                logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
+
     async def send_photo(self, image: bytes, chat_id: int, caption=None, reply_to=None, sleep_time=0, max_retries=5) -> None:
         await asyncio.sleep(sleep_time)
 
@@ -591,7 +606,7 @@ if __name__ == '__main__':
         user_mood_file='user_mood.json',
         user_opinions_file='user_opinions.json',
         secrets_file=SECRETS_FILE,
-        debug_mode=True,
+        debug_mode=False,
     )
 
     asyncio.run(
