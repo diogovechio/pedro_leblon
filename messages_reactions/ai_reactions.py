@@ -36,7 +36,7 @@ async def openai_reactions(
 
     if (swear_word_block := swear_word_detected
                             and not data.url_detector
-                            and data.bot.mocked_hour != data.bot.datetime_now.hour
+                            and not data.bot.mocked_today
                             and not data.mock_chat
     ):
         if not command_in('/imag', data.message.text):
@@ -118,7 +118,7 @@ async def _complain_swear_word(data: ReactData) -> None:
 
     if random.random() < bot.config.random_params.words_react_frequency or 'pedr' in data.message.text.lower():
         with bot.sending_action(data.message.chat.id, action="typing"):
-            bot.mocked_hour = bot.datetime_now.hour
+            bot.mocked_today = True
 
             mock_message = await bot.openai.generate_message(
                             message_username=data.username,
