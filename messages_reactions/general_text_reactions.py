@@ -115,11 +115,11 @@ async def words_reactions(
             data.bot.set_message_reaction(
                 message_id=data.message.message_id,
                 chat_id=data.message.chat.id,
-                reaction=random.choice(["🎉", "👏", "🏆", "🍾", "❤"]),
+                reaction=random.choice(["🎉", "👏", "🏆", "🍾", "❤", "💯"]),
             )
         )
 
-    if "bom dia" in unidecode(data.input_text.lower()):
+    if "bom dia" in unidecode(data.input_text.lower()) and data.bot.mocked_hour != data.bot.datetime_now.hour:
         data.bot.loop.create_task(
             data.bot.set_message_reaction(
                 message_id=data.message.message_id,
@@ -128,12 +128,14 @@ async def words_reactions(
             )
         )
 
+        data.bot.mocked_hour = data.bot.datetime_now.hour
+
     if "viado" in unidecode(data.input_text.lower()):
         data.bot.loop.create_task(
             data.bot.set_message_reaction(
                 message_id=data.message.message_id,
                 chat_id=data.message.chat.id,
-                reaction=random.choice(["💅", "🦄"]),
+                reaction=random.choice(["💅", "🦄", "🌭"]),
             )
         )
 

@@ -199,6 +199,17 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
     bot = data.bot
     user_message = ""
 
+    _, reaction = await adjust_mood(data)
+
+    if reaction:
+        data.bot.loop.create_task(
+            data.bot.set_message_reaction(
+                message_id=data.message.message_id,
+                chat_id=data.message.chat.id,
+                reaction=reaction,
+            )
+        )
+
     if data.url_detector:
         prompt_text = data.input_text
     else:
@@ -250,8 +261,6 @@ async def _default_pedro(data: ReactData, always_ironic=False) -> None:
                 reply_to=data.message.message_id
             )
         )
-
-        bot.loop.create_task(adjust_mood(data))
 
 
 @async_elapsed_time
@@ -819,8 +828,16 @@ async def _reply_reaction(data: ReactData) -> None:
                 reply_to=data.message.message_id
             )
         )
+        _, reaction = await adjust_mood(data)
 
-        bot.loop.create_task(adjust_mood(data))
+        if reaction:
+            data.bot.loop.create_task(
+                data.bot.set_message_reaction(
+                    message_id=data.message.message_id,
+                    chat_id=data.message.chat.id,
+                    reaction=reaction,
+                )
+            )
 
 
 @async_elapsed_time
@@ -853,19 +870,28 @@ async def _random_conversation(data: ReactData) -> None:
 
 
 @async_elapsed_time
-async def adjust_mood(data: ReactData):
+async def adjust_mood(data: ReactData) -> (int, str):
     message_tone = await data.bot.openai.check_message_tone(prompt=data.message.text)
+    reaction = ""
 
     if message_tone == 5:
         data.bot.mood_per_user[data.username] += 8.0
+        reaction = "🖕"
     if message_tone == 4:
         data.bot.mood_per_user[data.username] += 1.5
+        reaction = random.choice(["🤬", "😡"])
 
     if message_tone == 2:
         data.bot.mood_per_user[data.username] -= 1
+        reaction = random.choice(["🆒", "🗿"])
     if message_tone == 1:
         data.bot.mood_per_user[data.username] -= 1.5
+        reaction = random.choice(["❤", "💘", "😘"])
 
     if message_tone == 0:
+        reaction = random.choice(["🤔", "🥴", "🤨", "🙏", "🤷"])
+
         if data.bot.mood_per_user[data.username] > 0.0:
             data.bot.mood_per_user[data.username] /= 10
+
+    return message_tone, reaction
