@@ -1,6 +1,7 @@
 import random
 
 import feedparser
+from unidecode import unidecode
 
 from constants.constants import ASK_PHOTOS, SWEAR_WORDS
 from data_classes.react_data import ReactData
@@ -75,7 +76,10 @@ async def words_reactions(
 
             data.bot.asked_for_photo = round(data.bot.datetime_now.hour / 8)
 
-    if (random.random() < data.bot.config.random_params.random_mock_frequency and not data.bot.mocked_today) or "xiiii" in data.input_text.lower():
+    if (
+            random.random() < data.bot.config.random_params.random_mock_frequency and not data.bot.mocked_today
+            and data.message.chat.id not in data.bot.config.not_internal_chats
+    ) or "xiiii" in data.input_text.lower():
         data.bot.loop.create_task(
             data.bot.set_message_reaction(
                 message_id=data.message.message_id,
@@ -85,6 +89,53 @@ async def words_reactions(
         )
 
         data.bot.mocked_today = True
+
+    if any(word in data.input_text.lower() for word in ["meu deus", "wtf", "pqp"]):
+        data.bot.loop.create_task(
+            data.bot.set_message_reaction(
+                message_id=data.message.message_id,
+                chat_id=data.message.chat.id,
+                reaction="😨",
+            )
+        )
+
+    if any(word in data.input_text.lower() for word in
+           ["governo", "lula", "faz o l", "china", "bostil", "lixo de pa", "imposto", "bolsonaro", "trump", "milei"]
+           ) and data.message.from_.username and any(user in data.message.from_.username for user in ["decaptor", "nands93"]):
+        data.bot.loop.create_task(
+            data.bot.set_message_reaction(
+                message_id=data.message.message_id,
+                chat_id=data.message.chat.id,
+                reaction=random.choice(["💩", "🤡"]),
+            )
+        )
+
+    if "parabens" in unidecode(data.input_text.lower()):
+        data.bot.loop.create_task(
+            data.bot.set_message_reaction(
+                message_id=data.message.message_id,
+                chat_id=data.message.chat.id,
+                reaction=random.choice(["🎉", "👏", "🏆", "🍾", "❤"]),
+            )
+        )
+
+    if "bom dia" in unidecode(data.input_text.lower()):
+        data.bot.loop.create_task(
+            data.bot.set_message_reaction(
+                message_id=data.message.message_id,
+                chat_id=data.message.chat.id,
+                reaction='❤',
+            )
+        )
+
+    if "viado" in unidecode(data.input_text.lower()):
+        data.bot.loop.create_task(
+            data.bot.set_message_reaction(
+                message_id=data.message.message_id,
+                chat_id=data.message.chat.id,
+                reaction=random.choice(["💅", "🦄"]),
+            )
+        )
 
     if (
             random.random() < data.bot.config.random_params.words_react_frequency

@@ -343,7 +343,14 @@ class FakePedro:
                         else:
                             logging.critical(f"Image download failed: {download_request.status}")
 
-    async def set_message_reaction(self, message_id: int, chat_id: int, reaction=None, sleep_time=0, is_big=True) -> None:
+    async def set_message_reaction(
+            self,
+            message_id: int,
+            chat_id: int,
+            reaction=None,
+            sleep_time=0,
+            is_big=True
+    ) -> None:
         await asyncio.sleep(sleep_time)
 
         async with self.semaphore:
