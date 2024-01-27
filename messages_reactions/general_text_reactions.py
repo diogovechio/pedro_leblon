@@ -13,7 +13,7 @@ from utils.roleta_utils import get_roletas_from_pavuna
 async def words_reactions(
         data: ReactData
 ) -> None:
-    # Todo: organizar a bagunça
+    normalized_input_text = unidecode(data.input_text.lower().strip())
     if (
             (
                 data.message.text.lower() in ['oi', 'bom dia', 'boa noite', 'adeus', 'kk'] or (
@@ -90,14 +90,32 @@ async def words_reactions(
 
         data.bot.mocked_today = True
 
-    if any(word in data.input_text.lower() for word in ["meu deus", "wtf", "pqp"]):
+    if any(
+            word == unidecode(data.input_text.lower().strip())
+            for word in ["meu deus", "wtf", "pqp", "nossa", "caralho", "vsf", "tnc", "vtnc", "vai tomar no cu"]
+    ):
         data.bot.loop.create_task(
             data.bot.set_message_reaction(
                 message_id=data.message.message_id,
                 chat_id=data.message.chat.id,
-                reaction="😨",
+                reaction=random.choice(["😱", "😨"]),
             )
         )
+
+    if (
+            normalized_input_text.startswith("lol") or normalized_input_text.endswith("lol") or
+            normalized_input_text.startswith("haha") or normalized_input_text.endswith("haha") or
+            normalized_input_text == "rs"
+    ) and data.bot.mocked_hour != data.bot.datetime_now.hour:
+        data.bot.loop.create_task(
+            data.bot.set_message_reaction(
+                message_id=data.message.message_id,
+                chat_id=data.message.chat.id,
+                reaction=random.choice(["😁", "🤩", "🤣", "🐳", "🤪"]),
+            )
+        )
+
+        data.bot.mocked_hour = data.bot.datetime_now.hour
 
     if any(word in data.input_text.lower() for word in
            ["governo", "lula", "faz o l", "china", "bostil", "lixo de pa", "imposto", "bolsonaro", "trump", "milei"]
@@ -106,11 +124,11 @@ async def words_reactions(
             data.bot.set_message_reaction(
                 message_id=data.message.message_id,
                 chat_id=data.message.chat.id,
-                reaction=random.choice(["💩", "🤡"]),
+                reaction=random.choice(["💩", "🤡", "🤪"]),
             )
         )
 
-    if "parabens" in unidecode(data.input_text.lower()):
+    if any(word in unidecode(data.input_text.lower()) for word in ["parabens", "muito bom", "otimo", "excelente"]):
         data.bot.loop.create_task(
             data.bot.set_message_reaction(
                 message_id=data.message.message_id,
@@ -130,12 +148,12 @@ async def words_reactions(
 
         data.bot.mocked_hour = data.bot.datetime_now.hour
 
-    if "viado" in unidecode(data.input_text.lower()):
+    if any(word in unidecode(data.input_text.lower()) for word in ["viado", "bicha", "gay"]):
         data.bot.loop.create_task(
             data.bot.set_message_reaction(
                 message_id=data.message.message_id,
                 chat_id=data.message.chat.id,
-                reaction=random.choice(["💅", "🦄", "🌭"]),
+                reaction=random.choice(["💅", "🦄", "🌭", "👀", "🌚"]),
             )
         )
 
