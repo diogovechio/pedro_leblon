@@ -161,19 +161,19 @@ async def bot_commands(
                     reply_to=message.message_id
                 )
             )
+        else:
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=f"fazem {expiration.replace('-','')} que o jair já foi embora",
+                    chat_id=message.chat.id,
+                    reply_to=message.message_id
+                )
+            )
 
             bot.loop.create_task(
                 bot.send_video(
                     video=open(f'gifs/jair.mp4', 'rb').read(),
                     chat_id=message.chat.id
-                )
-            )
-        else:
-            bot.loop.create_task(
-                bot.send_message(
-                    message_text=f"já fazem {-1 * expiration} que o jair foi embora",
-                    chat_id=message.chat.id,
-                    reply_to=message.message_id
                 )
             )
 
