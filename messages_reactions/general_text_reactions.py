@@ -102,21 +102,6 @@ async def words_reactions(
             )
         )
 
-    if (
-            normalized_input_text.startswith("lol") or normalized_input_text.endswith("lol") or
-            normalized_input_text.startswith("haha") or normalized_input_text.endswith("haha") or
-            normalized_input_text == "rs"
-    ) and data.bot.mocked_hour != data.bot.datetime_now.hour:
-        data.bot.loop.create_task(
-            data.bot.set_message_reaction(
-                message_id=data.message.message_id,
-                chat_id=data.message.chat.id,
-                reaction=random.choice(["😁", "🤩", "🤣", "🐳", "🤪"]),
-            )
-        )
-
-        data.bot.mocked_hour = data.bot.datetime_now.hour
-
     if any(word in data.input_text.lower() for word in
            ["governo", "lula", "faz o l", "china", "bostil", "lixo de pa", "imposto", "bolsonaro", "trump", "milei"]
            ) and data.message.from_.username and any(user in data.message.from_.username for user in ["decaptor", "nands93"]):
@@ -148,7 +133,7 @@ async def words_reactions(
 
         data.bot.mocked_hour = data.bot.datetime_now.hour
 
-    if any(word in unidecode(data.input_text.lower()) for word in ["viado", "bicha", "gay"]):
+    if any(word in unidecode(data.input_text.lower()) for word in ["viado", "bicha", "gay"]) and "enviado" not in data.input_text.lower():
         data.bot.loop.create_task(
             data.bot.set_message_reaction(
                 message_id=data.message.message_id,

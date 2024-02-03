@@ -162,13 +162,20 @@ async def bot_commands(
                 )
             )
 
-            if 'embora' in bolsoff_message:
-                bot.loop.create_task(
-                    bot.send_video(
-                        video=open(f'gifs/jair.mp4', 'rb').read(),
-                        chat_id=message.chat.id
-                    )
+            bot.loop.create_task(
+                bot.send_video(
+                    video=open(f'gifs/jair.mp4', 'rb').read(),
+                    chat_id=message.chat.id
                 )
+            )
+        else:
+            bot.loop.create_task(
+                bot.send_message(
+                    message_text=f"já fazem {-1 * expiration} que o jair foi embora",
+                    chat_id=message.chat.id,
+                    reply_to=message.message_id
+                )
+            )
 
     elif command_in('/nomes', message.text):
         msg = f"eu conheço essas pessoas:\n" + '\n'.join(set(bot.faces_names))
