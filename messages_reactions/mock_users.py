@@ -99,18 +99,18 @@ async def mock_users(
 
             bot.mocked_today = True
 
-        if (
-                (bot.datetime_now.hour > 22 or (0 <= bot.datetime_now.hour < 6))
-                and random.random() < bot.config.random_params.mock_drunk_decaptor_frequency
-        ):
-            bot.loop.create_task(
-                bot.send_message(
-                    message_text=await message_miguxer(message.text) if round(
-                        random.random()) else random.choice(DRUNK_DECAPTOR_LIST),
-                    chat_id=message.chat.id,
-                    reply_to=message.message_id if round(random.random()) else None
-                )
-            )
+        # if (
+        #         (bot.datetime_now.hour > 22 or (0 <= bot.datetime_now.hour < 6))
+        #         and random.random() < bot.config.random_params.mock_drunk_decaptor_frequency
+        # ):
+        #     bot.loop.create_task(
+        #         bot.send_message(
+        #             message_text=await message_miguxer(message.text) if round(
+        #                 random.random()) else random.choice(DRUNK_DECAPTOR_LIST),
+        #             chat_id=message.chat.id,
+        #             reply_to=message.message_id if round(random.random()) else None
+        #         )
+        #     )
 
         if 'lol' in message.text.lower() and random.random(
 

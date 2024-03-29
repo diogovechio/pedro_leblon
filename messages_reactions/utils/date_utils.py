@@ -12,6 +12,9 @@ def display_time(
         seconds: int,
         granularity=6
 ) -> str:
+    if seconds < 0:
+        seconds *= -1
+
     result = []
 
     for name, count in intervals:
@@ -22,7 +25,9 @@ def display_time(
                 name = name.rstrip('s')
                 if name == "mese":
                     name = "mês"
+
             result.append("{} {}".format(value, name))
+
     joined = ', '.join(result[:granularity])
     last_comma_idx = joined.rfind(',')
     output = joined[:last_comma_idx] + ' e' + joined[last_comma_idx + 1:]
