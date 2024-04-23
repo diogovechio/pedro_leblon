@@ -54,15 +54,9 @@ async def messages_coordinator(
 
         elif not bot.debug_mode:
             bot.loop.create_task(
-                bot.leave_chat(
-                    chat_id=message.chat.id
-                )
-            )
-
-            bot.loop.create_task(
                 bot.send_message(
-                    chat_id=-704277411,
-                    message_text=f"new chat id: {incoming.message.chat.id}"
+                    chat_id=8375482,
+                    message_text=f"new chat id: {incoming.message.chat.id} - {incoming.message.chat.title}"
                 )
             )
 

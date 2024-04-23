@@ -16,7 +16,7 @@ TOKEN = json.loads(open(SECRETS_FILE).read())['secrets']['bot_token']
 SEMAPHORE = Semaphore(1)
 
 
-async def telegram_logging(text: T.Union[str, Exception], chat_id=-704277411):
+async def telegram_logging(text: T.Union[str, Exception], chat_id=-1002051541243):
     if isinstance(text, Exception):
         text = "\n".join(traceback.format_exception(text))
         text = "#exception\n" + text

@@ -644,6 +644,9 @@ async def _nem_li(data: ReactData, days: T.Optional[int] = 5, topics=False) -> N
         else:
             new_chat_title = "BLA " + new_chat_title
 
+        if "asd" in data.message.chat.title.lower():
+            new_chat_title = new_chat_title.replace("BLA", "ASD")
+
         chat_title = ""
         for char in new_chat_title:
             if "1" in new_chat_title:
