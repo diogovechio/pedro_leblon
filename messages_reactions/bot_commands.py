@@ -451,7 +451,7 @@ async def bot_commands(
             bot.commemorations.data.append(
                 Commemoration(
                     id=str(uuid.uuid4()),
-                    every_year=True,
+                    frequency="annual",
                     created_by=message.from_.id,
                     created_at=str(bot.datetime_now),
                     celebrate_at=str(celebration),

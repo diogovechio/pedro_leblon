@@ -85,7 +85,7 @@
         "for_chat": -632911267,
         "message": "",
         "anniversary": "verificar o volume do mongo do gt",
-        "last_celebration": "2023-05-01 00:00:09.083905"
+        "last_celebration": "2024-05-01 11:19:19.648216"
     },
     {
         "id": "99f5d621-28ec-4f4f-a860-7e87dbfbaf17",
@@ -305,7 +305,7 @@
         "for_chat": -632911267,
         "message": "fazer a planilha de billing",
         "anniversary": "",
-        "last_celebration": "2023-06-01 00:00:02.286291"
+        "last_celebration": "2024-05-01 11:19:19.648216"
     },
     {
         "id": "3eca36e2-cfd4-4db7-8b50-f44d005c2b33",
@@ -316,7 +316,7 @@
         "for_chat": -1001369599178,
         "message": "oi come\u00e7ou um novo m\u00eas",
         "anniversary": "",
-        "last_celebration": "2023-06-01 00:00:02.286291"
+        "last_celebration": "2024-05-01 11:19:19.648216"
     },
     {
         "id": "5c9059ce-2192-49c2-aad1-227a3736b127",
@@ -339,5 +339,27 @@
         "message": "preenche a planilha de horas",
         "anniversary": "",
         "last_celebration": "2023-08-31 21:13:33.702955"
+    },
+    {
+        "id": "9cfa9662-aad4-41f6-894d-d169ec6bcede",
+        "frequency": "annual",
+        "created_by": 8375482,
+        "created_at": "2024-05-01 11:24:37.104989",
+        "celebrate_at": "2024-05-01 00:00:00",
+        "for_chat": -1002051541243,
+        "message": "teste",
+        "anniversary": "",
+        "last_celebration": "2024-05-01 11:25:07.104595"
+    },
+    {
+        "id": "a78b7b42-99e9-4a8f-a37b-3d9ed39c81ce",
+        "frequency": "annual",
+        "created_by": 8375482,
+        "created_at": "2024-05-01 11:28:23.852497",
+        "celebrate_at": "2024-05-01 00:00:00",
+        "for_chat": -1002051541243,
+        "message": "",
+        "anniversary": "abacate",
+        "last_celebration": "2024-05-01 11:28:39.321509"
     }
 ]

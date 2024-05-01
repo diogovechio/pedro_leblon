@@ -179,7 +179,7 @@ class FakePedro:
                     force_model=self.config.openai.force_model
                 )
 
-                self.allowed_list = [8375482, -704277411, -884201527, -20341310, -4098496372] if self.debug_mode else [
+                self.allowed_list = [8375482, -704277411, -884201527, -20341310, -4098496372, -1002051541243] if self.debug_mode else [
                     *[value.id for value in self.config.allowed_ids]]
                 self.api_route = f"https://api.telegram.org/bot{self.config.secrets.bot_token}"
 
