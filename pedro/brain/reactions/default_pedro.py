@@ -32,8 +32,8 @@ async def default(
 
             prompt = await create_basic_prompt(
                 message, history,
-                user_data=None if web_search else user_data,
-                total_messages=1 if web_search else 7,
+                user_data=user_data,
+                total_messages=3 if web_search else 7,
                 telegram=telegram,
                 llm=llm
             )
