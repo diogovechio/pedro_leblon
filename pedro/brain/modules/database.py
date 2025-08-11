@@ -31,6 +31,28 @@ class Database:
                     os.remove(old_backup)
 
     def insert(self, table_name: str, data: Dict[str, Any]) -> int:
+        def _normalize_data(data: Dict[str, Any]) -> Dict[str, Any]:
+            normalized_data = {}
+
+            for key, value in data.items():
+                if isinstance(value, datetime):
+                    normalized_data[key] = value.isoformat()
+                elif isinstance(value, dict):
+                    normalized_data[key] = _normalize_data(value)
+                elif isinstance(value, list):
+                    normalized_data[key] = [
+                        item.isoformat() if isinstance(item, datetime)
+                        else _normalize_data(item) if isinstance(item, dict)
+                        else item
+                        for item in value
+                    ]
+                else:
+                    normalized_data[key] = value
+
+            return normalized_data
+
+        data = _normalize_data(data)
+
         table = self.db.table(table_name)
         result = table.insert(data)
         self._create_backup()
