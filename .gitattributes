@@ -1,0 +1,14 @@
+# Set default behavior to auto-detect text files and normalize line endings.
+* text=auto
+
+# Enforce LF line endings for most text files to ensure consistency across platforms.
+*.py eol=lf
+*.sh eol=lf
+*.json eol=lf
+*.md eol=lf
+*.txt eol=lf
+.gitignore eol=lf
+pip.ini eol=lf
+
+# Enforce CRLF for Windows-specific batch files.
+*.bat eol=crlf

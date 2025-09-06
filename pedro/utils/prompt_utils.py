@@ -126,6 +126,9 @@ async def create_basic_prompt(
 
     for user_opinion in users_opinions:
         if user_opinion.opinions:
+            if user_opinion.username and "pedroleblonbot" in user_opinion.username:
+                continue
+
             user_display_name = create_username(user_opinion.first_name, user_opinion.username)
             user_display_name = f"{user_opinion.first_name} - {user_display_name}"
             user_opinions_text = "\n".join([f"Sobre {user_display_name}: {opinion[:100]}" for opinion in user_opinion.opinions])
@@ -181,6 +184,9 @@ async def create_self_complement_prompt(
 
 
 def text_trigger(message: Message, daily_flags: DailyFlags) -> bool:
+    if message.text and message.text.startswith("/pedro"):
+        return False
+
     if random.random() < 0.15 and not daily_flags.random_talk_today and not message.text.startswith("/"):
         daily_flags.random_talk_today = True
 
@@ -291,3 +297,36 @@ async def get_doc_description(
 
 def check_web_search(message: Message) -> bool:
     return any(word in message.text.lower() for word in ["tempo", "previs", "clima", "cotação", "fonte", "pesquis", "google", "internet", "verifique", "busque", "notícia", "noticia"])
+
+
+async def create_vanilla_prompt(
+        message: Message,
+        memory: ChatHistory,
+        total_messages=15,
+        telegram: Telegram | None = None,
+        llm: LLM | None = None,
+) -> str:
+    datetime = DatetimeManager()
+
+    chat_history = memory.get_friendly_last_messages(chat_id=message.chat.id, limit=total_messages)
+
+    text = message.caption if message.caption else message.text
+    text = text.replace("/pedro", "").strip()
+
+    reply_text = ""
+    if message.reply_to_message:
+        reply_text = await process_reply_message(message=message, telegram=telegram, llm=llm)
+
+    user_message = f"{text} {reply_text}"
+
+    prompt = (f"###Complete o chat com uma resposta de Pedro ao final da conversa####\n\n{chat_history}\n{create_username(message.from_.first_name, message.from_.username)}:"
+              f" {user_message}\n{datetime.get_current_time_str()} - Pedro:")
+
+    if telegram:
+        asyncio.create_task(send_telegram_log(
+            telegram=telegram,
+            message_text=prompt,
+            message=message
+        ))
+
+    return prompt
