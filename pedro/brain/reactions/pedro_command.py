@@ -23,7 +23,7 @@ async def pedro_command_reaction(
                 llm=llm
             )
 
-            response = await llm.generate_text(prompt, model="gpt-4.1-mini")
+            response = await llm.generate_text(prompt, model="gpt-5-nano")
 
             await history.add_message(response, chat_id=message.chat.id, is_pedro=True)
 
