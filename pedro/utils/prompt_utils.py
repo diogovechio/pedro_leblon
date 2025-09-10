@@ -319,8 +319,8 @@ async def create_vanilla_prompt(
 
     user_message = f"{text} {reply_text}"
 
-    prompt = (f"###Complete o chat com uma resposta de Pedro ao final da conversa. Restrição: "
-              f"Não repita seu nome na mensagem que for gerada####"
+    prompt = (f"### Complete o chat com uma resposta de Pedro ao final da conversa. Restrição: "
+              f"Não repita seu nome na mensagem que for gerada ####"
               f"\n\n{chat_history}\n{create_username(message.from_.first_name, message.from_.username)}:"
               f" {user_message}\n{datetime.get_current_time_str()} - Pedro:")
 

@@ -1,3 +1,5 @@
+import re
+
 # Internal
 from pedro.brain.modules.chat_history import ChatHistory
 from pedro.brain.modules.feedback import sending_action
@@ -24,6 +26,8 @@ async def pedro_command_reaction(
             )
 
             response = await llm.generate_text(prompt, model="gpt-5-nano")
+
+            response = re.sub(r"^\d{2}:\d{2} - Pedro: ", "", response)
 
             await history.add_message(response, chat_id=message.chat.id, is_pedro=True)
 
