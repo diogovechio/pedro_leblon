@@ -48,6 +48,24 @@ class From:
 
 
 @dataclass
+class PollOption:
+    text: str
+    voter_count: int
+
+
+@dataclass
+class Poll:
+    id: str
+    question: str
+    options: T.List[PollOption]
+    total_voter_count: int
+    is_closed: bool
+    is_anonymous: bool
+    type: str
+    allows_multiple_answers: bool
+
+
+@dataclass
 class ReplyToMessage:
     message_id: T.Optional[int] = None
     from_: T.Optional[From] = None
@@ -57,6 +75,7 @@ class ReplyToMessage:
     caption: T.Optional[str] = None
     photo: T.Optional[T.List[Photo]] = None
     document: T.Optional[Document] = None
+    poll: T.Optional[Poll] = None
 
 
 @dataclass
@@ -71,6 +90,7 @@ class Message:
     document: T.Optional[Document] = None
     edit_date: T.Optional[int] = None
     caption: T.Optional[str] = None
+    poll: T.Optional[Poll] = None
 
 
 @dataclass

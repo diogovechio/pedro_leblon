@@ -156,6 +156,32 @@ class ChatHistory:
             logger.exception(f"Error processing document: {e}")
             return message.text or message.caption or ""
 
+    async def _process_poll(self, message: Message) -> str:
+        """
+        Process a poll message and format it for storage.
+
+        Args:
+            message (Message): The Telegram message containing a poll.
+
+        Returns:
+            str: A formatted string containing the poll information.
+                Returns empty string if poll processing fails.
+        """
+        if not message.poll:
+            return ""
+
+        try:
+            options = "\n".join([f"- {option.text}" for option in message.poll.options])
+            formatted_text = f"[[ENQUETE ANEXADA: {message.poll.question}\n{options}]]"
+
+            if message.caption:
+                formatted_text = f"{message.caption}\n\n{formatted_text}"
+
+            return formatted_text
+        except Exception as e:
+            logger.exception(f"Error processing poll: {e}")
+            return ""
+
     async def add_message(self, message: Message | ReplyToMessage | str, chat_id: int, is_pedro: bool = False):
         """
         Adds a message to the chat history database.
@@ -206,6 +232,8 @@ class ChatHistory:
                 message_text = await self._process_image(message)
             elif message.document and self.telegram:
                 message_text = await self._process_document(message)
+            elif message.poll:
+                message_text = await self._process_poll(message)
             else:
                 message_text = message.text or message.caption or ""
 

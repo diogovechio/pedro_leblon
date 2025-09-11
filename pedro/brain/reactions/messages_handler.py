@@ -17,6 +17,7 @@ from pedro.brain.reactions.emoji_reactions import emoji_reactions
 from pedro.brain.reactions.misc_commands import misc_commands_reaction
 from pedro.brain.reactions.critic_or_praise import critic_or_praise_reaction
 from pedro.brain.reactions.pedro_command import pedro_command_reaction
+from pedro.brain.reactions.poll_reaction import poll_reaction
 from pedro.brain.reactions.weather_commands import weather_commands_reaction
 from pedro.data_structures.daily_flags import DailyFlags
 from pedro.data_structures.telegram_message import Message
@@ -72,6 +73,7 @@ async def messages_handler(
             weather_commands_reaction(updated_message, history, telegram, user_data, llm, config),
             random_reactions(updated_message, telegram, user_data, daily_flags),
             pedro_command_reaction(updated_message, history, telegram, llm),
+            poll_reaction(updated_message, telegram),
         )
     else:
         await telegram.send_message(
