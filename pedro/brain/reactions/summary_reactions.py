@@ -23,16 +23,23 @@ async def tlsr_trigger(message: Message) -> bool:
     return message.text and message.text.lower().startswith("/tlsr")
 
 
+async def tlfr_trigger(message: Message) -> bool:
+    return message.text and message.text.lower().startswith("/tlfr")
+
+
 async def handle_reply_to_message(
     message: Message,
     history: ChatHistory,
     telegram: Telegram,
     llm: LLM,
-    topics: bool
+    topics: bool,
+    tlfr: bool,
 ) -> str:
     prompt = "faça um resumo do texto a seguir:"
     if topics:
         prompt = "em no máximo 7 tópicos de no máximo 6 palavras cada, " + prompt
+    elif tlfr:
+        prompt = "de maneira distorcida e levemente sensacionalista, " + prompt
 
     if message.reply_to_message.photo:
         image_description = await get_photo_description(
@@ -69,6 +76,7 @@ async def handle_command_with_parameters(
     user_data: UserDataManager,
     llm: LLM,
     topics: bool,
+    tlfr: bool,
     days: int
 ) -> str:
     first_text = message.text.split(" ")[0]
@@ -104,6 +112,8 @@ async def handle_command_with_parameters(
 
     if topics:
         prompt = "em no máximo 7 tópicos de no máximo 6 palavras cada, " + prompt
+    elif tlfr:
+        prompt = "de maneira distorcida e levemente sensacionalista, " + prompt
 
     summary = await llm.generate_text(
         prompt=f"{prompt}:\n\n{chat_history}",
@@ -130,6 +140,7 @@ async def handle_basic_summarization(
     telegram: Telegram,
     llm: LLM,
     topics: bool,
+    tlfr: bool,
 ) -> str:
     chat_history = history.get_friendly_messages_since_last_from_user(
         chat_id=message.chat.id,
@@ -139,6 +150,11 @@ async def handle_basic_summarization(
     if topics:
         prompt = "em no máximo 7 tópicos de no máximo 6 palavras cada, " \
                  "cite de maneira enumerada os principais temas discutidos na conversa abaixo"
+    elif tlfr:
+        prompt = random.choice([
+            "de maneira distorcida e levemente sensacionalista, faça um pequeno resumo da conversa abaixo",
+            f"de maneira distorcida e levement sensacionalista, faça um pequeno resumo da conversa de {message.from_.first_name} e seus amigos"],
+        )
     else:
         prompt = random.choice(
             ["em no máximo 500 caracteres, faça um resumo da conversa abaixo",
@@ -217,19 +233,21 @@ async def summary_reaction(
 ) -> None:
     is_tldr = await tldr_trigger(message)
     is_tlsr = await tlsr_trigger(message)
+    is_tlfr = await tlfr_trigger(message)
 
-    if not (is_tldr or is_tlsr):
+    if not (is_tldr or is_tlsr or is_tlfr):
         return
 
     topics = is_tlsr
+    tlfr = is_tlfr
     days = 5
 
     with sending_action(chat_id=message.chat.id, telegram=telegram, user=message.from_.username):
         if message.reply_to_message:
-            summary = await handle_reply_to_message(message, history, telegram, llm, topics)
+            summary = await handle_reply_to_message(message, history, telegram, llm, topics, tlfr)
         elif " " in message.text or any(letter.isdigit() for letter in message.text):
-            summary = await handle_command_with_parameters(message, history, telegram, user_data, llm, topics, days)
+            summary = await handle_command_with_parameters(message, history, telegram, user_data, llm, topics, tlfr, days)
         else:
-            summary = await handle_basic_summarization(message, history, telegram, llm, topics)
+            summary = await handle_basic_summarization(message, history, telegram, llm, topics, tlfr)
 
         await update_chat_title(message, telegram, llm, summary)
