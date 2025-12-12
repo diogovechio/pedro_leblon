@@ -28,7 +28,7 @@ async def default(
 
         with sending_action(chat_id=message.chat.id, telegram=telegram, user=message.from_.username):
             web_search = check_web_search(message)
-            model = "gpt-4.1-mini" if web_search else "gpt-4.1-nano"
+            model = "gpt-5-mini" if web_search else "gpt-5-nano"
 
             prompt = await create_basic_prompt(
                 message, history,
@@ -51,7 +51,7 @@ async def default(
                     llm=llm
                 )
 
-                model = "gpt-4.1-mini"
+                model = "gpt-5-mini"
                 response = await adjust_pedro_casing(
                     await llm.generate_text(prompt, model=model, web_search=web_search)
                 )

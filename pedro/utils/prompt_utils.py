@@ -245,7 +245,7 @@ async def get_photo_description(
         if extra_prompt:
             prompt = "Sobre a imagem: " + extra_prompt
         caption = f'Legenda: {temp_message.caption}: ' if temp_message.caption else ""
-        description = await llm.generate_text(prompt=prompt, image=image, model="gpt-4.1-mini")
+        description = await llm.generate_text(prompt=prompt, image=image, model="gpt-5-mini")
 
         return f"[[{caption}IMAGEM ANEXADA: {description} ]]"
     except Exception as e:
@@ -287,7 +287,7 @@ async def get_doc_description(
             prompt = f"Sobre o documento PDF '{document.file_name}': " + extra_prompt
 
         caption = f'Legenda: {temp_message.caption}: ' if temp_message.caption else ""
-        description = await llm.generate_text(prompt=prompt, model="gpt-4.1-mini", document=document)
+        description = await llm.generate_text(prompt=prompt, model="gpt-5-mini", document=document)
 
         return f"[[{caption}DOCUMENTO PDF ANEXADO: {description} ]]"
     except Exception as e:
