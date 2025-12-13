@@ -25,7 +25,7 @@ async def pedro_command_reaction(
                 llm=llm
             )
 
-            response = await llm.generate_text(prompt, model="gpt-5-nano")
+            response = await llm.generate_text(prompt, model="gpt-5-mini")
 
             response = re.sub(r"^\d{2}:\d{2} - Pedro: ", "", response)
 

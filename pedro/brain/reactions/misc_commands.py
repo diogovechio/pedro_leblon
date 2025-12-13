@@ -68,7 +68,7 @@ async def handle_me_command(
         opinion_message = (await llm.generate_text(
             prompt=prompt,
             temperature=1.0,
-            model="gpt-5-mini"
+            model="gpt-4.1-mini"
         )).replace("\n", "")
 
     await telegram.send_message(

@@ -9,7 +9,7 @@ from pedro.brain.modules.telegram import Telegram
 from pedro.brain.modules.user_data_manager import UserDataManager
 from pedro.data_structures.daily_flags import DailyFlags
 from pedro.data_structures.telegram_message import Message
-from pedro.utils.prompt_utils import create_basic_prompt, text_trigger, check_web_search, send_telegram_log, \
+from pedro.utils.prompt_utils import create_basic_prompt, text_trigger, random_trigger, check_web_search, send_telegram_log, \
     create_self_complement_prompt, negative_response
 from pedro.utils.text_utils import adjust_pedro_casing
 from pedro.utils.url_utils import https_url_extract
@@ -23,12 +23,15 @@ async def default(
         llm: LLM,
         daily_flags: DailyFlags,
 ) -> None:
-    if text_trigger(message=message, daily_flags=daily_flags):
+    _text_trigger = text_trigger(message)
+    _random_trigger = random_trigger(message=message, daily_flags=daily_flags)
+
+    if _text_trigger or _text_trigger:
         await user_data.adjust_sentiment(message)
 
-        with sending_action(chat_id=message.chat.id, telegram=telegram, user=message.from_.username):
+        with sending_action(chat_id=message.chat.id, telegram=telegram, user=message.from_.username if _text_trigger else None):
             web_search = check_web_search(message)
-            model = "gpt-5-mini" if web_search else "gpt-5-nano"
+            model = "gpt-5-mini" if web_search else "gpt-4.1-nano"
 
             prompt = await create_basic_prompt(
                 message, history,
@@ -51,7 +54,7 @@ async def default(
                     llm=llm
                 )
 
-                model = "gpt-5-mini"
+                model = "gpt-4.1-mini"
                 response = await adjust_pedro_casing(
                     await llm.generate_text(prompt, model=model, web_search=web_search)
                 )

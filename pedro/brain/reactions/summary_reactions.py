@@ -117,7 +117,7 @@ async def handle_command_with_parameters(
 
     summary = await llm.generate_text(
         prompt=f"{prompt}:\n\n{chat_history}",
-        model="gpt-5-nano",
+        model="gpt-4.1-nano",
         temperature=1.0
     )
 

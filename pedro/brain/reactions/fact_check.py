@@ -34,7 +34,7 @@ async def fact_check(
     user_data: UserDataManager,
     llm: LLM,
 ) -> None:
-    model = "gpt-5-mini"
+    model = "gpt-4.1-mini"
     training_counterpoint = """Como especialista em verificação de fatos e jornalista com 
     uma perspectiva marxista materialista e dialética, examine 'Argumento' a 
     partir de uma perspectiva de defesa da classe trabalhadora. Identifique 

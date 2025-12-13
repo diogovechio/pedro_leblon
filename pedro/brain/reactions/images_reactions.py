@@ -30,7 +30,7 @@ async def images_reaction(
                                     "Responda apenas com 'SIM', 'PROVÁVEL' ou 'NÃO'. "
                                     "Não elabore ou explique sua resposta.")
 
-                response = await llm.generate_text(political_prompt, model="gpt-5-mini", image=image)
+                response = await llm.generate_text(political_prompt, model="gpt-4.1-mini", image=image)
 
                 if "SIM" in response.upper() or "PROV" in response.upper():
                     await asyncio.gather(
@@ -48,7 +48,7 @@ async def images_reaction(
                 message=message, memory=history, user_data=user_data, total_messages=3, telegram=telegram, llm=llm)
 
                 response = await adjust_pedro_casing(
-                    await llm.generate_text(prompt, model="gpt-4.1" if image.from_doc else "gpt-5-mini", image=image)
+                    await llm.generate_text(prompt, model="gpt-4.1" if image.from_doc else "gpt-4.1-mini", image=image)
                 )
 
                 await history.add_message(response, chat_id=message.chat.id, is_pedro=True)

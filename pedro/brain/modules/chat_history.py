@@ -92,13 +92,13 @@ class ChatHistory:
                 logger.warning("Failed to download image")
                 return message.text or message.caption or ""
 
-            model = "gpt-5-nano"
+            model = "gpt-4.1-nano"
             prompt = "Faça uma curta descrição da imagem, máximo 10 palavras."
             bot_in_prompt = message.caption and "pedro" in message.caption.lower()
 
             if bot_in_prompt:
                 prompt = f"Descreva a imagem e responda: '{message.caption}'"
-                model = "gpt-5-mini"
+                model = "gpt-4.1-mini"
 
             description = await self.llm.generate_text(prompt=prompt, model=model, image=image)
 

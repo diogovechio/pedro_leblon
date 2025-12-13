@@ -25,7 +25,7 @@ class LLM:
     def __init__(
             self,
             api_key: str,
-            default_model: str = "gpt-5-nano",
+            default_model: str = "gpt-4.1-nano",
     ):
         """
         Initialize the LLM client.
@@ -49,7 +49,7 @@ class LLM:
     async def generate_text(
             self,
             prompt: str,
-            model: str = "gpt-5-nano",
+            model: str = "gpt-4.1-nano",
             temperature: float = 1.0,
             image: 'MessageImage' = None,
             document: 'MessageDocument' = None,
