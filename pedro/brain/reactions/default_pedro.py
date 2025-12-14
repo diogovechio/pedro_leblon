@@ -31,7 +31,7 @@ async def default(
 
         with sending_action(chat_id=message.chat.id, telegram=telegram, user=message.from_.username if _text_trigger else None):
             web_search = check_web_search(message)
-            model = "gpt-5-mini" if web_search else "gpt-4.1-nano"
+            model = "gpt-4.1-mini" if web_search else "gpt-4.1-nano"
 
             prompt = await create_basic_prompt(
                 message, history,
