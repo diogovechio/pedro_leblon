@@ -113,6 +113,55 @@ class LLM:
 
         return "ué"
 
+    async def chat(
+            self,
+            messages: list[Dict[str, Any]],
+            model: str = None,
+            tools: list[Dict[str, Any]] = None,
+            temperature: float = 1.0,
+    ) -> Dict[str, Any]:
+        """
+        Send a chat completion request to OpenAI (supports tools).
+        Args:
+            messages: List of message dictionaries
+            model: Model to use (default: self.default_model)
+            tools: List of tool definitions
+            temperature: Randomness (0.0-2.0)
+        Returns:
+            Full API response dictionary
+        """
+        for i in range(3):
+            retry_sleep = int(2.0 + random.random() * 5.0)
+            try:
+                async with self.semaphore:
+                    model = model or self.default_model
+                    endpoint = "https://api.openai.com/v1/chat/completions"
+                    
+                    request_data = {
+                        "model": model,
+                        "messages": messages,
+                        "temperature": temperature,
+                    }
+                    if tools:
+                        request_data["tools"] = tools
+
+                    async with self.session.post(
+                            endpoint,
+                            headers=self.headers,
+                            json=request_data
+                    ) as response:
+                        response_json = await response.json()
+                        if response.status != 200:
+                            logging.error(f"OpenAI API error: {response_json}")
+                            raise Exception(f"OpenAI API error: {response.status}")
+                        return response_json
+
+            except Exception as exc:
+                logging.exception(exc)
+                await asyncio.sleep(retry_sleep)
+        
+        return {}
+
     @staticmethod
     def _prepare_web_search_request(
             prompt: str,

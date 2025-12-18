@@ -10,6 +10,7 @@ The project is structured in a modular way, with a clear separation of concerns.
 
 -   **`pedro/main.py`**: The main entry point of the application. It initializes all the modules, loads the configuration, and starts the message handling loop.
 -   **`pedro/brain/modules/`**: This directory contains the core logic of the bot, with each file representing a specific functionality (e.g., `telegram.py`, `llm.py`, `database.py`).
+-   **`pedro/brain/agent/`**: This directory contains the autonomous agent logic and tools.
 -   **`pedro/brain/reactions/`**: This directory contains the logic for how the bot reacts to different types of messages and commands. Each file defines a specific set of reactions.
 -   **`pedro/data_structures/`**: This directory contains the data classes used throughout the project, ensuring a consistent data model.
 -   **`pedro/utils/`**: This directory contains utility functions that are used across different modules.
@@ -27,9 +28,16 @@ The project is structured in a modular way, with a clear separation of concerns.
 -   **`datetime_manager.py`**: A utility for handling dates and times, with support for timezones.
 -   **`feedback.py`**: Provides feedback to the user during long-running operations, such as sending "typing..." actions.
 
+## Agent (`pedro/brain/agent/`)
+
+-   **`core.py`**: Contains the `Agent` class which implements the ReAct loop (Thought -> Action -> Observation). It orchestrates tool execution and LLM interaction.
+-   **`tools/base.py`**: Defines the abstract `Tool` interface that all tools must implement.
+-   **`tools/weather.py`**: A tool that exposes `weather_utils.get_forecast` to the Agent, allowing it to fetch weather data.
+
 ## Reactions (`pedro/brain/reactions/`)
 
 -   **`messages_handler.py`**: The main message handler that orchestrates all other reactions. It receives incoming messages and triggers the appropriate reactions based on the message content.
+-   **`agent_pedro.py`**: Handles messages starting with "Agente Pedro". It initializes the autonomous Agent with tools (like WeatherTool) and delegates the response generation to the agentic loop.
 -   **`default_pedro.py`**: The default reaction, which is triggered when no other specific reaction matches. It uses the LLM to generate a response based on the conversation history and user data.
 -   **`agenda_commands.py`**: Handles all commands related to the agenda, such as `/agendar`, `/agenda`, `/aniversario`, and `/delete`.
 -   **`complain_swearword.py`**: Reacts to messages containing swear words, either by critiquing the language or by sending a random message.

@@ -309,6 +309,7 @@ class ChatHistory:
 
             # Close the database connection
             db.close()
+
     def get_messages(self, chat_id: int, days_limit: int=0, max_messages: int=0) -> dict[str, list[ChatLog]]:
         """
         Retrieve chat logs for a specific chat, optionally filtering by date range and message count.

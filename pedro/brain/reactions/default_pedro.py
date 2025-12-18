@@ -26,7 +26,7 @@ async def default(
     _text_trigger = text_trigger(message)
     _random_trigger = random_trigger(message=message, daily_flags=daily_flags)
 
-    if _text_trigger or _text_trigger:
+    if _text_trigger or _random_trigger:
         await user_data.adjust_sentiment(message)
 
         with sending_action(chat_id=message.chat.id, telegram=telegram, user=message.from_.username if _text_trigger else None):
