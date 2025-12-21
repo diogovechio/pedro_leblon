@@ -11,7 +11,7 @@ from pedro.brain.modules.chat_history import ChatHistory
 from pedro.brain.modules.telegram import Telegram
 
 
-async def _is_taking_too_long(telegram: Telegram, chat_id: int, user="", max_loops=5, timeout=5, memory: T.Optional[ChatHistory] = None):
+async def _is_taking_too_long(telegram: Telegram, chat_id: int, user="", max_loops=5, timeout=10, memory: T.Optional[ChatHistory] = None):
     if user:
         messages = [f"@{user} já vou responder",
                     f"@{user} só 1 minuto"]
@@ -32,7 +32,7 @@ async def _is_taking_too_long(telegram: Telegram, chat_id: int, user="", max_loo
                 )
             )
 
-            timeout *= 2
+            timeout *= 1.5
 
 
 @contextmanager

@@ -1,10 +1,14 @@
 import json
 import logging
+import asyncio
 from typing import List, Dict, Any, Optional
 
 from pedro.brain.modules.llm import LLM
+from pedro.brain.modules.telegram import Telegram
 from pedro.brain.agent.tools.base import Tool
 from pedro.data_structures.chat_log import ChatLog
+from pedro.data_structures.telegram_message import Message
+from pedro.utils.prompt_utils import send_telegram_log
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +33,9 @@ class Agent:
         user_message: str, 
         history: List[ChatLog], 
         system_prompt: str,
-        user_name: str = "User"
+        user_name: str = "User",
+        telegram: Optional[Telegram] = None,
+        original_message: Optional[Message] = None,
     ) -> str:
         """
         Run the agent loop: Thought -> Action -> Observation.
@@ -53,7 +59,8 @@ class Agent:
         for _ in range(max_turns):
             response_data = await self.llm.chat(
                 messages=messages,
-                tools=self.tool_definitions if self.tool_definitions else None
+                tools=self.tool_definitions if self.tool_definitions else None,
+                model="gpt-5-nano"
             )
 
             if not response_data or 'choices' not in response_data:
@@ -70,28 +77,44 @@ class Agent:
 
             if message.get('tool_calls'):
                 # Handle tool calls
-                for tool_call in message['tool_calls']:
+                for i, tool_call in enumerate(message['tool_calls']):
                     function_name = tool_call['function']['name']
                     function_args = json.loads(tool_call['function']['arguments'])
+
+                    func = self.tools[function_name]
+
+                    if i >= 1 and hasattr(func, "limited") and func.limited:
+                        break
+
+                    logger.info(f"Agent calling tool {i + 1}/{len(message['tool_calls'])}: {function_name} with {function_args}")
                     
-                    logger.info(f"Agent calling tool: {function_name} with {function_args}")
+                    if telegram and original_message:
+                        asyncio.create_task(
+                            send_telegram_log(
+                                telegram=telegram,
+                                message_text=f"Agent calling tool {i + 1}/{len(message['tool_calls'])}: <b>{function_name}</b>\nArgs: <code>{function_args}</code>",
+                                message=original_message
+                            )
+                        )
 
                     tool_result = "Erro: Ferramenta não encontrada."
                     if function_name in self.tools:
                         try:
                             # Execute tool
-                            result = await self.tools[function_name].execute(**function_args)
+                            result = await func.execute(**function_args)
                             tool_result = str(result)
                         except Exception as e:
                             tool_result = f"Erro na execução da ferramenta: {str(e)}"
                             logging.exception(f"Tool execution failed: {e}")
 
                     # Append tool result
-                    messages.append({
-                        "role": "tool",
-                        "tool_call_id": tool_call['id'],
-                        "content": tool_result
-                    })
+                    messages.append(
+                        {
+                            "role": "tool",
+                            "tool_call_id": tool_call['id'],
+                            "content": tool_result
+                        }
+                    )
             else:
                 # Final response (no more tool calls)
                 return message['content']

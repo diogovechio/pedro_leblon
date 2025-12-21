@@ -6,7 +6,8 @@ from pedro.brain.modules.agenda import AgendaManager
 
 
 # Project
-from pedro.brain.reactions.default_pedro import default
+from pedro.brain.reactions.default_pedro import pedro_reaction
+from pedro.brain.reactions.deprecated_pedro import pedro_deprecado
 from pedro.brain.reactions.fact_check import fact_check_reaction
 from pedro.brain.reactions.images_reactions import images_reaction
 from pedro.brain.reactions.random_reactions import random_reactions
@@ -19,7 +20,6 @@ from pedro.brain.reactions.critic_or_praise import critic_or_praise_reaction
 from pedro.brain.reactions.pedro_command import pedro_command_reaction
 from pedro.brain.reactions.poll_reaction import poll_reaction
 from pedro.brain.reactions.weather_commands import weather_commands_reaction
-from pedro.brain.reactions.agent_pedro import agent_pedro_reaction
 from pedro.data_structures.daily_flags import DailyFlags
 from pedro.data_structures.telegram_message import Message
 from pedro.data_structures.bot_config import BotConfig
@@ -62,7 +62,7 @@ async def messages_handler(
         updated_message = await check_and_update_with_url_contents(message)
 
         await asyncio.gather(
-            default(updated_message, history, telegram, user_data, llm, daily_flags),
+            pedro_deprecado(updated_message, history, telegram, user_data, llm, daily_flags),
             images_reaction(updated_message, history, telegram, user_data, llm),
             summary_reaction(updated_message, history, telegram, user_data, llm),
             fact_check_reaction(updated_message, history, telegram, user_data, llm),
@@ -75,7 +75,7 @@ async def messages_handler(
             random_reactions(updated_message, telegram, user_data, daily_flags),
             pedro_command_reaction(updated_message, history, telegram, llm),
             poll_reaction(updated_message, telegram),
-            agent_pedro_reaction(updated_message, history, telegram, user_data, llm, config),
+            pedro_reaction(updated_message, history, telegram, user_data, llm, config, daily_flags),
         )
     else:
         await telegram.send_message(

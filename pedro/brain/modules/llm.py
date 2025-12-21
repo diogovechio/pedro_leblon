@@ -120,6 +120,8 @@ class LLM:
             tools: list[Dict[str, Any]] = None,
             temperature: float = 1.0,
     ) -> Dict[str, Any]:
+        if not tools:
+            tools = []
         """
         Send a chat completion request to OpenAI (supports tools).
         Args:
@@ -141,9 +143,8 @@ class LLM:
                         "model": model,
                         "messages": messages,
                         "temperature": temperature,
+                        "tools": tools,
                     }
-                    if tools:
-                        request_data["tools"] = tools
 
                     async with self.session.post(
                             endpoint,
@@ -296,10 +297,8 @@ class LLM:
 
             if web_search:
                 output = response_json["output"]
-                if len(output) > 1:
-                    response_text = output[1]["content"][0]["text"]
-                else:
-                    response_text = output[0]["content"][0]["text"]
+                responses = [x for x in output if "content" in x]
+                response_text = responses[0]["content"][0]["text"]
             elif is_chat_model:
                 response_text = response_json['choices'][0]['message']['content']
             else:
