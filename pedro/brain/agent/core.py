@@ -54,6 +54,9 @@ class Agent:
         current_content = f"[{user_name}]: {user_message}"
         messages.append({"role": "user", "content": current_content})
 
+        asyncio.create_task(send_telegram_log(telegram, system_prompt))
+        asyncio.create_task(send_telegram_log(telegram, "\n".join([str(message) for message in messages])))
+
         # 2. ReAct Loop
         max_turns = 5
         for _ in range(max_turns):
@@ -82,9 +85,6 @@ class Agent:
                     function_args = json.loads(tool_call['function']['arguments'])
 
                     func = self.tools[function_name]
-
-                    if i >= 1 and hasattr(func, "limited") and func.limited:
-                        break
 
                     logger.info(f"Agent calling tool {i + 1}/{len(message['tool_calls'])}: {function_name} with {function_args}")
                     

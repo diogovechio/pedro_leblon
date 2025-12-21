@@ -12,7 +12,7 @@ set VENV_DIR=venv
 
 if not exist %VENV_DIR%\ (
     echo Creating virtual environment...
-    python -m venv %VENV_DIR%
+    python3 -m venv %VENV_DIR%
     if %ERRORLEVEL% NEQ 0 (
         echo Failed to create virtual environment. Make sure you have Python 3.3+ with venv support.
         pause
@@ -24,10 +24,10 @@ echo Activating virtual environment...
 call %VENV_DIR%\Scripts\activate.bat
 
 echo Upgrading pip...
-python -m pip install --upgrade pip
+python3 -m pip install --upgrade pip
 
 echo Installing dependencies with trusted hosts...
-pip install -r requirements.txt --trusted-host pypi.org --trusted-host files.pythonhosted.org
+python3 -m pip install -r requirements.txt --trusted-host pypi.org --trusted-host files.pythonhosted.org
 
 if %ERRORLEVEL% EQU 0 (
     echo Installation complete!

@@ -7,3 +7,4 @@ youtube_transcript_api
 beautifulsoup4
 unidecode
 geopy
+ddgs

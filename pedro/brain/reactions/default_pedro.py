@@ -9,6 +9,7 @@ from pedro.brain.agent.tools.weather import WeatherTool
 from pedro.brain.agent.tools.chat_history_search import ChatHistorySearchTool
 from pedro.brain.agent.tools.birthdays import BirthdaySearchTool
 from pedro.brain.agent.tools.political_opinions import PoliticalOpinionsTool
+from pedro.brain.agent.tools.web_search import WebSearchTool
 from pedro.brain.modules.chat_history import ChatHistory
 from pedro.brain.modules.feedback import sending_action
 from pedro.brain.modules.llm import LLM
@@ -35,7 +36,7 @@ async def pedro_reaction(
     """
     Handle messages using the autonomous Agent, replacing the old default reaction.
     """
-    _text_trigger = text_trigger(message)
+    _text_trigger = text_trigger(message=message)
     _random_trigger = random_trigger(message=message, daily_flags=daily_flags)
 
     if not (_text_trigger or _random_trigger):
@@ -50,9 +51,10 @@ async def pedro_reaction(
         chat_history_tool = ChatHistorySearchTool(history, message.chat.id)
         birthday_tool = BirthdaySearchTool(message.chat.id)
         politics_tool = PoliticalOpinionsTool()
+        web_search_tool = WebSearchTool()
 
         # 2. Initialize Agent
-        agent = Agent(llm=llm, tools=[weather_tool, chat_history_tool, birthday_tool, politics_tool])
+        agent = Agent(llm=llm, tools=[weather_tool, chat_history_tool, birthday_tool, politics_tool, web_search_tool])
 
         # 3. Build System Prompt
         datetime_manager = DatetimeManager()
@@ -64,12 +66,38 @@ async def pedro_reaction(
              sentiment = user_data.get_sentiment_level_prompt(message.from_.id)
              user_context = f"\nSobre o usuário {user_name}: {sentiment}"
 
+        # Get opinions about other users mentioned in the conversation
+        opinions_text = ""
+        if user_data:
+            # Get chat history to find mentioned users
+            chat_logs = history.get_last_messages(chat_id=message.chat.id, limit=10)
+            chat_history_text = history.get_friendly_last_messages(chat_id=message.chat.id, limit=10)
+            users_opinions = user_data.get_users_by_text_match(chat_history_text)
+            
+            for user_opinion in users_opinions:
+                if user_opinion.opinions:
+                    # Skip Pedro himself
+                    if user_opinion.username and "pedroleblonbot" in user_opinion.username:
+                        continue
+                    
+                    user_display_name = create_username(user_opinion.first_name, user_opinion.username)
+                    user_display_name = f"{user_opinion.first_name} - {user_display_name}"
+                    user_opinions_text = "\n".join([f"Sobre {user_display_name}: {opinion[:100]}" for opinion in user_opinion.opinions])
+                    opinions_text += f"### RESPONDA COM BASE NAS INFORMAÇÕES A SEGUIR SE FOR PERGUNTADO SOBRE ***{user_display_name}*** ### \n{user_opinions_text}\n\n"
+
         system_prompt = (
-            "Você é o Pedro, um bot sarcástico, inteligente e útil no Telegram. "
-            "Você opera como um Agente autônomo capaz de usar ferramentas. "
-            "Responda de forma natural e engajante."
-            f"Hora atual: {datetime_manager.get_current_time_str()}"
-            f"{user_context}"
+            "Você é o Pedro, um usuário sarcástico, inteligente e útil no Telegram. "
+            "Você é capaz de usar ferramentas para trazer diversas informações. "
+            "Responda de forma natural, no mesmo estilo de mensagem de outros participantes na conversa, "
+            "evitando excesso de cumprimentos e formalidades, "
+            "evitando excesso de pontuação, "
+            "evitando excesso de empolgação, "
+            "evitando perguntas desnecessárias. "
+            "Você conversa num estilo informal de usuário de internet.\n\n"
+            f"Hora atual: {datetime_manager.get_current_time_str()}\n"
+            f"Data atual: {datetime_manager.get_current_date_str()}\n"
+            f"{user_context}\n"
+            f"{opinions_text}"
         )
 
         # 4. Get History
@@ -88,7 +116,7 @@ async def pedro_reaction(
             telegram=telegram,
             original_message=message
         )
-
+        #
         # Apply casing normalization
         response = await adjust_pedro_casing(response)
 
