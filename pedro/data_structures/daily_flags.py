@@ -1,7 +1,7 @@
 import asyncio
 
 
-class DailyFlags:
+class Flags:
     """
     Class to hold daily flags for Pedro's behavior.
     These flags control whether certain actions have been performed today.

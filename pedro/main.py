@@ -14,7 +14,7 @@ from pedro.brain.modules.agenda import AgendaManager
 # Project
 from pedro.__version__ import __version__
 from pedro.data_structures.bot_config import BotConfig
-from pedro.data_structures.daily_flags import DailyFlags
+from pedro.data_structures.daily_flags import Flags
 from pedro.brain.modules.llm import LLM
 from pedro.brain.modules.chat_history import ChatHistory
 from pedro.brain.reactions.messages_handler import messages_handler
@@ -71,7 +71,7 @@ class TelegramBot:
 
         self.lock = True
 
-        self.daily_flags = DailyFlags(
+        self.flags = Flags(
             swearword_complain_today=False,
             swearword_random_reaction_today=False,
             random_talk_today=False,
@@ -168,7 +168,7 @@ class TelegramBot:
                     chat_history=self.chat_history,
                 )
 
-                self.scheduler = Scheduler(self.user_data, self.telegram, self.daily_flags)
+                self.scheduler = Scheduler(self.user_data, self.telegram, self.flags)
                 self.scheduler.start()
 
                 self.allowed_list = [value.id for value in self.config.allowed_ids]
@@ -193,7 +193,7 @@ class TelegramBot:
                         await self.chat_history.add_message(message, chat_id=message.chat.id)
                         self.user_data.add_user_if_not_exists(message)
 
-                        if not self.lock and not self.daily_flags.freeze:
+                        if not self.lock and not self.flags.freeze:
                             self.loop.create_task(
                                 messages_handler(
                                     message=message,
@@ -203,7 +203,7 @@ class TelegramBot:
                                     allowed_list=self.allowed_list,
                                     agenda=self.agenda,
                                     llm=self.llm,
-                                    daily_flags=self.daily_flags,
+                                    flags=self.flags,
                                     config=self.config,
                                 )
                             )

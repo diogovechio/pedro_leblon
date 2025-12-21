@@ -8,7 +8,7 @@ from pedro.brain.modules.feedback import sending_action
 from pedro.brain.modules.llm import LLM
 from pedro.brain.modules.telegram import Telegram
 from pedro.brain.modules.user_data_manager import UserDataManager
-from pedro.data_structures.daily_flags import DailyFlags
+from pedro.data_structures.daily_flags import Flags
 from pedro.data_structures.telegram_message import Message
 from pedro.utils.text_utils import adjust_pedro_casing, get_roletas_from_pavuna
 
@@ -31,7 +31,7 @@ async def complain_swearword_reaction(
     telegram: Telegram,
     user_data: UserDataManager,
     llm: LLM,
-    daily_flags: DailyFlags
+    daily_flags: Flags
 ) -> None:
     is_triggered = await complain_swearword_trigger(message)
 

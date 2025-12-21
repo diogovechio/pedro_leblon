@@ -16,7 +16,7 @@ from pedro.brain.modules.llm import LLM
 from pedro.brain.modules.telegram import Telegram
 from pedro.brain.modules.user_data_manager import UserDataManager
 from pedro.data_structures.bot_config import BotConfig
-from pedro.data_structures.daily_flags import DailyFlags
+from pedro.data_structures.daily_flags import Flags
 from pedro.data_structures.telegram_message import Message
 from pedro.utils.text_utils import create_username, adjust_pedro_casing
 from pedro.utils.prompt_utils import text_trigger, random_trigger, create_self_complement_prompt, check_web_search
@@ -31,7 +31,7 @@ async def pedro_reaction(
         user_data: UserDataManager,
         llm: LLM,
         config: BotConfig,
-        daily_flags: DailyFlags,
+        daily_flags: Flags,
 ) -> None:
     """
     Handle messages using the autonomous Agent, replacing the old default reaction.
@@ -62,15 +62,13 @@ async def pedro_reaction(
         
         # Get user opinion/sentiment if available
         user_context = ""
-        if user_data:
-             sentiment = user_data.get_sentiment_level_prompt(message.from_.id)
-             user_context = f"\nSobre o usuário {user_name}: {sentiment}"
+        opinions_text = ""
 
         # Get opinions about other users mentioned in the conversation
-        opinions_text = ""
         if user_data:
+            sentiment = user_data.get_sentiment_level_prompt(message.from_.id)
+            user_context = f"\nSobre o usuário {user_name}: {sentiment}"
             # Get chat history to find mentioned users
-            chat_logs = history.get_last_messages(chat_id=message.chat.id, limit=10)
             chat_history_text = history.get_friendly_last_messages(chat_id=message.chat.id, limit=10)
             users_opinions = user_data.get_users_by_text_match(chat_history_text)
             

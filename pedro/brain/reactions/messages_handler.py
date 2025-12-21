@@ -20,7 +20,7 @@ from pedro.brain.reactions.critic_or_praise import critic_or_praise_reaction
 from pedro.brain.reactions.pedro_command import pedro_command_reaction
 from pedro.brain.reactions.poll_reaction import poll_reaction
 from pedro.brain.reactions.weather_commands import weather_commands_reaction
-from pedro.data_structures.daily_flags import DailyFlags
+from pedro.data_structures.daily_flags import Flags
 from pedro.data_structures.telegram_message import Message
 from pedro.data_structures.bot_config import BotConfig
 from pedro.brain.modules.llm import LLM
@@ -38,7 +38,7 @@ async def messages_handler(
         agenda: AgendaManager,
         llm: LLM,
         allowed_list: list,
-        daily_flags: DailyFlags,
+        flags: Flags,
         config: BotConfig,
 ) -> None:
     """
@@ -52,7 +52,7 @@ async def messages_handler(
         agenda (AgendaManager): Agenda management instance
         llm (LLM): Language model instance
         allowed_list (list): List of allowed chat IDs
-        daily_flags (DailyFlags): Daily feature flags manager
+        flags (Flags): Daily feature flags manager
         config (BotConfig): Bot configuration instance
 
     Returns:
@@ -62,20 +62,20 @@ async def messages_handler(
         updated_message = await check_and_update_with_url_contents(message)
 
         await asyncio.gather(
-            pedro_deprecado(updated_message, history, telegram, user_data, llm, daily_flags),
+            pedro_deprecado(updated_message, history, telegram, user_data, llm, flags),
             images_reaction(updated_message, history, telegram, user_data, llm),
             summary_reaction(updated_message, history, telegram, user_data, llm),
             fact_check_reaction(updated_message, history, telegram, user_data, llm),
             agenda_commands_reaction(updated_message, history, telegram, user_data, agenda, llm),
-            complain_swearword_reaction(updated_message, history, telegram, user_data, llm, daily_flags),
+            complain_swearword_reaction(updated_message, history, telegram, user_data, llm, flags),
             emoji_reactions(updated_message, history, telegram, user_data, llm),
-            misc_commands_reaction(updated_message, history, telegram, user_data, llm, daily_flags),
+            misc_commands_reaction(updated_message, history, telegram, user_data, llm, flags),
             critic_or_praise_reaction(updated_message, history, telegram, user_data, llm),
             weather_commands_reaction(updated_message, history, telegram, user_data, llm, config),
-            random_reactions(updated_message, telegram, user_data, daily_flags),
+            random_reactions(updated_message, telegram, user_data, flags),
             pedro_command_reaction(updated_message, history, telegram, llm),
             poll_reaction(updated_message, telegram),
-            pedro_reaction(updated_message, history, telegram, user_data, llm, config, daily_flags),
+            pedro_reaction(updated_message, history, telegram, user_data, llm, config, flags),
         )
     else:
         await telegram.send_message(

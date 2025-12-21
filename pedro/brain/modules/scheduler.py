@@ -11,7 +11,7 @@ import schedule
 from pedro.brain.modules.user_data_manager import UserDataManager
 from pedro.brain.modules.datetime_manager import DatetimeManager
 from pedro.brain.modules.telegram import Telegram
-from pedro.data_structures.daily_flags import DailyFlags
+from pedro.data_structures.daily_flags import Flags
 
 
 def _convert_hour_if_needed(time_str: str) -> str:
@@ -63,7 +63,7 @@ class Scheduler:
         daily_flags: An optional instance of DailyFlags for managing daily state.
         running: A boolean indicating whether the scheduler is active.
     """
-    def __init__(self, user_opinions: UserDataManager, telegram: Telegram, daily_flags: DailyFlags | None = None):
+    def __init__(self, user_opinions: UserDataManager, telegram: Telegram, daily_flags: Flags | None = None):
         """Initializes the Scheduler.
 
         Args:

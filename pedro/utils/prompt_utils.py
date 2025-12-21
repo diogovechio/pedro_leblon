@@ -7,7 +7,7 @@ from pedro.brain.modules.datetime_manager import DatetimeManager
 from pedro.brain.modules.llm import LLM
 from pedro.brain.modules.telegram import Telegram
 from pedro.brain.modules.user_data_manager import UserDataManager
-from pedro.data_structures.daily_flags import DailyFlags
+from pedro.data_structures.daily_flags import Flags
 from pedro.data_structures.telegram_message import Message, ReplyToMessage
 from pedro.utils.text_utils import create_username
 import logging
@@ -182,7 +182,7 @@ async def create_self_complement_prompt(
 
     return prompt
 
-def random_trigger(message: Message, daily_flags: DailyFlags) -> bool:
+def random_trigger(message: Message, daily_flags: Flags) -> bool:
     if random.random() < 0.15 and not daily_flags.random_talk_today and not message.text.startswith("/"):
         daily_flags.random_talk_today = True
 

@@ -7,7 +7,7 @@ from pedro.brain.modules.feedback import sending_action
 from pedro.brain.modules.llm import LLM
 from pedro.brain.modules.telegram import Telegram
 from pedro.brain.modules.user_data_manager import UserDataManager
-from pedro.data_structures.daily_flags import DailyFlags
+from pedro.data_structures.daily_flags import Flags
 from pedro.data_structures.telegram_message import Message
 from pedro.utils.prompt_utils import create_basic_prompt, text_trigger, random_trigger, check_web_search, send_telegram_log, \
     create_self_complement_prompt, negative_response
@@ -21,7 +21,7 @@ async def pedro_deprecado(
         telegram: Telegram,
         user_data: UserDataManager,
         llm: LLM,
-        daily_flags: DailyFlags,
+        daily_flags: Flags,
 ) -> None:
     is_deprecated_trigger = message.text and message.text.lower().startswith("deprecado pedro")
     
