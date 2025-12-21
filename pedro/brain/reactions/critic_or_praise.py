@@ -38,8 +38,7 @@ async def _critic_or_praise(message, telegram, llm, history) -> None:
         user_name = message.reply_to_message.from_.first_name
 
         if message.text.startswith("/critique"):
-            prompt = f"{'dê uma bronca em' if round(random.random()) else 'xingue o'} {user_name} por ter dito isso: " \
-                     f"'{text}'"
+            prompt = f"dê uma bronca em {user_name} por ter dito isso: '{text}'"
         elif message.text.startswith("/elogie"):
             prompt = f"{'elogie o' if round(random.random()) else 'parabenize o'} {user_name} por ter dito isso: " \
                      f"'{text}'"
