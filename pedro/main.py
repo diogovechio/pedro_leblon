@@ -193,7 +193,7 @@ class TelegramBot:
                         await self.chat_history.add_message(message, chat_id=message.chat.id)
                         self.user_data.add_user_if_not_exists(message)
 
-                        if not self.lock:
+                        if not self.lock and not self.daily_flags.freeze:
                             self.loop.create_task(
                                 messages_handler(
                                     message=message,

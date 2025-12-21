@@ -1,3 +1,6 @@
+import asyncio
+
+
 class DailyFlags:
     """
     Class to hold daily flags for Pedro's behavior.
@@ -14,3 +17,9 @@ class DailyFlags:
         self.swearword_random_reaction_today = swearword_random_reaction_today
         self.random_talk_today = random_talk_today
         self.random_tease_message = random_tease_message
+        self.freeze = False
+
+    async def freeze_mode(self, minutes: int):
+        self.freeze = True
+        await asyncio.sleep(minutes * 60)
+        self.freeze = False

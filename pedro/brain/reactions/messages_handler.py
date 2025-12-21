@@ -69,7 +69,7 @@ async def messages_handler(
             agenda_commands_reaction(updated_message, history, telegram, user_data, agenda, llm),
             complain_swearword_reaction(updated_message, history, telegram, user_data, llm, daily_flags),
             emoji_reactions(updated_message, history, telegram, user_data, llm),
-            misc_commands_reaction(updated_message, history, telegram, user_data, llm),
+            misc_commands_reaction(updated_message, history, telegram, user_data, llm, daily_flags),
             critic_or_praise_reaction(updated_message, history, telegram, user_data, llm),
             weather_commands_reaction(updated_message, history, telegram, user_data, llm, config),
             random_reactions(updated_message, telegram, user_data, daily_flags),

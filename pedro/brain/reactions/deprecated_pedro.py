@@ -28,7 +28,7 @@ async def pedro_deprecado(
     if is_deprecated_trigger:
         await user_data.adjust_sentiment(message)
 
-        with sending_action(chat_id=message.chat.id, telegram=telegram, user=message.from_.username if _text_trigger else None):
+        with sending_action(chat_id=message.chat.id, telegram=telegram, user=message.from_.username):
             web_search = check_web_search(message)
             model = "gpt-4.1-mini" if web_search else "gpt-4.1-nano"
 

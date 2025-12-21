@@ -10,6 +10,7 @@ from pedro.brain.modules.feedback import sending_action
 from pedro.brain.modules.llm import LLM
 from pedro.brain.modules.telegram import Telegram
 from pedro.brain.modules.user_data_manager import UserDataManager
+from pedro.data_structures.daily_flags import DailyFlags
 from pedro.data_structures.telegram_message import Message
 from pedro.utils.text_utils import create_username
 
@@ -25,6 +26,7 @@ async def misc_commands_reaction(
         telegram: Telegram,
         user_data: UserDataManager,
         llm: LLM,
+        flags: DailyFlags,
 ) -> None:
     if message.text:
         if message.text.startswith("/me"):
@@ -37,7 +39,27 @@ async def misc_commands_reaction(
             await handle_puto_command(message, telegram, user_data, llm)
         elif message.text.startswith('/version'):
             await handle_version_command(message, telegram)
+        elif message.text.startswith('/dorme'):
+            await handle_freeze_command(message, telegram, flags)
 
+async def handle_freeze_command(
+        message: Message,
+        telegram: Telegram,
+        flags: DailyFlags,
+) -> None:
+    await telegram.send_message(
+        message_text="vou tirar 10 minutos de cochilo",
+        chat_id=message.chat.id,
+        reply_to=message.message_id,
+    )
+
+    await flags.freeze_mode(minutes=10)
+
+    await telegram.send_message(
+        message_text="acordei",
+        chat_id=message.chat.id,
+        reply_to=message.message_id,
+    )
 
 async def handle_me_command(
     message: Message,
