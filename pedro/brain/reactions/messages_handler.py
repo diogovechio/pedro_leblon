@@ -13,6 +13,7 @@ from pedro.brain.reactions.images_reactions import images_reaction
 from pedro.brain.reactions.random_reactions import random_reactions
 from pedro.brain.reactions.summary_reactions import summary_reaction
 from pedro.brain.reactions.agenda_commands import agenda_commands_reaction
+from pedro.brain.reactions.task_commands import task_commands_reaction
 from pedro.brain.reactions.complain_swearword import complain_swearword_reaction
 from pedro.brain.reactions.emoji_reactions import emoji_reactions
 from pedro.brain.reactions.misc_commands import misc_commands_reaction
@@ -36,6 +37,7 @@ async def messages_handler(
         telegram: Telegram,
         user_data: UserDataManager,
         agenda: AgendaManager,
+        task_list,
         llm: LLM,
         allowed_list: list,
         flags: Flags,
@@ -50,6 +52,7 @@ async def messages_handler(
         telegram (Telegram): Telegram bot API manager instance
         user_data (UserDataManager): User data management instance
         agenda (AgendaManager): Agenda management instance
+        task_list (TaskListManager): Task list management instance
         llm (LLM): Language model instance
         allowed_list (list): List of allowed chat IDs
         flags (Flags): Daily feature flags manager
@@ -67,6 +70,7 @@ async def messages_handler(
             summary_reaction(updated_message, history, telegram, user_data, llm),
             fact_check_reaction(updated_message, history, telegram, user_data, llm),
             agenda_commands_reaction(updated_message, history, telegram, user_data, agenda, llm),
+            task_commands_reaction(updated_message, history, telegram, user_data, task_list, llm),
             complain_swearword_reaction(updated_message, history, telegram, user_data, llm, flags),
             emoji_reactions(updated_message, history, telegram, user_data, llm),
             misc_commands_reaction(updated_message, history, telegram, user_data, llm, flags),
@@ -75,7 +79,7 @@ async def messages_handler(
             random_reactions(updated_message, telegram, user_data, flags),
             pedro_command_reaction(updated_message, history, telegram, llm),
             poll_reaction(updated_message, telegram),
-            pedro_reaction(updated_message, history, telegram, user_data, llm, config, flags),
+            pedro_reaction(updated_message, history, telegram, user_data, llm, config, flags, task_list),
         )
     else:
         await telegram.send_message(

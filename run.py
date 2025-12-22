@@ -6,7 +6,6 @@ if __name__ == '__main__':
     bot = TelegramBot(
         bot_config_file='bot_configs.json',
         secrets_file='secrets.json',
-        debug_mode=True,
     )
 
     asyncio.run(

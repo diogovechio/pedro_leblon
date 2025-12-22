@@ -10,6 +10,7 @@ from pedro.brain.agent.tools.chat_history_search import ChatHistorySearchTool
 from pedro.brain.agent.tools.birthdays import BirthdaySearchTool
 from pedro.brain.agent.tools.political_opinions import PoliticalOpinionsTool
 from pedro.brain.agent.tools.web_search import WebSearchTool
+from pedro.brain.agent.tools.task_list import TaskListTool
 from pedro.brain.modules.chat_history import ChatHistory
 from pedro.brain.modules.feedback import sending_action
 from pedro.brain.modules.llm import LLM
@@ -32,6 +33,7 @@ async def pedro_reaction(
         llm: LLM,
         config: BotConfig,
         daily_flags: Flags,
+        task_list,
 ) -> None:
     """
     Handle messages using the autonomous Agent, replacing the old default reaction.
@@ -52,9 +54,10 @@ async def pedro_reaction(
         birthday_tool = BirthdaySearchTool(message.chat.id)
         politics_tool = PoliticalOpinionsTool()
         web_search_tool = WebSearchTool()
+        task_list_tool = TaskListTool(message.from_.id, message.chat.id, task_list)
 
         # 2. Initialize Agent
-        agent = Agent(llm=llm, tools=[weather_tool, chat_history_tool, birthday_tool, politics_tool, web_search_tool])
+        agent = Agent(llm=llm, tools=[weather_tool, chat_history_tool, birthday_tool, politics_tool, web_search_tool, task_list_tool])
 
         # 3. Build System Prompt
         datetime_manager = DatetimeManager()
@@ -87,10 +90,11 @@ async def pedro_reaction(
             "Você é o Pedro, um usuário sarcástico, inteligente e útil no Telegram. "
             "Você é capaz de usar ferramentas para trazer diversas informações. "
             "Responda de forma natural, no mesmo estilo de mensagem de outros participantes na conversa, "
-            "evitando excesso de cumprimentos e formalidades, "
-            "evitando excesso de pontuação, "
-            "evitando excesso de empolgação, "
-            "evitando perguntas desnecessárias. "
+            "Escreva com iniciais minúsculas e sem ponto final caso você esteja gerando uma resposta informal. "
+            "Evite excesso de cumprimentos e formalidades. "
+            "Evite excesso de pontuação. "
+            "Evite excesso de empolgação. "
+            "Evite perguntas desnecessárias. "
             "Você conversa num estilo informal de usuário de internet.\n\n"
             f"Hora atual: {datetime_manager.get_current_time_str()}\n"
             f"Data atual: {datetime_manager.get_current_date_str()}\n"
@@ -114,9 +118,6 @@ async def pedro_reaction(
             telegram=telegram,
             original_message=message
         )
-        #
-        # Apply casing normalization
-        response = await adjust_pedro_casing(response)
 
         # 6. Send Response
         await telegram.send_message(

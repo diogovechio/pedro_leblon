@@ -9,6 +9,7 @@ import json
 import typing as T
 
 from pedro.brain.modules.agenda import AgendaManager
+from pedro.brain.modules.task_list import TaskListManager
 # External
 
 # Project
@@ -43,7 +44,6 @@ class TelegramBot:
             self,
             bot_config_file: str,
             secrets_file: str,
-            debug_mode=False
     ):
         """
         Initialize the TelegramBot with configuration files and debug settings.
@@ -51,11 +51,9 @@ class TelegramBot:
         Args:
             bot_config_file (str): Path to the bot configuration file
             secrets_file (str): Path to the secrets file containing sensitive data
-            debug_mode (bool, optional): Enable debug mode. Defaults to False.
         """
         self.version = __version__
         self.allowed_list = []
-        self.debug_mode = debug_mode
 
         self.config: BotConfig | None = None
         self.config_file = bot_config_file
@@ -67,6 +65,7 @@ class TelegramBot:
         self.user_data: UserDataManager | None = None
         self.chat_history: ChatHistory | None = None
         self.agenda: AgendaManager | None = None
+        self.task_list: TaskListManager | None = None
         self.scheduler: Scheduler | None = None
 
         self.lock = True
@@ -158,6 +157,7 @@ class TelegramBot:
 
                 self.telegram = Telegram(self.config.secrets.bot_token)
                 self.agenda = AgendaManager(self.telegram)
+                self.task_list = TaskListManager()
                 self.llm = LLM(self.config.secrets.openai_key)
                 self.database = Database("database/pedro_database.json")
                 self.chat_history = ChatHistory(telegram=self.telegram, llm=self.llm)
@@ -202,6 +202,7 @@ class TelegramBot:
                                     user_data=self.user_data,
                                     allowed_list=self.allowed_list,
                                     agenda=self.agenda,
+                                    task_list=self.task_list,
                                     llm=self.llm,
                                     flags=self.flags,
                                     config=self.config,
