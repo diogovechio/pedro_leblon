@@ -7,6 +7,7 @@ from pedro.brain.modules.llm import LLM
 from pedro.brain.modules.telegram import Telegram
 from pedro.brain.agent.tools.base import Tool
 from pedro.data_structures.chat_log import ChatLog
+from pedro.data_structures.images import MessageImage
 from pedro.data_structures.telegram_message import Message
 from pedro.utils.prompt_utils import send_telegram_log
 
@@ -36,6 +37,7 @@ class Agent:
         user_name: str = "User",
         telegram: Optional[Telegram] = None,
         original_message: Optional[Message] = None,
+        image: Optional[MessageImage] = None,
     ) -> str:
         """
         Run the agent loop: Thought -> Action -> Observation.
@@ -52,6 +54,18 @@ class Agent:
 
         # Add current message
         current_content = f"[{user_name}]: {user_message}"
+        
+        if image:
+            current_content = [
+                {"type": "text", "text": current_content},
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": image.url
+                    }
+                }
+        ]
+        
         messages.append({"role": "user", "content": current_content})
 
         asyncio.create_task(send_telegram_log(telegram, system_prompt))
@@ -63,7 +77,7 @@ class Agent:
             response_data = await self.llm.chat(
                 messages=messages,
                 tools=self.tool_definitions if self.tool_definitions else None,
-                model="gpt-5-nano"
+                model="gpt-5-nano" if not image else "gpt-5-mini"
             )
 
             if not response_data or 'choices' not in response_data:

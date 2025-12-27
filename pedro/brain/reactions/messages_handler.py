@@ -2,6 +2,7 @@
 import asyncio
 
 from pedro.brain.modules.agenda import AgendaManager
+from pedro.brain.modules.task_list import TaskListManager
 # External
 
 
@@ -37,7 +38,7 @@ async def messages_handler(
         telegram: Telegram,
         user_data: UserDataManager,
         agenda: AgendaManager,
-        task_list,
+        task_list: TaskListManager,
         llm: LLM,
         allowed_list: list,
         flags: Flags,
@@ -66,7 +67,7 @@ async def messages_handler(
 
         await asyncio.gather(
             pedro_deprecado(updated_message, history, telegram, user_data, llm, flags),
-            images_reaction(updated_message, history, telegram, user_data, llm),
+            images_reaction(updated_message, history, telegram, user_data, llm, config, task_list),
             summary_reaction(updated_message, history, telegram, user_data, llm),
             fact_check_reaction(updated_message, history, telegram, user_data, llm),
             agenda_commands_reaction(updated_message, history, telegram, user_data, agenda, llm),
