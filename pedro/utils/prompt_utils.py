@@ -196,8 +196,10 @@ def text_trigger(message: Message) -> bool:
 
     return (
             message.text and
-            (message.text.lower().startswith("pedro") or message.text.lower().replace("?", "").strip().endswith(
-                "pedro") or message.chat.id > 0)
+            (
+                    message.text.replace("@","").lower().startswith("pedro")
+                    or message.text.lower().replace("?", "").strip().endswith("pedro")
+                    or message.chat.id > 0)
     ) or (
             message.reply_to_message and "pedro" in message.reply_to_message.from_.username and not message.text.startswith("/")
     )

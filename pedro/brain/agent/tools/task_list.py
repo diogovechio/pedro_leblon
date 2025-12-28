@@ -26,6 +26,8 @@ class TaskListTool(Tool):
             "Use esta ferramenta quando o usuário pedir para adicionar, listar ou concluir tarefas. "
             "Tarefas pessoais são acessíveis de qualquer chat. "
             "Tarefas do grupo são específicas deste chat. "
+            "Por padrão, usuários mencionarão tarefas pessoais, apenas adicione ou liste do grupo caso o "
+            "usuário especifique que é para o grupo ou para todos. "
             "Para concluir uma tarefa, use a ação 'complete_task' com o ID da tarefa."
         )
 
