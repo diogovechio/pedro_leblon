@@ -40,17 +40,17 @@ async def pedro_reaction(
 
     # Trigger action typing
     await user_data.adjust_sentiment(message)
-    
-    with sending_action(chat_id=message.chat.id, telegram=telegram, user=message.from_.username if _text_trigger else None):
-        await run_agent_reaction(
-            message=message,
-            history=history,
-            telegram=telegram,
-            user_data=user_data,
-            llm=llm,
-            config=config,
-            task_list=task_list
-        )
+
+    await run_agent_reaction(
+        message=message,
+        history=history,
+        telegram=telegram,
+        user_data=user_data,
+        llm=llm,
+        config=config,
+        task_list=task_list,
+        send_delay_message=bool(_text_trigger),
+    )
 
     # 8. Randomly keep reacting
     await _randomly_keeps_reacting(

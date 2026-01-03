@@ -391,7 +391,7 @@ class Telegram:
             disable_notification=False,
             disable_web_page_preview=False,
             max_retries=7
-    ) -> None:
+    ) -> T.Optional[int]:
         """
         Send a text message to a Telegram chat.
 
@@ -407,6 +407,9 @@ class Telegram:
             disable_notification (bool, optional): Whether to send the message silently. Defaults to False.
             disable_web_page_preview (bool, optional): Whether to disable link previews. Defaults to False.
             max_retries (int, optional): Maximum number of retry attempts. Defaults to 7.
+
+        Returns:
+            Optional[int]: The message_id of the sent message, or None if sending failed.
         """
         fallback_parse_modes = ["", "HTML", "MarkdownV2", "Markdown"]
 
@@ -429,8 +432,14 @@ class Telegram:
                     logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
 
                     if 200 <= resp.status < 300:
-                        break
+                        try:
+                            response_data = await resp.json()
+                            return response_data.get('result', {}).get('message_id')
+                        except Exception:
+                            return None
                     parse_mode = fallback_parse_modes.pop() if len(fallback_parse_modes) else ""
+
+        return None
 
     async def leave_chat(self, chat_id: int, sleep_time=0) -> None:
         """
@@ -464,6 +473,54 @@ class Telegram:
                 }
         ) as resp:
             logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
+
+    async def edit_message(
+            self,
+            message_text: str,
+            chat_id: int,
+            message_id: int,
+            parse_mode: str = "Markdown",
+            disable_web_page_preview: bool = False,
+            max_retries: int = 7
+    ) -> bool:
+        """
+        Edit an existing text message in a Telegram chat.
+
+        This method attempts to edit a message with the specified parse mode,
+        falling back to other parse modes if the initial attempt fails.
+
+        Args:
+            message_text (str): New text for the message.
+            chat_id (int): The ID of the chat containing the message.
+            message_id (int): The ID of the message to edit.
+            parse_mode (str, optional): Message formatting mode. Defaults to "Markdown".
+            disable_web_page_preview (bool, optional): Disable link previews. Defaults to False.
+            max_retries (int, optional): Maximum retry attempts. Defaults to 7.
+
+        Returns:
+            bool: True if edit was successful, False otherwise.
+        """
+        fallback_parse_modes = ["", "HTML", "MarkdownV2", "Markdown"]
+
+        for i in range(max_retries):
+            async with self._semaphore:
+                async with self._session.post(
+                        f"{self._api_route}/editMessageText".replace('\n', ''),
+                        json={
+                            "chat_id": chat_id,
+                            "message_id": message_id,
+                            "text": message_text,
+                            "disable_web_page_preview": disable_web_page_preview,
+                            "parse_mode": parse_mode
+                        }
+                ) as resp:
+                    logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
+
+                    if 200 <= resp.status < 300:
+                        return True
+                    parse_mode = fallback_parse_modes.pop() if len(fallback_parse_modes) else ""
+
+        return False
 
     async def set_chat_title(self, chat_id: int, title: str) -> None:
         """
