@@ -68,9 +68,6 @@ class Agent:
         
         messages.append({"role": "user", "content": current_content})
 
-        asyncio.create_task(send_telegram_log(telegram, system_prompt))
-        asyncio.create_task(send_telegram_log(telegram, "\n".join([str(message) for message in messages])))
-
         # 2. ReAct Loop
         max_turns = 5
         for _ in range(max_turns):

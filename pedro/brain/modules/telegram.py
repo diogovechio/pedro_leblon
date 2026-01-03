@@ -24,6 +24,12 @@ from pedro.data_structures.max_size_list import MaxSizeList
 from pedro.data_structures.images import MessageImage, MessageDocument
 
 
+# Constants for rate limit retry
+RATE_LIMIT_MAX_RETRIES = 3
+RATE_LIMIT_WAIT_MIN = 20  # seconds
+RATE_LIMIT_WAIT_MAX = 40  # seconds
+
+
 class Telegram:
     """
     A class for interacting with the Telegram Bot API.
@@ -58,6 +64,26 @@ class Telegram:
 
         asyncio.create_task(self._message_polling())
 
+    async def _handle_rate_limit(self, attempt: int, method_name: str) -> bool:
+        """
+        Handle rate limit (429) errors with exponential backoff.
+
+        Args:
+            attempt (int): Current attempt number (0-indexed).
+            method_name (str): Name of the calling method for logging.
+
+        Returns:
+            bool: True if should retry, False if max retries exceeded.
+        """
+        if attempt >= RATE_LIMIT_MAX_RETRIES:
+            logging.error(f"{method_name} - Rate limit exceeded after {RATE_LIMIT_MAX_RETRIES} retries")
+            return False
+        
+        wait_time = random.uniform(RATE_LIMIT_WAIT_MIN, RATE_LIMIT_WAIT_MAX)
+        logging.warning(f"{method_name} - Rate limited (429), waiting {wait_time:.1f}s before retry {attempt + 1}/{RATE_LIMIT_MAX_RETRIES}")
+        await asyncio.sleep(wait_time)
+        return True
+
     async def get_new_message(self) -> T.AsyncGenerator[MessageReceived, None]:
         """
         Get new messages from Telegram.
@@ -90,13 +116,19 @@ class Telegram:
 
                 polling_url = f"{self._api_route}/getUpdates?offset={self._last_id}"
 
-                async with self._session.get(polling_url) as request:
-                    if 200 <= request.status < 300:
-                        response = json.loads((await request.text()).replace('"from":{"', '"from_":{"'))
-                        if 'ok' in response and response['ok']:
-                            self._messages = MessagesResults(**response)
-                            if self._messages.result:
-                                self._last_id = self._messages.result[-1].update_id
+                for attempt in range(RATE_LIMIT_MAX_RETRIES + 1):
+                    async with self._session.get(polling_url) as request:
+                        if request.status == 429:
+                            if not await self._handle_rate_limit(attempt, "_message_polling"):
+                                break
+                            continue
+                        if 200 <= request.status < 300:
+                            response = json.loads((await request.text()).replace('"from":{"', '"from_":{"'))
+                            if 'ok' in response and response['ok']:
+                                self._messages = MessagesResults(**response)
+                                if self._messages.result:
+                                    self._last_id = self._messages.result[-1].update_id
+                        break
             except Exception as exc:
                 logging.exception(exc)
                 await asyncio.sleep(15)
@@ -129,21 +161,34 @@ class Telegram:
             else:
                 return None
 
-        async with self._session.get(
-                f"{self._api_route}/getFile?file_id={message.photo[-1].file_id}") as request:
-            if 200 <= request.status < 300:
-                response = json.loads(await request.text())
-                if 'ok' in response and response['ok']:
-                    file_path = response['result']['file_path']
-                    url = f"{self._api_route.replace('.org/bot', '.org/file/bot')}/{file_path}"
-                    async with self._session.get(url) as download_request:
-                        if 200 <= download_request.status < 300:
-                            return MessageImage(
-                                url=url,
-                                bytes=await download_request.read()
-                            )
-                        else:
-                            logging.critical(f"Image download failed: {download_request.status}")
+        for attempt in range(RATE_LIMIT_MAX_RETRIES + 1):
+            async with self._session.get(
+                    f"{self._api_route}/getFile?file_id={message.photo[-1].file_id}") as request:
+                if request.status == 429:
+                    if not await self._handle_rate_limit(attempt, "image_downloader"):
+                        return None
+                    continue
+                if 200 <= request.status < 300:
+                    response = json.loads(await request.text())
+                    if 'ok' in response and response['ok']:
+                        file_path = response['result']['file_path']
+                        url = f"{self._api_route.replace('.org/bot', '.org/file/bot')}/{file_path}"
+                        for download_attempt in range(RATE_LIMIT_MAX_RETRIES + 1):
+                            async with self._session.get(url) as download_request:
+                                if download_request.status == 429:
+                                    if not await self._handle_rate_limit(download_attempt, "image_downloader"):
+                                        return None
+                                    continue
+                                if 200 <= download_request.status < 300:
+                                    return MessageImage(
+                                        url=url,
+                                        bytes=await download_request.read()
+                                    )
+                                else:
+                                    logging.critical(f"Image download failed: {download_request.status}")
+                                break
+                break
+        return None
 
     async def document_downloader(
             self,
@@ -167,23 +212,36 @@ class Telegram:
         if not message.document or message.document.file_size > limit_mb * 1024 * 1024:
             return None
 
-        async with self._session.get(
-                f"{self._api_route}/getFile?file_id={message.document.file_id}") as request:
-            if 200 <= request.status < 300:
-                response = json.loads(await request.text())
-                if 'ok' in response and response['ok']:
-                    file_path = response['result']['file_path']
-                    url = f"{self._api_route.replace('.org/bot', '.org/file/bot')}/{file_path}"
-                    async with self._session.get(url) as download_request:
-                        if 200 <= download_request.status < 300:
-                            return MessageDocument(
-                                url=url,
-                                bytes=await download_request.read(),
-                                file_name=message.document.file_name or "document",
-                                mime_type=message.document.mime_type or "application/octet-stream"
-                            )
-                        else:
-                            logging.critical(f"Document download failed: {download_request.status}")
+        for attempt in range(RATE_LIMIT_MAX_RETRIES + 1):
+            async with self._session.get(
+                    f"{self._api_route}/getFile?file_id={message.document.file_id}") as request:
+                if request.status == 429:
+                    if not await self._handle_rate_limit(attempt, "document_downloader"):
+                        return None
+                    continue
+                if 200 <= request.status < 300:
+                    response = json.loads(await request.text())
+                    if 'ok' in response and response['ok']:
+                        file_path = response['result']['file_path']
+                        url = f"{self._api_route.replace('.org/bot', '.org/file/bot')}/{file_path}"
+                        for download_attempt in range(RATE_LIMIT_MAX_RETRIES + 1):
+                            async with self._session.get(url) as download_request:
+                                if download_request.status == 429:
+                                    if not await self._handle_rate_limit(download_attempt, "document_downloader"):
+                                        return None
+                                    continue
+                                if 200 <= download_request.status < 300:
+                                    return MessageDocument(
+                                        url=url,
+                                        bytes=await download_request.read(),
+                                        file_name=message.document.file_name or "document",
+                                        mime_type=message.document.mime_type or "application/octet-stream"
+                                    )
+                                else:
+                                    logging.critical(f"Document download failed: {download_request.status}")
+                                break
+                break
+        return None
 
     async def send_photo(self, image: bytes, chat_id: int, caption=None, reply_to=None, sleep_time=0, max_retries=5) -> None:
         """
@@ -199,6 +257,7 @@ class Telegram:
         """
         await asyncio.sleep(sleep_time)
 
+        rate_limit_attempt = 0
         for _ in range(max_retries):
             async with self._semaphore:
                 async with self._session.post(
@@ -214,8 +273,13 @@ class Telegram:
                         )
                 ) as resp:
                     logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
+                    if resp.status == 429:
+                        if await self._handle_rate_limit(rate_limit_attempt, "send_photo"):
+                            rate_limit_attempt += 1
+                            continue
+                        return
                     if 200 <= resp.status < 300:
-                        break
+                        return
             await asyncio.sleep(10)
 
     async def send_video(self, video: bytes, chat_id: int, reply_to=None, sleep_time=0) -> None:
@@ -230,19 +294,25 @@ class Telegram:
         """
         await asyncio.sleep(sleep_time)
 
-        async with self._semaphore:
-            async with self._session.post(
-                    url=f"{self._api_route}/sendVideo".replace('\n', ''),
-                    data=aiohttp.FormData(
-                        (
-                                ("chat_id", str(chat_id)),
-                                ("video", video),
-                                ("reply_to_message_id", str(reply_to) if reply_to else ''),
-                                ('allow_sending_without_reply', 'true'),
+        for attempt in range(RATE_LIMIT_MAX_RETRIES + 1):
+            async with self._semaphore:
+                async with self._session.post(
+                        url=f"{self._api_route}/sendVideo".replace('\n', ''),
+                        data=aiohttp.FormData(
+                            (
+                                    ("chat_id", str(chat_id)),
+                                    ("video", video),
+                                    ("reply_to_message_id", str(reply_to) if reply_to else ''),
+                                    ('allow_sending_without_reply', 'true'),
+                            )
                         )
-                    )
-            ) as resp:
-                logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
+                ) as resp:
+                    logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
+                    if resp.status == 429:
+                        if not await self._handle_rate_limit(attempt, "send_video"):
+                            return
+                        continue
+                    return
 
     async def send_voice(self, audio: bytes, chat_id: int, reply_to=None, sleep_time=0) -> None:
         """
@@ -256,19 +326,25 @@ class Telegram:
         """
         await asyncio.sleep(sleep_time)
 
-        async with self._semaphore:
-            async with self._session.post(
-                    url=f"{self._api_route}/sendVoice".replace('\n', ''),
-                    data=aiohttp.FormData(
-                        (
-                                ("chat_id", str(chat_id)),
-                                ("voice", audio),
-                                ("reply_to_message_id", str(reply_to) if reply_to else ''),
-                                ('allow_sending_without_reply', 'true'),
+        for attempt in range(RATE_LIMIT_MAX_RETRIES + 1):
+            async with self._semaphore:
+                async with self._session.post(
+                        url=f"{self._api_route}/sendVoice".replace('\n', ''),
+                        data=aiohttp.FormData(
+                            (
+                                    ("chat_id", str(chat_id)),
+                                    ("voice", audio),
+                                    ("reply_to_message_id", str(reply_to) if reply_to else ''),
+                                    ('allow_sending_without_reply', 'true'),
+                            )
                         )
-                    )
-            ) as resp:
-                logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
+                ) as resp:
+                    logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
+                    if resp.status == 429:
+                        if not await self._handle_rate_limit(attempt, "send_voice"):
+                            return
+                        continue
+                    return
 
     async def send_action(
             self,
@@ -288,6 +364,7 @@ class Telegram:
                 The action to send. Defaults to 'typing'.
             repeats (bool, optional): Whether to repeat the action continuously. Defaults to False.
         """
+        rate_limit_attempt = 0
         while True:
             async with self._semaphore:
                 async with self._session.post(
@@ -300,11 +377,17 @@ class Telegram:
                         )
                 ) as resp:
                     logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
+                    if resp.status == 429:
+                        if await self._handle_rate_limit(rate_limit_attempt, "send_action"):
+                            rate_limit_attempt += 1
+                            continue
+                        return
 
             if not repeats:
                 break
 
             await asyncio.sleep(round(5 + (random.random() * 2)))
+            rate_limit_attempt = 0  # Reset for next iteration in repeats mode
 
     async def send_document(self, document: bytes, chat_id: int, caption=None, reply_to=None, sleep_time=0, file_name=None) -> None:
         """
@@ -333,12 +416,28 @@ class Telegram:
         form_data.add_field("reply_to_message_id", str(reply_to) if reply_to else '')
         form_data.add_field('allow_sending_without_reply', 'true')
 
-        async with self._semaphore:
-            async with self._session.post(
-                    url=f"{self._api_route}/sendDocument".replace('\n', ''),
-                    data=form_data
-            ) as resp:
-                logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
+        for attempt in range(RATE_LIMIT_MAX_RETRIES + 1):
+            async with self._semaphore:
+                async with self._session.post(
+                        url=f"{self._api_route}/sendDocument".replace('\n', ''),
+                        data=form_data
+                ) as resp:
+                    logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
+                    if resp.status == 429:
+                        if not await self._handle_rate_limit(attempt, "send_document"):
+                            return
+                        # Recreate form_data since it may have been consumed
+                        form_data = aiohttp.FormData()
+                        form_data.add_field("chat_id", str(chat_id))
+                        if file_name:
+                            form_data.add_field("document", document, filename=file_name)
+                        else:
+                            form_data.add_field("document", document)
+                        form_data.add_field("caption", caption if caption else '')
+                        form_data.add_field("reply_to_message_id", str(reply_to) if reply_to else '')
+                        form_data.add_field('allow_sending_without_reply', 'true')
+                        continue
+                    return
 
     async def forward_message(
             self,
@@ -366,20 +465,25 @@ class Telegram:
         if replace_token:
             url = f"https://api.telegram.org/bot{replace_token}"
 
-        async with self._semaphore:
-            async with self._session.post(
-                    url=f"{url}/forwardMessage".replace('\n', ''),
-                    data=aiohttp.FormData(
-                        (
-                            ("chat_id", str(target_chat_id)),
-                            ("from_chat_id", str(from_chat_id)),
-                            ("message_id", str(message_id)),
+        for attempt in range(RATE_LIMIT_MAX_RETRIES + 1):
+            async with self._semaphore:
+                async with self._session.post(
+                        url=f"{url}/forwardMessage".replace('\n', ''),
+                        data=aiohttp.FormData(
+                            (
+                                ("chat_id", str(target_chat_id)),
+                                ("from_chat_id", str(from_chat_id)),
+                                ("message_id", str(message_id)),
+                            )
                         )
-                    )
-            ) as resp:
-                logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
-
-                return resp.status
+                ) as resp:
+                    logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
+                    if resp.status == 429:
+                        if not await self._handle_rate_limit(attempt, "forward_message"):
+                            return 429
+                        continue
+                    return resp.status
+        return 500  # Return error if all retries exhausted
 
     async def send_message(
             self,
@@ -412,9 +516,11 @@ class Telegram:
             Optional[int]: The message_id of the sent message, or None if sending failed.
         """
         fallback_parse_modes = ["", "HTML", "MarkdownV2", "Markdown"]
+        max_message_length = 3500
 
         await asyncio.sleep(sleep_time)
 
+        rate_limit_attempt = 0
         for i in range(max_retries):
             async with self._semaphore:
                 async with self._session.post(
@@ -431,6 +537,45 @@ class Telegram:
                 ) as resp:
                     logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
 
+                    if resp.status == 429:
+                        if await self._handle_rate_limit(rate_limit_attempt, "send_message"):
+                            rate_limit_attempt += 1
+                            continue
+                        return None
+                    if resp.status == 400 and len(message_text) > max_message_length:
+                        # Message too long, split and send in parts
+                        logging.info(f"send_message - Message too long ({len(message_text)} chars), splitting into parts")
+                        parts = []
+                        remaining = message_text
+                        while remaining:
+                            if len(remaining) <= max_message_length:
+                                parts.append(remaining)
+                                break
+                            # Find a good split point (newline or space)
+                            split_point = remaining.rfind('\n', 0, max_message_length)
+                            if split_point == -1 or split_point < max_message_length // 2:
+                                split_point = remaining.rfind(' ', 0, max_message_length)
+                            if split_point == -1 or split_point < max_message_length // 2:
+                                split_point = max_message_length
+                            parts.append(remaining[:split_point])
+                            remaining = remaining[split_point:].lstrip()
+                        
+                        last_message_id = None
+                        for part_index, part in enumerate(parts):
+                            # Only reply_to on the first part
+                            part_reply_to = reply_to if part_index == 0 else None
+                            await asyncio.sleep(1 + round(random.random() * 2))
+                            last_message_id = await self.send_message(
+                                message_text=part,
+                                chat_id=chat_id,
+                                reply_to=part_reply_to,
+                                sleep_time=0,
+                                parse_mode=parse_mode,
+                                disable_notification=disable_notification,
+                                disable_web_page_preview=disable_web_page_preview,
+                                max_retries=max_retries
+                            )
+                        return last_message_id
                     if 200 <= resp.status < 300:
                         try:
                             response_data = await resp.json()
@@ -451,11 +596,17 @@ class Telegram:
         """
         await asyncio.sleep(sleep_time)
 
-        async with self._session.post(
-                f"{self._api_route}/leaveChat".replace('\n', ''),
-                json={"chat_id": chat_id}
-        ) as resp:
-            logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
+        for attempt in range(RATE_LIMIT_MAX_RETRIES + 1):
+            async with self._session.post(
+                    f"{self._api_route}/leaveChat".replace('\n', ''),
+                    json={"chat_id": chat_id}
+            ) as resp:
+                logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
+                if resp.status == 429:
+                    if not await self._handle_rate_limit(attempt, "leave_chat"):
+                        return
+                    continue
+                return
 
     async def delete_message(self, chat_id: int, message_id: int) -> None:
         """
@@ -465,14 +616,20 @@ class Telegram:
             chat_id (int): The ID of the chat containing the message.
             message_id (int): The ID of the message to delete.
         """
-        async with self._session.post(
-                f"{self._api_route}/deleteMessage".replace('\n', ''),
-                json={
-                    "chat_id": chat_id,
-                    "message_id": message_id
-                }
-        ) as resp:
-            logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
+        for attempt in range(RATE_LIMIT_MAX_RETRIES + 1):
+            async with self._session.post(
+                    f"{self._api_route}/deleteMessage".replace('\n', ''),
+                    json={
+                        "chat_id": chat_id,
+                        "message_id": message_id
+                    }
+            ) as resp:
+                logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
+                if resp.status == 429:
+                    if not await self._handle_rate_limit(attempt, "delete_message"):
+                        return
+                    continue
+                return
 
     async def edit_message(
             self,
@@ -502,6 +659,7 @@ class Telegram:
         """
         fallback_parse_modes = ["", "HTML", "MarkdownV2", "Markdown"]
 
+        rate_limit_attempt = 0
         for i in range(max_retries):
             async with self._semaphore:
                 async with self._session.post(
@@ -514,8 +672,15 @@ class Telegram:
                             "parse_mode": parse_mode
                         }
                 ) as resp:
-                    logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
+                    content = await resp.json()
 
+                    logging.info(f"{sys._getframe().f_code.co_name} - {resp.status} - {content}")
+
+                    if resp.status == 429:
+                        if await self._handle_rate_limit(rate_limit_attempt, "edit_message"):
+                            rate_limit_attempt += 1
+                            continue
+                        return False
                     if 200 <= resp.status < 300:
                         return True
                     parse_mode = fallback_parse_modes.pop() if len(fallback_parse_modes) else ""
@@ -530,14 +695,20 @@ class Telegram:
             chat_id (int): The ID of the chat to rename.
             title (str): The new title for the chat.
         """
-        async with self._session.post(
-                f"{self._api_route}/setChatTitle".replace('\n', ''),
-                json={
-                    "chat_id": chat_id,
-                    "title": title
-                }
-        ) as resp:
-            logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
+        for attempt in range(RATE_LIMIT_MAX_RETRIES + 1):
+            async with self._session.post(
+                    f"{self._api_route}/setChatTitle".replace('\n', ''),
+                    json={
+                        "chat_id": chat_id,
+                        "title": title
+                    }
+            ) as resp:
+                logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
+                if resp.status == 429:
+                    if not await self._handle_rate_limit(attempt, "set_chat_title"):
+                        return
+                    continue
+                return
 
     async def set_message_reaction(
             self,
@@ -559,13 +730,19 @@ class Telegram:
         """
         await asyncio.sleep(sleep_time)
 
-        async with self._session.post(
-                url=f"{self._api_route}/setMessageReaction".replace('\n', ''),
-                json={
-                        "chat_id": str(chat_id),
-                        "message_id": message_id,
-                        "reaction": [{"type": "emoji", "emoji": reaction}],
-                        "is_big": is_big
-                    }
-        ) as resp:
-            logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
+        for attempt in range(RATE_LIMIT_MAX_RETRIES + 1):
+            async with self._session.post(
+                    url=f"{self._api_route}/setMessageReaction".replace('\n', ''),
+                    json={
+                            "chat_id": str(chat_id),
+                            "message_id": message_id,
+                            "reaction": [{"type": "emoji", "emoji": reaction}],
+                            "is_big": is_big
+                        }
+            ) as resp:
+                logging.info(f"{sys._getframe().f_code.co_name} - {resp.status}")
+                if resp.status == 429:
+                    if not await self._handle_rate_limit(attempt, "set_message_reaction"):
+                        return
+                    continue
+                return
