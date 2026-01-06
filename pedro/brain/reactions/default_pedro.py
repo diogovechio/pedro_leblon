@@ -41,6 +41,8 @@ async def pedro_reaction(
     # Trigger action typing
     await user_data.adjust_sentiment(message)
 
+    image = await telegram.image_downloader(message)
+
     await run_agent_reaction(
         message=message,
         history=history,
@@ -50,6 +52,7 @@ async def pedro_reaction(
         config=config,
         task_list=task_list,
         send_delay_message=bool(_text_trigger),
+        image=image
     )
 
     # 8. Randomly keep reacting

@@ -161,9 +161,16 @@ class Telegram:
             else:
                 return None
 
+        if message.photo:
+            photo_data = message.photo
+        elif message.reply_to_message.photo:
+            photo_data = message.reply_to_message.photo
+        else:
+            return None
+
         for attempt in range(RATE_LIMIT_MAX_RETRIES + 1):
             async with self._session.get(
-                    f"{self._api_route}/getFile?file_id={message.photo[-1].file_id}") as request:
+                    f"{self._api_route}/getFile?file_id={photo_data[-1].file_id}") as request:
                 if request.status == 429:
                     if not await self._handle_rate_limit(attempt, "image_downloader"):
                         return None
