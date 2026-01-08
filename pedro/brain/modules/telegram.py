@@ -163,7 +163,7 @@ class Telegram:
 
         if message.photo:
             photo_data = message.photo
-        elif message.reply_to_message.photo:
+        elif message.reply_to_message and message.reply_to_message.photo:
             photo_data = message.reply_to_message.photo
         else:
             return None
