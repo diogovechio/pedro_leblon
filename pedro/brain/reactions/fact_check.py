@@ -1,4 +1,5 @@
 # Internal
+import asyncio
 import random
 
 # Project
@@ -70,8 +71,6 @@ async def fact_check(
                 model=model
             )
 
-            fact_check_text = fact_check_text.lower()
-
             prompt_fact_checked = f"""Como especialista em verificação de fatos e jornalista 
             com uma perspectiva marxista materialista e dialética, você formulou a 
             seguinte Análise: "{fact_check_text}"; sobre o Argumento do {mentiroso}: "{mentiroso_argument}"; 
@@ -89,15 +88,23 @@ async def fact_check(
             if mentiroso.lower() not in message_text:
                 message_text = f"{mentiroso}, {message_text}"
 
-            if random.random() < 0.25:
-                message_text = message_text.upper()
-
             message_text = await adjust_pedro_casing(message_text)
 
-            await history.add_message(message_text, chat_id=message.chat.id, is_pedro=True)
+            message_text = message_text.replace(";",".").replace(",",".")
+            messages = message_text.split(".")
 
-            await telegram.send_message(
-                message_text=message_text,
-                chat_id=message.chat.id,
-                reply_to=reply_to
-            )
+            for i, single_message in enumerate(messages):
+                single_message = single_message.strip()
+
+                if random.random() < 0.15:
+                    single_message = single_message.upper()
+
+                await asyncio.gather(
+                    history.add_message(single_message, chat_id=message.chat.id, is_pedro=True),
+                    asyncio.sleep(2 + (random.random() * 4)),
+                    telegram.send_message(
+                        message_text=single_message,
+                        chat_id=message.chat.id,
+                        reply_to=reply_to if i == 0 else None,
+                    )
+                )

@@ -26,14 +26,14 @@ class WebSearchTool(Tool):
                 },
                 "max_results": {
                     "type": "integer",
-                    "description": "Número máximo de resultados a retornar (padrão é 2, máximo recomendado é 4).",
-                    "default": 2
+                    "description": "Número máximo de resultados a retornar (padrão é 8, máximo recomendado é 24).",
+                    "default": 8
                 }
             },
             "required": ["query"]
         }
 
-    async def execute(self, query: str, max_results: int = 5) -> str:
+    async def execute(self, query: str, max_results: int = 8) -> str:
         """
         Execute a web search using DuckDuckGo.
         
@@ -46,7 +46,7 @@ class WebSearchTool(Tool):
         """
         try:
             # Limit max_results to prevent excessive data
-            max_results = min(max_results, 10)
+            max_results = min(max_results, 24)
             
             with DDGS() as ddgs:
                 results = list(ddgs.text(query, max_results=max_results))
