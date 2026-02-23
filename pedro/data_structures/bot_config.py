@@ -18,6 +18,7 @@ class Chats:
 class BotSecret:
     bot_token: str
     openai_key: str
+    deepseek_key: str = ""
     open_weather: str = ""
 
 

@@ -23,8 +23,18 @@ from pedro.brain.modules.telegram import Telegram
 from pedro.brain.modules.database import Database
 from pedro.brain.modules.user_data_manager import UserDataManager
 from pedro.brain.modules.scheduler import Scheduler
+from pedro.utils.json_validator import find_invalid_jsons_detailed
 
 logging.basicConfig(level=logging.INFO)
+
+
+def _delete_invalid_chat_logs():
+    invalid_files = find_invalid_jsons_detailed(r"database\chat_logs")
+
+    for f in invalid_files:
+        os.remove(f["path"])
+
+        logging.critical(f'{f["path"]} deleted')
 
 
 class TelegramBot:
@@ -116,6 +126,8 @@ class TelegramBot:
 
         # Check if config files exist and create them if they don't
         files_created = False
+
+        _delete_invalid_chat_logs()
 
         if not os.path.exists(self.config_file):
             logging.info(f"Configuration file {self.config_file} not found. Creating empty template.")
