@@ -28,7 +28,7 @@ async def _is_taking_too_long(
     user: str = "",
     max_loops: int = 5,
     timeout: int = 15,
-    memory: T.Optional[ChatHistory] = None,
+    chat_history: T.Optional[ChatHistory] = None,
     feedback_state: T.Optional[FeedbackState] = None
 ):
     """
@@ -40,7 +40,7 @@ async def _is_taking_too_long(
         user: Username to mention in delay messages.
         max_loops: Maximum number of delay messages to send.
         timeout: Initial timeout before first message (seconds).
-        memory: Optional chat history to log messages.
+        chat_history: Optional chat history to log messages.
         feedback_state: Optional state container to store the last message_id.
     """
     if user:
@@ -55,8 +55,8 @@ async def _is_taking_too_long(
             message = random.choice(messages)
             messages.remove(message)
 
-            if memory:
-                await memory.add_message(message, chat_id=chat_id)
+            if chat_history:
+                await chat_history.add_message(message, chat_id=chat_id)
 
             # Send message and capture message_id
             msg_id = await telegram.send_message(
@@ -77,7 +77,7 @@ def sending_action(
         chat_id: int,
         user: str = "",
         action: T.Union[T.Literal['typing'], T.Literal['upload_photo'], T.Literal['find_location']] = 'typing',
-        memory: T.Optional[ChatHistory] = None,
+        chat_history: T.Optional[ChatHistory] = None,
         feedback_state: T.Optional[FeedbackState] = None
 ):
     """
@@ -88,7 +88,7 @@ def sending_action(
         chat_id: The chat ID to send actions to.
         user: Username to mention in delay messages. If empty, no delay messages are sent.
         action: The chat action to send (typing, upload_photo, find_location).
-        memory: Optional chat history to log delay messages.
+        chat_history: Optional chat history to log delay messages.
         feedback_state: Optional state container to track the last delay message_id.
     """
     sending = asyncio.create_task(telegram.send_action(chat_id, action, True))
@@ -96,7 +96,7 @@ def sending_action(
         telegram=telegram,
         chat_id=chat_id,
         user=user,
-        memory=memory,
+        chat_history=chat_history,
         feedback_state=feedback_state
     ))
     try:

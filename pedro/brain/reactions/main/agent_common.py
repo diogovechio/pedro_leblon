@@ -21,6 +21,8 @@ from pedro.data_structures.bot_config import BotConfig
 from pedro.data_structures.telegram_message import Message
 from pedro.utils.text_utils import create_username
 from pedro.brain.modules.datetime_manager import DatetimeManager
+from pedro.utils.prompt_utils import send_telegram_log
+import html
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +36,7 @@ async def run_agent_reaction(
     task_list: TaskListManager,
     image: Any = None,
     send_delay_message: bool = False,
+    memory_manager = None,
 ) -> None:
     """
     Common function to initialize and run the Agent with tools.
@@ -89,6 +92,12 @@ async def run_agent_reaction(
                     user_opinions_text = "\n".join([f"Sobre {user_display_name}: {opinion[:100]}" for opinion in user_opinion.opinions])
                     opinions_text += f"### RESPONDA COM BASE NAS INFORMAÇÕES A SEGUIR SE FOR PERGUNTADO SOBRE ***{user_display_name}*** ### \n{user_opinions_text}\n\n"
 
+        memory_context = ""
+        if memory_manager:
+            chat_memory = memory_manager.get_memory_by_chat_id(message.chat.id)
+            if chat_memory:
+                memory_context = f"\nMemória de conversas anteriores com este grupo/usuário:\n{chat_memory}\n"
+
         system_prompt = (
             "Você é o Pedro, um usuário sarcástico, inteligente e útil no Telegram. "
             "Você é capaz de usar ferramentas para trazer diversas informações. "
@@ -103,6 +112,7 @@ async def run_agent_reaction(
             f"Data atual: {datetime_manager.get_current_date_str()}\n"
             f"{user_context}\n"
             f"{opinions_text}"
+            f"{memory_context}"
         )
 
         # 4. Get History
@@ -114,6 +124,29 @@ async def run_agent_reaction(
         clean_message = message.text if message.text else ""
         if image and not clean_message:
             clean_message = "Analise esta imagem."
+
+        if message.reply_to_message:
+            reply_text = message.reply_to_message.text or message.reply_to_message.caption
+            if reply_text:
+                if clean_message:
+                    clean_message += f"\n\n[Respondendo a: {reply_text}]"
+                else:
+                    clean_message = f"[Respondendo a: {reply_text}]"
+
+        # Send log to telegram log chat in the background
+        log_message = (
+            f"<b>[Agent Reaction Log]</b>\n"
+            f"<b>Chat ID:</b> {message.chat.id}\n"
+            f"<b>Clean Message:</b> {html.escape(clean_message)}\n\n"
+            f"<b>System Prompt:</b>\n{html.escape(system_prompt)}"
+        )
+        asyncio.create_task(
+            send_telegram_log(
+                telegram=telegram,
+                message_text=log_message,
+                parse_mode="HTML"
+            )
+        )
 
         response = await agent.run(
             user_message=clean_message,
@@ -153,4 +186,11 @@ async def run_agent_reaction(
 
         # 7. Add to History
         await history.add_message(response, chat_id=message.chat.id, is_pedro=True)
+
+        # 8. Update Memory in the Background
+        if memory_manager:
+            chat_history_text = history.get_friendly_last_messages(chat_id=message.chat.id, limit=10)
+            asyncio.create_task(
+                memory_manager.upsert_memory_by_chat_id(message.chat.id, chat_history_text)
+            )
 

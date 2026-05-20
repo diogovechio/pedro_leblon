@@ -1,5 +1,9 @@
+import logging
 from typing import Any, Dict
+import aiohttp
+import asyncio
 from pedro.brain.agent.tools.base import Tool
+from pedro.utils.url_utils import html_paragraph_extractor
 from ddgs import DDGS
 
 
@@ -53,21 +57,47 @@ class WebSearchTool(Tool):
             
             if not results:
                 return f"Não encontrei resultados para: {query}"
+
+            # Fetch the full text for each URL concurrently
+            async def fetch_full_text(session: aiohttp.ClientSession, url: str) -> str:
+                if not url:
+                    return ""
+                try:
+                    headers = {"User-Agent": "Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) "
+                                             "AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"}
+                    timeout = aiohttp.ClientTimeout(total=4)
+                    async with session.get(url, headers=headers, timeout=timeout) as site:
+                        html_content = await site.text()
+                        return await html_paragraph_extractor(html_content, char_limit=1500)
+                except Exception as exc:
+                    logging.error(f"Exception encountered: {exc}")
+                    return ""
+
+            async with aiohttp.ClientSession() as session:
+                tasks = [fetch_full_text(session, r.get('href', '')) for r in results]
+                full_texts = await asyncio.gather(*tasks)
             
             # Format results
             formatted_results = [f"Resultados da busca para '{query}':\n"]
-            for i, result in enumerate(results, 1):
+            for i, (result, full_text) in enumerate(zip(results, full_texts), 1):
+                # Add full_text key to result dict as requested
+                result['full_text'] = full_text
+                
                 title = result.get('title', 'Sem título')
                 body = result.get('body', 'Sem descrição')
                 url = result.get('href', '')
                 
-                formatted_results.append(
+                res_str = (
                     f"{i}. {title}\n"
                     f"   {body}\n"
                     f"   URL: {url}\n"
                 )
+                if full_text:
+                    res_str += f"   Texto completo: {full_text}\n"
+                formatted_results.append(res_str)
             
             return "\n".join(formatted_results)
             
         except Exception as e:
             return f"Erro ao realizar busca: {str(e)}"
+

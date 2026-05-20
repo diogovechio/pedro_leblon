@@ -1,10 +1,9 @@
 # Internal
 import asyncio
-from typing import Any
 
 from pedro.brain.modules.task_list import TaskListManager
 # Project
-from pedro.brain.reactions.agent_common import run_agent_reaction
+from pedro.brain.reactions.main.agent_common import run_agent_reaction
 from pedro.brain.modules.chat_history import ChatHistory
 from pedro.brain.modules.feedback import sending_action
 from pedro.brain.modules.llm import LLM
@@ -24,6 +23,7 @@ async def images_reaction(
         llm: LLM,
         config: BotConfig,
         task_list: TaskListManager,
+        memory_manager = None,
 ) -> None:
     if message.photo or message.document:
         image = await telegram.image_downloader(message)
@@ -57,6 +57,7 @@ async def images_reaction(
                     config=config,
                     image=image,
                     task_list=task_list,
+                    memory_manager=memory_manager,
                 )
 
     return None

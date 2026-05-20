@@ -7,10 +7,9 @@ from pedro.brain.modules.task_list import TaskListManager
 
 
 # Project
-from pedro.brain.reactions.default_pedro import pedro_reaction
-from pedro.brain.reactions.deprecated_pedro import pedro_deprecado
+from pedro.brain.reactions.main.default_pedro import pedro_reaction
 from pedro.brain.reactions.fact_check import fact_check_reaction
-from pedro.brain.reactions.images_reactions import images_reaction
+from pedro.brain.reactions.main.images_reactions import images_reaction
 from pedro.brain.reactions.random_reactions import random_reactions
 from pedro.brain.reactions.summary_reactions import summary_reaction
 from pedro.brain.reactions.agenda_commands import agenda_commands_reaction
@@ -43,6 +42,7 @@ async def messages_handler(
         allowed_list: list,
         flags: Flags,
         config: BotConfig,
+        memory_manager = None,
 ) -> None:
     """
     Handle incoming messages and trigger appropriate reactions.
@@ -58,6 +58,7 @@ async def messages_handler(
         allowed_list (list): List of allowed chat IDs
         flags (Flags): Daily feature flags manager
         config (BotConfig): Bot configuration instance
+        memory_manager (MemoryManager, optional): Memory manager instance
 
     Returns:
         None
@@ -66,8 +67,7 @@ async def messages_handler(
         updated_message = await check_and_update_with_url_contents(message)
 
         await asyncio.gather(
-            pedro_deprecado(updated_message, history, telegram, user_data, llm, flags),
-            images_reaction(updated_message, history, telegram, user_data, llm, config, task_list),
+            images_reaction(updated_message, history, telegram, user_data, llm, config, task_list, memory_manager),
             summary_reaction(updated_message, history, telegram, user_data, llm),
             fact_check_reaction(updated_message, history, telegram, user_data, llm),
             agenda_commands_reaction(updated_message, history, telegram, user_data, agenda, llm),
@@ -78,9 +78,9 @@ async def messages_handler(
             critic_or_praise_reaction(updated_message, history, telegram, user_data, llm),
             weather_commands_reaction(updated_message, history, telegram, user_data, llm, config),
             random_reactions(updated_message, telegram, user_data, flags),
-            pedro_command_reaction(updated_message, history, telegram, llm),
+            pedro_command_reaction(updated_message, history, telegram, llm, memory_manager),
             poll_reaction(updated_message, telegram),
-            pedro_reaction(updated_message, history, telegram, user_data, llm, config, flags, task_list),
+            pedro_reaction(updated_message, history, telegram, user_data, llm, config, flags, task_list, memory_manager),
         )
     else:
         await telegram.send_message(

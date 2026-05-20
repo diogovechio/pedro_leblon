@@ -4,7 +4,6 @@ import logging
 import os
 import sys
 from asyncio import AbstractEventLoop
-from datetime import datetime
 import json
 import typing as T
 
@@ -18,11 +17,12 @@ from pedro.data_structures.bot_config import BotConfig
 from pedro.data_structures.daily_flags import Flags
 from pedro.brain.modules.llm import LLM
 from pedro.brain.modules.chat_history import ChatHistory
-from pedro.brain.reactions.messages_handler import messages_handler
+from pedro.brain.reactions.main.messages_handler import messages_handler
 from pedro.brain.modules.telegram import Telegram
 from pedro.brain.modules.database import Database
 from pedro.brain.modules.user_data_manager import UserDataManager
 from pedro.brain.modules.scheduler import Scheduler
+from pedro.brain.modules.memory_manager import MemoryManager
 from pedro.utils.json_validator import find_invalid_jsons_detailed
 
 logging.basicConfig(level=logging.INFO)
@@ -76,6 +76,7 @@ class TelegramBot:
         self.chat_history: ChatHistory | None = None
         self.agenda: AgendaManager | None = None
         self.task_list: TaskListManager | None = None
+        self.memory_manager: MemoryManager | None = None
         self.scheduler: Scheduler | None = None
 
         self.lock = True
@@ -179,6 +180,10 @@ class TelegramBot:
                     telegram=self.telegram,
                     chat_history=self.chat_history,
                 )
+                self.memory_manager = MemoryManager(
+                    database=self.database,
+                    llm=self.llm
+                )
 
                 self.scheduler = Scheduler(self.user_data, self.telegram, self.flags)
                 self.scheduler.start()
@@ -218,6 +223,7 @@ class TelegramBot:
                                     llm=self.llm,
                                     flags=self.flags,
                                     config=self.config,
+                                    memory_manager=self.memory_manager,
                                 )
                             )
 

@@ -82,7 +82,7 @@ async def process_reply_message(llm: LLM, telegram: Telegram, message: Message) 
 
 async def create_basic_prompt(
         message: Message,
-        memory: ChatHistory,
+        chat_history: ChatHistory,
         user_data: UserDataManager | None,
         total_messages=15,
         telegram: Telegram | None = None,
@@ -92,7 +92,7 @@ async def create_basic_prompt(
 
     datetime = DatetimeManager()
 
-    chat_history = memory.get_friendly_last_messages(chat_id=message.chat.id, limit=total_messages)
+    chat_history = chat_history.get_friendly_last_messages(chat_id=message.chat.id, limit=total_messages)
     users_opinions = []
 
     political_opinions = ""
@@ -305,14 +305,14 @@ def check_web_search(message: Message) -> bool:
 
 async def create_vanilla_prompt(
         message: Message,
-        memory: ChatHistory,
+        chat_history: ChatHistory,
         total_messages=15,
         telegram: Telegram | None = None,
         llm: LLM | None = None,
 ) -> str:
     datetime = DatetimeManager()
 
-    chat_history = memory.get_friendly_last_messages(chat_id=message.chat.id, limit=total_messages)
+    chat_history = chat_history.get_friendly_last_messages(chat_id=message.chat.id, limit=total_messages)
 
     text = message.caption if message.caption else message.text
     text = text.replace("/pedro", "").strip()
