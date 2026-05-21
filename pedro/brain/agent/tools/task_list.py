@@ -1,19 +1,22 @@
 # Internal
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from pedro.brain.agent.tools.base import Tool
 from pedro.brain.modules.task_list import TaskListManager
 
 
 class TaskListTool(Tool):
     """
-    Tool for managing task lists (personal and group tasks).
-    Allows the LLM to add and list tasks, but instructs users to use /concluir for completion.
+    Tool for managing task lists (personal and group tasks) and reminders.
+    Allows the LLM to add and list tasks, set reminders, and complete tasks.
     """
     
-    def __init__(self, user_id: int, chat_id: int, task_list_manager: TaskListManager):
+    def __init__(self, user_id: int, chat_id: int, task_list_manager: TaskListManager,
+                 username: Optional[str] = None, message_id: Optional[int] = None):
         self.user_id = user_id
         self.chat_id = chat_id
         self.task_manager = task_list_manager
+        self.username = username
+        self.message_id = message_id
 
     @property
     def name(self) -> str:
@@ -22,8 +25,12 @@ class TaskListTool(Tool):
     @property
     def description(self) -> str:
         return (
-            "Gerencia listas de tarefas pessoais e do grupo. "
-            "Use esta ferramenta quando o usuário pedir para adicionar, listar ou concluir tarefas. "
+            "Gerencia listas de tarefas pessoais e do grupo, e também lembretes. "
+            "Use esta ferramenta quando o usuário pedir para adicionar, listar ou concluir tarefas, "
+            "OU quando o usuário pedir para ser lembrado de algo em um momento específico. "
+            "Quando o usuário pedir para ser lembrado de algo (ex: 'me lembra de X amanhã às 15h', "
+            "'me avisa daqui a 2 horas', 'lembrete para dia 20'), use a ação add_personal ou add_group "
+            "com o campo reminder_at preenchido com a data/hora absoluta no formato ISO 8601 (GMT-3 Brasília). "
             "Tarefas pessoais são acessíveis de qualquer chat. "
             "Tarefas do grupo são específicas deste chat. "
             "Por padrão, usuários mencionarão tarefas pessoais, apenas adicione ou liste do grupo caso o "
@@ -41,26 +48,35 @@ class TaskListTool(Tool):
                     "enum": ["add_personal", "list_personal", "add_group", "list_group", "complete_task"],
                     "description": (
                         "Ação a realizar: "
-                        "'add_personal' para adicionar tarefa pessoal, "
+                        "'add_personal' para adicionar tarefa pessoal ou lembrete pessoal, "
                         "'list_personal' para listar tarefas pessoais, "
-                        "'add_group' para adicionar tarefa do grupo, "
+                        "'add_group' para adicionar tarefa do grupo ou lembrete do grupo, "
                         "'list_group' para listar tarefas do grupo, "
                         "'complete_task' para concluir uma tarefa"
                     )
                 },
                 "description": {
                     "type": "string",
-                    "description": "Descrição da tarefa (obrigatório apenas para add_personal e add_group)"
+                    "description": "Descrição da tarefa ou lembrete (obrigatório para add_personal e add_group)"
                 },
                 "task_id": {
                     "type": "string",
                     "description": "ID da tarefa (obrigatório apenas para complete_task)"
+                },
+                "reminder_at": {
+                    "type": "string",
+                    "description": (
+                        "Data e hora para o lembrete no formato ISO 8601 (ex: 2026-05-21T15:00:00). "
+                        "Use sempre o fuso horário GMT-3 (horário de Brasília). "
+                        "Se o usuário pedir 'daqui a 3 horas', calcule a data/hora absoluta com base na hora atual. "
+                        "Opcional: se não informado, a tarefa não terá lembrete automático."
+                    )
                 }
             },
             "required": ["action"]
         }
 
-    async def execute(self, action: str, description: str = None, task_id: str = None) -> str:
+    async def execute(self, action: str, description: str = None, task_id: str = None, reminder_at: str = None) -> str:
         """
         Execute task management actions.
         
@@ -68,11 +84,21 @@ class TaskListTool(Tool):
             action: The action to perform (add_personal, list_personal, add_group, list_group, complete_task)
             description: Task description (required for add actions)
             task_id: Task ID (required for complete_task action)
+            reminder_at: Optional ISO 8601 datetime string for the reminder (GMT-3)
             
         Returns:
             String with the result of the operation
         """
         try:
+            # Parse reminder_at if provided
+            parsed_reminder = None
+            if reminder_at:
+                try:
+                    from datetime import datetime
+                    parsed_reminder = datetime.fromisoformat(reminder_at)
+                except ValueError:
+                    return f"Erro: formato de data/hora inválido para reminder_at: {reminder_at}. Use o formato ISO 8601 (ex: 2026-05-21T15:00:00)."
+
             if action == "add_personal":
                 if not description:
                     return "Erro: descrição da tarefa é obrigatória para adicionar."
@@ -81,8 +107,14 @@ class TaskListTool(Tool):
                     description=description,
                     created_by=self.user_id,
                     for_chat=self.chat_id,
-                    is_group_task=False
+                    is_group_task=False,
+                    reminder_at=parsed_reminder,
+                    username=self.username,
+                    message_id=self.message_id
                 )
+
+                if parsed_reminder:
+                    return f"Tarefa pessoal com lembrete adicionada! ID: {task_item.id} - {description} (lembrete: {reminder_at})"
                 return f"Tarefa pessoal adicionada com sucesso! ID: {task_item.id} - {description}"
             
             elif action == "list_personal":
@@ -93,7 +125,11 @@ class TaskListTool(Tool):
                 
                 result = "Suas tarefas pessoais:\n"
                 for item in task_items:
-                    result += f"- ID {item.id}: {item.description}\n"
+                    reminder_info = ""
+                    if item.reminder_at:
+                        status = "✅ lembrado" if item.reminded else "⏳ pendente"
+                        reminder_info = f" (lembrete: {item.reminder_at.strftime('%d/%m/%Y %H:%M')} - {status})"
+                    result += f"- ID {item.id}: {item.description}{reminder_info}\n"
                 
                 return result
             
@@ -105,8 +141,14 @@ class TaskListTool(Tool):
                     description=description,
                     created_by=self.user_id,
                     for_chat=self.chat_id,
-                    is_group_task=True
+                    is_group_task=True,
+                    reminder_at=parsed_reminder,
+                    username=self.username,
+                    message_id=self.message_id
                 )
+
+                if parsed_reminder:
+                    return f"Tarefa do grupo com lembrete adicionada! ID: {task_item.id} - {description} (lembrete: {reminder_at})"
                 return f"Tarefa do grupo adicionada com sucesso! ID: {task_item.id} - {description}"
             
             elif action == "list_group":
@@ -117,7 +159,11 @@ class TaskListTool(Tool):
                 
                 result = "Tarefas do grupo:\n"
                 for item in task_items:
-                    result += f"- ID {item.id}: {item.description}\n"
+                    reminder_info = ""
+                    if item.reminder_at:
+                        status = "✅ lembrado" if item.reminded else "⏳ pendente"
+                        reminder_info = f" (lembrete: {item.reminder_at.strftime('%d/%m/%Y %H:%M')} - {status})"
+                    result += f"- ID {item.id}: {item.description}{reminder_info}\n"
                 
                 return result
             

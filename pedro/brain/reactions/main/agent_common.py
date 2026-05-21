@@ -60,7 +60,8 @@ async def run_agent_reaction(
         birthday_tool = BirthdaySearchTool(message.chat.id)
         politics_tool = PoliticalOpinionsTool()
         web_search_tool = WebSearchTool()
-        task_list_tool = TaskListTool(message.from_.id, message.chat.id, task_list)
+        task_list_tool = TaskListTool(message.from_.id, message.chat.id, task_list,
+                                      username=message.from_.username, message_id=message.message_id)
 
         # 2. Initialize Agent
         agent = Agent(llm=llm, tools=[weather_tool, chat_history_tool, birthday_tool, politics_tool, web_search_tool, task_list_tool])

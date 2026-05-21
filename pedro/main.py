@@ -170,7 +170,7 @@ class TelegramBot:
 
                 self.telegram = Telegram(self.config.secrets.bot_token)
                 self.agenda = AgendaManager(self.telegram)
-                self.task_list = TaskListManager()
+                self.task_list = TaskListManager(telegram=self.telegram)
                 self.llm = LLM(self.config.secrets.openai_key)
                 self.database = Database("database/pedro_database.json")
                 self.chat_history = ChatHistory(telegram=self.telegram, llm=self.llm)
