@@ -119,7 +119,7 @@ class UserDataManager:
 
         return users
 
-    def get_users_by_text_match(self, text: str, threshold: float=0.8) -> List[UserData]:
+    def get_users_by_text_match(self, text: str, threshold: float=0.7) -> List[UserData]:
         """
         Find users whose first name or username matches the given text with a similarity above the threshold.
 
@@ -265,9 +265,7 @@ class UserDataManager:
         return_num = re.sub(r"\D", "", response)
 
         if len(return_num):
-            if return_num != 3 and message:
-                await self.add_opinion_by_message_tone(text, message=message)
-            elif random.random() < 0.3:
+            if return_num not in [3, 0] and message:
                 await self.add_opinion_by_message_tone(text, message=message)
 
             return int(return_num)
@@ -451,8 +449,8 @@ class UserDataManager:
                 logging.info(f"Found {len(user_messages)} messages for user {user_id} across all chats")
 
                 # Randomly select up to 10 messages
-                if len(user_messages) > 10:
-                    selected_messages = random.sample(user_messages, 10)
+                if len(user_messages) > 30:
+                    selected_messages = random.sample(user_messages, 30)
                 else:
                     selected_messages = user_messages
 
