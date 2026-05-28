@@ -55,7 +55,7 @@ class MemoryManager:
                 f"\"\"\"\n{old_memory}\n\"\"\"\n\n"
                 f"Novos fatos ocorridos recentemente na conversa:\n"
                 f"\"\"\"\n{new_summary}\n\"\"\"\n\n"
-                f"Gere um único resumo unificado de no máximo 3 parágrafos consolidando ambas as informações. "
+                f"Gere um único resumo unificado de no máximo 1 parágrafo consolidando de maneira sucinta as informações mais relevantes. "
                 f"Não repita fatos. Responda diretamente com o resumo consolidado, sem introduções ou prefácios."
             )
             merged_memory = await self.llm.generate_text(prompt=prompt_merge, model="gpt-5-nano")

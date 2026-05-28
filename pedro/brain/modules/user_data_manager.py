@@ -24,7 +24,7 @@ class UserDataManager:
     This class handles storing and retrieving user information, tracking relationship sentiment,
     analyzing message tone, and managing user opinions based on their interactions.
     """
-    def __init__(self, database: Database, llm: LLM, telegram: Telegram, chat_history=None, max_opinions: int = 8):
+    def __init__(self, database: Database, llm: LLM, telegram: Telegram, chat_history=None, max_opinions: int = 4):
         """
         Initialize the UserDataManager with necessary dependencies.
 
