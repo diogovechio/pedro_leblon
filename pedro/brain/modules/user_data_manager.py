@@ -44,8 +44,8 @@ class UserDataManager:
 
         self.sentiment_levels = [
             "Responda de maneira sucinta. Evitando comentários desnecessários.",
-            "Responda de acordo com sua opinião sobre o usuário que enviou a mensagem.",
-            "Seja impaciente e passivo agressivo. Responda de acordo com sua opinião sobre o usuário que enviou a mensagem."
+            "Responda de acordo com sua opinião sobre o usuário.",
+            "Seja impaciente e passivo agressivo. Responda de acordo com sua opinião sobre o usuário."
         ]
 
         # Start the sentiment decay loop

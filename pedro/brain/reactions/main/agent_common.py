@@ -77,7 +77,7 @@ async def run_agent_reaction(
         # Get opinions about other users mentioned in the conversation
         if user_data:
             sentiment = user_data.get_sentiment_level_prompt(message.from_.id)
-            user_context = f"\nAja dessa forma com {user_name}: {sentiment}\n\n"
+            user_context = f"\nAja dessa forma com {user_name}: {sentiment}\n"
             # Get chat history to find mentioned users
             chat_history_text = history.get_friendly_last_messages(chat_id=message.chat.id, limit=10)
             users_opinions = user_data.get_users_by_text_match(chat_history_text)
