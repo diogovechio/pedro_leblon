@@ -1,6 +1,8 @@
 # Internal
 import logging
 import asyncio
+import random
+import time
 from typing import Optional, Any
 
 # Project
@@ -26,6 +28,9 @@ import html
 
 logger = logging.getLogger(__name__)
 
+# Tracks the last timestamp a tease message was sent to a specific user (user_id -> float)
+LAST_TEASE_MESSAGES = {}
+
 async def run_agent_reaction(
     message: Message,
     history: ChatHistory,
@@ -45,6 +50,25 @@ async def run_agent_reaction(
     will be sent to the user. When the response is ready, if a delay message was
     sent, it will be edited with the final response instead of sending a new message.
     """
+    # If user has no username and has tease messages, there is a 25% chance to reply with one instead of running the agent.
+    # Limited to at most once every 15 minutes per user.
+    if user_data:
+        user = user_data.get_user_data(message.from_.id)
+        if user and not user.username and user.tease_messages:
+            current_time = time.time()
+            last_tease_time = LAST_TEASE_MESSAGES.get(message.from_.id, 0.0)
+            if current_time - last_tease_time >= 900.0:
+                if random.random() < 0.25:
+                    LAST_TEASE_MESSAGES[message.from_.id] = current_time
+                    tease_msg = random.choice(user.tease_messages)
+                    await telegram.send_message(
+                        message_text=tease_msg,
+                        chat_id=message.chat.id,
+                        reply_to=message.message_id
+                    )
+                    await history.add_message(tease_msg, chat_id=message.chat.id, is_pedro=True)
+                    return
+
     # Create feedback state to track delay messages
     feedback_state = FeedbackState() if send_delay_message else None
     

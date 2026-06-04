@@ -44,8 +44,8 @@ class UserDataManager:
 
         self.sentiment_levels = [
             "Responda de maneira sucinta. Evitando comentários desnecessários.",
-            "Responda de acordo com sua opinião sobre o usuário.",
-            "Seja impaciente e passivo agressivo. Responda de acordo com sua opinião sobre o usuário."
+            "Seja frio. Responda de acordo com sua opinião sobre o usuário.",
+            "Seja impaciente e passivo agressivo. Responda de acordo com sua opinião sobre o usuário. Use o que sabe contra ele."
         ]
 
         # Start the sentiment decay loop
@@ -515,8 +515,8 @@ class UserDataManager:
                         self.adjust_sentiment_by_user_id(user.user_id, -0.1)
                         logging.info(f"Decreased sentiment for user {user.user_id} by 0.1")
 
-                # Sleep for 20 minutes (1200 seconds)
-                await asyncio.sleep(1200)
+                # Sleep for 60 minutes (3600 seconds)
+                await asyncio.sleep(3600)
             except Exception as e:
                 logging.error(f"Error in sentiment decay loop: {e}")
                 # Sleep for a short time before retrying in case of error
@@ -559,7 +559,7 @@ class UserDataManager:
         reaction = ""
 
         if message_tone == 4:
-            self.adjust_sentiment_by_user_id(user_id=user_id, sentiment_adjust=1.0)
+            self.adjust_sentiment_by_user_id(user_id=user_id, sentiment_adjust=4.0)
             reaction = random.choice(["🤬", "😡", "🖕"])
         if message_tone == 2:
             self.adjust_sentiment_by_user_id(user_id=user_id, sentiment_adjust=-1.0)

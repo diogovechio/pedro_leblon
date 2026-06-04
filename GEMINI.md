@@ -1,90 +1,143 @@
-# Pedro Leblon Bot - Technical Documentation
+# Pedro Leblon Bot - Guidelines & Technical Context
 
-## Project Overview
+Welcome, Antigravity/Gemini! This document serves as the developer guidelines and context for the **Pedro Leblon Bot** project. It is automatically loaded as a workspace rule. Follow these rules and architectural descriptions strictly.
 
-Pedro Leblon is a sophisticated Telegram bot built with Python. It uses a modular architecture and leverages OpenAI's language models to provide a wide range of functionalities. The bot can engage in conversations, react to messages, manage a schedule, check the weather, and much more. It's designed to be extensible and configurable.
+---
 
-## Architecture
+## 1. Core Developer Rules (MUST FOLLOW)
 
-The project is structured in a modular way, with a clear separation of concerns.
+*   **No Hardcoding IDs or Keys**: Never hardcode chat IDs, user IDs, or API keys. Always use `secrets.json` for credentials and `bot_configs.json` for configuration values (such as allowed chat IDs, target directories, rate limits, etc.).
+*   **Asynchronous-First (`asyncio`)**: The bot is entirely asynchronous. Never use blocking operations (like standard `time.sleep`, synchronous requests, or blocking I/O) in the main thread. Always use `await asyncio.sleep()` and async libraries. If synchronous code must be run, execute it in a thread pool using the loop's `run_in_executor`.
+*   **Maintain Documentation & Docstrings**: Retain existing docstrings and comments when modifying code. Ensure new features are fully typed with python type hints and documented.
+*   **Response Style (Persona)**: Pedro has a specific "internet user" persona:
+    *   **Tone**: Sarcastic, intelligent, useful, informal.
+    *   **Format**: Use all-lowercase letters for informal chat, and **no final period** at the end of responses.
+    *   **Limits**: Avoid excessive emojis, formal greetings, punctuation (like multiple exclamation marks), and unnecessary questions.
+*   **Error Handling**: Wrap reactions and tools in try-except blocks. Log errors using `logging.exception` to avoid silent failures. Ensure rate-limiting errors from APIs (e.g., OpenAI or Telegram) are caught gracefully.
 
--   **`pedro/main.py`**: The main entry point of the application. It initializes all the modules, loads the configuration, and starts the message handling loop.
--   **`pedro/brain/modules/`**: This directory contains the core logic of the bot, with each file representing a specific functionality (e.g., `telegram.py`, `llm.py`, `database.py`).
--   **`pedro/brain/agent/`**: This directory contains the autonomous agent logic and tools.
--   **`pedro/brain/reactions/`**: This directory contains the logic for how the bot reacts to different types of messages and commands. Each file defines a specific set of reactions.
--   **`pedro/data_structures/`**: This directory contains the data classes used throughout the project, ensuring a consistent data model.
--   **`pedro/utils/`**: This directory contains utility functions that are used across different modules.
--   **`database/`**: This directory stores the TinyDB database files and chat logs.
+---
 
-## Modules (`pedro/brain/modules/`)
+## 2. Directory & Architectural Layout
 
--   **`telegram.py`**: Handles all communication with the Telegram Bot API. It provides methods for sending and receiving messages, media, and other actions. It also includes a message polling mechanism.
--   **`llm.py`**: A client for interacting with OpenAI's API. It supports text generation with different models, including multimodal input with images and documents, and web search capabilities.
--   **`database.py`**: A wrapper around the TinyDB library for data persistence. It provides a simple interface for inserting, retrieving, updating, and deleting data.
--   **`chat_history.py`**: Manages the chat logs. It records all messages in a structured way, organized by chat and date. It can also process images and documents in messages.
--   **`user_data_manager.py`**: Manages user data, including their opinions, relationship sentiment, and other preferences. It uses the LLM to analyze message tone and form opinions about users.
--   **`agenda.py`**: Manages scheduled events and reminders. It allows users to create, list, and delete agenda items with different frequencies (annual, monthly, once).
--   **`scheduler.py`**: A task scheduler for periodic jobs, such as processing historical messages, creating database backups, and resetting daily flags.
--   **`datetime_manager.py`**: A utility for handling dates and times, with support for timezones.
--   **`feedback.py`**: Provides feedback to the user during long-running operations, such as sending "typing..." actions.
+```
+pedro_leblon/
+├── database/                    # TinyDB files and JSON chat logs
+├── gifs/                        # GIFs and video files for birthday reactions
+├── pedro/                       # Core Python codebase
+│   ├── brain/
+│   │   ├── agent/               # Autonomous ReAct agent and tools
+│   │   │   ├── tools/           # Individual agent tools (Weather, Search, etc.)
+│   │   │   └── core.py          # ReAct execution loop
+│   │   ├── constants/           # Global word lists and constants
+│   │   ├── modules/             # Key stateful components and managers
+│   │   └── reactions/           # Message reactions and routing
+│   │       └── main/            # Core routing and default response logic
+│   ├── data_structures/         # Pydantic or basic dataclasses for type safety
+│   ├── utils/                   # Shared utility modules
+│   ├── __version__.py           # Bot versioning
+│   └── main.py                  # Main initialization and connection class
+├── .cursorrules                 # Rules for Cursor and other AI editors
+├── bot_configs.json             # Main JSON configuration file
+├── secrets.json                 # Secret tokens and API keys (DO NOT COMMIT)
+├── run.py                       # Application runner
+└── requirements.txt             # Python dependencies
+```
 
-## Agent (`pedro/brain/agent/`)
+---
 
--   **`core.py`**: Contains the `Agent` class which implements the ReAct loop (Thought -> Action -> Observation). It orchestrates tool execution and LLM interaction.
--   **`tools/base.py`**: Defines the abstract `Tool` interface that all tools must implement.
--   **`tools/weather.py`**: A tool that exposes `weather_utils.get_forecast` to the Agent, allowing it to fetch weather data.
+## 3. Core Modules & Flow of Message Processing
 
-## Reactions (`pedro/brain/reactions/`)
+### 3.1 Flow of Message Handling
+1.  **Entry**: `run.py` runs `TelegramBot.run()` in [pedro/main.py](file:///d:/OneDrive/repos/pedro_leblon/pedro/main.py).
+2.  **Polling**: `TelegramBot._message_handler()` polls Telegram for new messages.
+3.  **Logging**: New messages are recorded via [chat_history.py](file:///d:/OneDrive/repos/pedro_leblon/pedro/brain/modules/chat_history.py) and the user database is updated via [user_data_manager.py](file:///d:/OneDrive/repos/pedro_leblon/pedro/brain/modules/user_data_manager.py).
+4.  **Routing**: The main router `messages_handler()` in [messages_handler.py](file:///d:/OneDrive/repos/pedro_leblon/pedro/brain/reactions/main/messages_handler.py) processes the message if the bot is unlocked.
+5.  **Execution**: `messages_handler()` executes multiple reaction functions in parallel using `asyncio.gather()`. Each reaction check resolves quickly if the message does not match its triggers.
 
--   **`messages_handler.py`**: The main message handler that orchestrates all other reactions. It receives incoming messages and triggers the appropriate reactions based on the message content.
--   **`agent_pedro.py`**: Handles messages starting with "Agente Pedro". It initializes the autonomous Agent with tools (like WeatherTool) and delegates the response generation to the agentic loop.
--   **`default_pedro.py`**: The default reaction, which is triggered when no other specific reaction matches. It uses the LLM to generate a response based on the conversation history and user data.
--   **`agenda_commands.py`**: Handles all commands related to the agenda, such as `/agendar`, `/agenda`, `/aniversario`, and `/delete`.
--   **`complain_swearword.py`**: Reacts to messages containing swear words, either by critiquing the language or by sending a random message.
--   **`critic_or_praise.py`**: Handles commands like `/critique`, `/elogie`, `/simpatize`, and `/humilhe`, which use the LLM to generate a response that criticizes or praises a user.
--   **`emoji_reactions.py`**: Reacts to messages with emojis based on jejich content (e.g., political, congratulations, LGBT-related).
--   **`fact_check.py`**: Handles commands like `/refute`, `/fact`, and `/check`, which use the LLM to fact-check a statement from a Marxist perspective.
--   **`images_reactions.py`**: Reacts to images, either by analyzing them for political content or by generating a response based on the image and the conversation history.
--   **`misc_commands.py`**: Handles miscellaneous commands like `/me`, `/del`, `/data`, `/puto`, and `/version`.
--   **`random_reactions.py`**: Triggers random reactions based on user data and daily flags.
--   **`summary_reactions.py`**: Handles commands like `/tldr` and `/tlsr`, which use the LLM to summarize a conversation or a replied-to message.
--   **`weather_commands.py`**: Handles commands like `/previsao` and `/prev`, which provide weather forecasts for a specified location.
+### 3.2 Core Component Managers (`pedro/brain/modules/`)
+*   [telegram.py](file:///d:/OneDrive/repos/pedro_leblon/pedro/brain/modules/telegram.py): Wrapper for Telegram API (sends/edits/deletes messages, downloads media).
+*   [llm.py](file:///d:/OneDrive/repos/pedro_leblon/pedro/brain/modules/llm.py): Wrapper for OpenAI model queries (supports text generation and multimodal inputs).
+*   [database.py](file:///d:/OneDrive/repos/pedro_leblon/pedro/brain/modules/database.py): Simple wrapper around TinyDB for persistence.
+*   [user_data_manager.py](file:///d:/OneDrive/repos/pedro_leblon/pedro/brain/modules/user_data_manager.py): Tracks user relationship metrics, sentiments, opinions, and profiles.
+*   [chat_history.py](file:///d:/OneDrive/repos/pedro_leblon/pedro/brain/modules/chat_history.py): Saves message logs to filesystem in `database/chat_logs/` and cleans invalid JSONs.
 
-## Data Structures (`pedro/data_structures/`)
+---
 
--   **`agenda.py`**: Defines the `Agenda` dataclass for storing agenda items.
--   **`bot_config.py`**: Defines the dataclasses for the bot's configuration, including `BotConfig`, `BotSecret`, and `Chats`.
--   **`chat_log.py`**: Defines the `ChatLog` dataclass for storing individual chat messages.
--   **`daily_flags.py`**: Defines the `DailyFlags` class for managing daily feature flags.
--   **`images.py`**: Defines the `MessageImage` and `MessageDocument` dataclasses for storing image and document data.
--   **`max_size_list.py`**: A custom list class with a maximum size.
--   **`telegram_message.py`**: Defines the dataclasses for Telegram messages, such as `Message`, `MessageReceived`, `Chat`, `From`, etc.
--   **`user_data.py`**: Defines the `UserData` dataclass for storing user information.
+## 4. How to Add a New Command or Message Reaction
 
-## Utils (`pedro/utils/`)
+1.  **Create Reaction File**: Add a new Python file in `pedro/brain/reactions/`.
+2.  **Define Reaction Function**: The signature should accept the `Message` and whatever modules it needs, returning `None`. Inside the reaction, check the trigger condition (e.g., starts with a command or contains specific keywords) and exit early if it is not met.
+    ```python
+    # Example: pedro/brain/reactions/my_new_reaction.py
+    from pedro.data_structures.telegram_message import Message
+    from pedro.brain.modules.telegram import Telegram
 
--   **`prompt_utils.py`**: Contains functions for creating prompts for the LLM.
--   **`text_utils.py`**: Contains utility functions for text manipulation, such as creating usernames, removing hashtags and emojis, and adjusting casing.
--   **`url_utils.py`**: Contains functions for extracting content from URLs, including YouTube transcripts and website paragraphs.
--   **`weather_utils.py`**: Contains functions for getting weather forecasts using the OpenWeatherMap API.
-
-## Configuration
-
-The bot is configured through two JSON files:
-
--   **`bot_configs.json`**: Contains the main configuration for the bot, such as the allowed chat IDs.
--   **`secrets.json`**: Contains the secret keys for the Telegram Bot API and the OpenAI API.
-
-## How to Run
-
-1.  **Install dependencies**:
-    ```bash
-    pip install -r requirements.txt
+    async def my_new_reaction_handler(message: Message, telegram: Telegram) -> None:
+        if not (message.text and message.text.startswith("/mycommand")):
+            return
+        
+        # Implement reaction logic...
+        await telegram.send_message(
+            message_text="comando executado com sucesso", 
+            chat_id=message.chat.id
+        )
     ```
-2.  **Configure the bot**:
-    -   Create `bot_configs.json` and `secrets.json` files based on the templates.
-    -   Fill in the required information, such as the bot token, OpenAI key, and allowed chat IDs.
-3.  **Run the bot**:
+3.  **Register Reaction**: Import and add your function to the `asyncio.gather()` inside `messages_handler()` in [messages_handler.py](file:///d:/OneDrive/repos/pedro_leblon/pedro/brain/reactions/main/messages_handler.py).
+
+---
+
+## 5. ReAct Agent & Writing Tools
+
+When Pedro receives a general message or query, he triggers the ReAct Agent in [agent_common.py](file:///d:/OneDrive/repos/pedro_leblon/pedro/brain/reactions/main/agent_common.py). The agent can make calls to external/internal APIs using `Tools`.
+
+### 5.1 Writing a New Agent Tool
+1.  **Define the Tool**: Create a new class inheriting from `Tool` (defined in [base.py](file:///d:/OneDrive/repos/pedro_leblon/pedro/brain/agent/tools/base.py)).
+    *   Set `name` (string).
+    *   Set `description` (tells the LLM when to use it).
+    *   Set `parameters` (JSON schema dictionary defining inputs).
+2.  **Implement Execute**: Write the async `execute()` method.
+    ```python
+    # Example: pedro/brain/agent/tools/my_tool.py
+    from pedro.brain.agent.tools.base import Tool
+
+    class MyCustomTool(Tool):
+        def __init__(self):
+            super().__init__(
+                name="my_custom_tool",
+                description="Use this tool to do a specific action.",
+                parameters={
+                    "type": "object",
+                    "properties": {
+                        "param1": {"type": "string", "description": "Parameter explanation"}
+                    },
+                    "required": ["param1"]
+                }
+            )
+
+        async def execute(self, param1: str) -> str:
+            # Execute tool logic (e.g. call API or fetch data)
+            return f"Resultado do custom tool com param: {param1}"
+    ```
+3.  **Register Tool**: Initialize and add your tool to the `tools` list in `run_agent_reaction()` inside [agent_common.py](file:///d:/OneDrive/repos/pedro_leblon/pedro/brain/reactions/main/agent_common.py).
+
+---
+
+## 6. TinyDB Usage Guidelines
+
+*   Database instance: initialized in `TelegramBot.load_config_params()` and passed to modules like `UserDataManager` and `MemoryManager`.
+*   Data Tables:
+    *   `users`: Tracks sentiment levels, opinions, details.
+    *   `memories`: Stores summary contexts for chats.
+    *   `rate_limits`: Stores timestamps for rate-limiting calculations.
+*   To retrieve or insert data, use the methods defined in `Database` ([database.py](file:///d:/OneDrive/repos/pedro_leblon/pedro/brain/modules/database.py)) instead of raw TinyDB calls if possible.
+
+---
+
+## 7. Testing & Verification
+
+*   Verify syntax and code style by checking your code against Python linters or executing simple test runs.
+*   Test python files locally inside the virtual environment:
     ```bash
     python run.py
     ```
+*   Always inspect if logs show any parsing/exceptions during start-up.

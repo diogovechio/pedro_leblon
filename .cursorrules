@@ -1,0 +1,22 @@
+# Pedro Leblon Bot - AI Rules & Coding Guidelines
+
+You are an AI coding assistant working on the Pedro Leblon Bot. Always follow these rules.
+
+## Tech Stack & Coding Standards
+- Language: Python 3.10+
+- Execution Model: Fully asynchronous (`asyncio`). Never block the event loop (avoid synchronous API requests, standard `time.sleep()`, or blocking file operations in the main thread).
+- Formatting: Follow PEP 8 guidelines. Write typed Python (use typing module/annotations).
+- Comments & Docstrings: Retain all existing docstrings and comments. If modifying or adding functions, provide clear docstrings.
+
+## Critical Guidelines
+- **No Hardcoding**: Never hardcode credentials, chat IDs, or API keys. Fetch them from `secrets.json` or `bot_configs.json`.
+- **Persona Context**: Pedro's Telegram persona is informal, sarcastic, and intelligent.
+  - Informal responses must be in **all-lowercase**.
+  - **No final period** at the end of informal messages.
+  - Do not add exclamation marks or emojis excessively.
+- **Exceptions**: Always catch exceptions inside reactions and tools, logging them with `logging.exception`. Do not let one failing reaction crash the whole bot.
+
+## Adding Features
+- **Reactions / Commands**: Add to `pedro/brain/reactions/`, then register inside the `asyncio.gather` in `pedro/brain/reactions/main/messages_handler.py`.
+- **ReAct Agent Tools**: Inherit from `Tool` class in `pedro/brain/agent/tools/base.py`, then instantiate and register in `run_agent_reaction` in `pedro/brain/reactions/main/agent_common.py`.
+- **Database Operations**: Use the wrapper in `pedro/brain/modules/database.py` to persist data in TinyDB.

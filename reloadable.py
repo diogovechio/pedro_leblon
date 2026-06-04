@@ -5,7 +5,7 @@ from subprocess import Popen
 from sys import argv
 
 # Grab the script name from a command line arg.
-SCRIPT_FILENAME = argv[1]
+SCRIPT_FILENAME = "run.py"
 
 
 class Runner:
