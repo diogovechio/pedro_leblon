@@ -81,7 +81,7 @@ async def messages_handler(
                 db = user_data.database
                 user_id = updated_message.from_.id
                 current_time = time.time()
-                one_hour_ago = current_time - 900
+                one_hour_ago = current_time - 600
 
                 # Fetch records from database
                 records = db.search("rate_limits", {"user_id": user_id})
@@ -96,10 +96,10 @@ async def messages_handler(
                         else:
                             active_records.append(record)
 
-                if len(active_records) >= 5:
+                if len(active_records) >= 7:
                     active_records.sort(key=lambda x: x["timestamp"])
                     t_old = active_records[0]["timestamp"]
-                    remaining_seconds = t_old + 900 - current_time
+                    remaining_seconds = t_old + 600 - current_time
                     remaining_minutes = max(1, math.ceil(remaining_seconds / 60))
 
                     response_text = f"já deu de conversar agora, voltamos a falar em {remaining_minutes} minutos"

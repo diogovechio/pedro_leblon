@@ -24,7 +24,7 @@ class UserDataManager:
     This class handles storing and retrieving user information, tracking relationship sentiment,
     analyzing message tone, and managing user opinions based on their interactions.
     """
-    def __init__(self, database: Database, llm: LLM, telegram: Telegram, chat_history=None, max_opinions: int = 4):
+    def __init__(self, database: Database, llm: LLM, telegram: Telegram, chat_history=None, max_opinions: int = 7):
         """
         Initialize the UserDataManager with necessary dependencies.
 
@@ -562,7 +562,7 @@ class UserDataManager:
             self.adjust_sentiment_by_user_id(user_id=user_id, sentiment_adjust=4.0)
             reaction = random.choice(["🤬", "😡", "🖕"])
         if message_tone == 2:
-            self.adjust_sentiment_by_user_id(user_id=user_id, sentiment_adjust=-1.0)
+            self.adjust_sentiment_by_user_id(user_id=user_id, sentiment_adjust=-0.3)
             reaction = random.choice(["🆒", "🗿"])
         if message_tone == 1:
             self.adjust_sentiment_by_user_id(user_id=user_id, sentiment_adjust=-1.5)
