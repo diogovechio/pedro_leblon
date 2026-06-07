@@ -28,6 +28,7 @@ class TaskItem:
     for_chat: int
     is_group_task: bool
     reminder_at: T.Optional[datetime] = None
+    recurrence: T.Optional[str] = None
     username: T.Optional[str] = None
     message_id: T.Optional[int] = None
     reminded: bool = False

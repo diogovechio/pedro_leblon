@@ -71,12 +71,17 @@ class TaskListTool(Tool):
                         "Se o usuário pedir 'daqui a 3 horas', calcule a data/hora absoluta com base na hora atual. "
                         "Opcional: se não informado, a tarefa não terá lembrete automático."
                     )
+                },
+                "recurrence": {
+                    "type": "string",
+                    "enum": ["diário", "semanal", "mensal"],
+                    "description": "Recorrência opcional do lembrete: 'diário', 'semanal' ou 'mensal'. Só faz sentido se reminder_at for informado."
                 }
             },
             "required": ["action"]
         }
 
-    async def execute(self, action: str, description: str = None, task_id: str = None, reminder_at: str = None) -> str:
+    async def execute(self, action: str, description: str = None, task_id: str = None, reminder_at: str = None, recurrence: str = None) -> str:
         """
         Execute task management actions.
         
@@ -85,6 +90,7 @@ class TaskListTool(Tool):
             description: Task description (required for add actions)
             task_id: Task ID (required for complete_task action)
             reminder_at: Optional ISO 8601 datetime string for the reminder (GMT-3)
+            recurrence: Optional recurrence ('diário', 'semanal', 'mensal')
             
         Returns:
             String with the result of the operation
@@ -99,6 +105,17 @@ class TaskListTool(Tool):
                 except ValueError:
                     return f"Erro: formato de data/hora inválido para reminder_at: {reminder_at}. Use o formato ISO 8601 (ex: 2026-05-21T15:00:00)."
 
+            if recurrence:
+                rec_normalized = recurrence.lower().strip()
+                if rec_normalized in ("diário", "diario", "diária", "diaria"):
+                    recurrence = "diário"
+                elif rec_normalized in ("semanal", "semanais"):
+                    recurrence = "semanal"
+                elif rec_normalized in ("mensal", "mensais"):
+                    recurrence = "mensal"
+                else:
+                    return f"Erro: recorrência '{recurrence}' inválida. Use 'diário', 'semanal' ou 'mensal'."
+
             if action == "add_personal":
                 if not description:
                     return "Erro: descrição da tarefa é obrigatória para adicionar."
@@ -109,12 +126,14 @@ class TaskListTool(Tool):
                     for_chat=self.chat_id,
                     is_group_task=False,
                     reminder_at=parsed_reminder,
+                    recurrence=recurrence,
                     username=self.username,
                     message_id=self.message_id
                 )
 
                 if parsed_reminder:
-                    return f"Tarefa pessoal com lembrete adicionada! ID: {task_item.id} - {description} (lembrete: {reminder_at})"
+                    rec_info = f", recorrência: {recurrence}" if recurrence else ""
+                    return f"Tarefa pessoal com lembrete adicionada! ID: {task_item.id} - {description} (lembrete: {reminder_at}{rec_info})"
                 return f"Tarefa pessoal adicionada com sucesso! ID: {task_item.id} - {description}"
             
             elif action == "list_personal":
@@ -128,7 +147,8 @@ class TaskListTool(Tool):
                     reminder_info = ""
                     if item.reminder_at:
                         status = "✅ lembrado" if item.reminded else "⏳ pendente"
-                        reminder_info = f" (lembrete: {item.reminder_at.strftime('%d/%m/%Y %H:%M')} - {status})"
+                        rec_info = f", recorrência: {item.recurrence}" if item.recurrence else ""
+                        reminder_info = f" (lembrete: {item.reminder_at.strftime('%d/%m/%Y %H:%M')}{rec_info} - {status})"
                     result += f"- ID {item.id}: {item.description}{reminder_info}\n"
                 
                 return result
@@ -143,12 +163,14 @@ class TaskListTool(Tool):
                     for_chat=self.chat_id,
                     is_group_task=True,
                     reminder_at=parsed_reminder,
+                    recurrence=recurrence,
                     username=self.username,
                     message_id=self.message_id
                 )
 
                 if parsed_reminder:
-                    return f"Tarefa do grupo com lembrete adicionada! ID: {task_item.id} - {description} (lembrete: {reminder_at})"
+                    rec_info = f", recorrência: {recurrence}" if recurrence else ""
+                    return f"Tarefa do grupo com lembrete adicionada! ID: {task_item.id} - {description} (lembrete: {reminder_at}{rec_info})"
                 return f"Tarefa do grupo adicionada com sucesso! ID: {task_item.id} - {description}"
             
             elif action == "list_group":
@@ -162,7 +184,8 @@ class TaskListTool(Tool):
                     reminder_info = ""
                     if item.reminder_at:
                         status = "✅ lembrado" if item.reminded else "⏳ pendente"
-                        reminder_info = f" (lembrete: {item.reminder_at.strftime('%d/%m/%Y %H:%M')} - {status})"
+                        rec_info = f", recorrência: {item.recurrence}" if item.recurrence else ""
+                        reminder_info = f" (lembrete: {item.reminder_at.strftime('%d/%m/%Y %H:%M')}{rec_info} - {status})"
                     result += f"- ID {item.id}: {item.description}{reminder_info}\n"
                 
                 return result

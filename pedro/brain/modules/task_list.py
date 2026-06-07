@@ -39,6 +39,7 @@ class TaskListManager:
                       for_chat: int,
                       is_group_task: bool,
                       reminder_at: Optional[datetime] = None,
+                      recurrence: Optional[str] = None,
                       username: Optional[str] = None,
                       message_id: Optional[int] = None) -> TaskItem:
         """
@@ -50,6 +51,7 @@ class TaskListManager:
             for_chat: ID of the chat where the task belongs
             is_group_task: Whether this is a group task or personal task
             reminder_at: Optional datetime for when the bot should remind the user (GMT-3)
+            recurrence: Optional recurrence string ('diário', 'semanal', 'mensal')
             username: Optional Telegram username (without @) for mentioning in reminders
             message_id: Optional message ID of the original request to reply to
 
@@ -81,6 +83,7 @@ class TaskListManager:
             for_chat=for_chat,
             is_group_task=is_group_task,
             reminder_at=reminder_at,
+            recurrence=recurrence,
             username=username,
             message_id=message_id,
             reminded=False
@@ -228,10 +231,16 @@ class TaskListManager:
                                 parse_mode=""
                             )
 
-                        # Mark as reminded
-                        self.mark_as_reminded(task.id)
-
-                        logging.info(f"Reminder sent for task {task.id}: {task.description}")
+                        # If it is a recurring reminder, update the date and keep active.
+                        # Otherwise, mark as reminded.
+                        if task.recurrence:
+                            new_time = self._get_next_recurrence_datetime(task.reminder_at, task.recurrence)
+                            self.update_recurring_reminder(task.id, new_time)
+                            logging.info(f"Recurring reminder sent and rescheduled for task {task.id}: {task.description} to {new_time}")
+                        else:
+                            # Mark as reminded
+                            self.mark_as_reminded(task.id)
+                            logging.info(f"Reminder sent for task {task.id}: {task.description}")
 
                     except Exception as exc:
                         logging.exception(f"Error sending reminder for task {task.id}: {exc}")
@@ -240,6 +249,62 @@ class TaskListManager:
                 logging.exception(f"Error in check_reminders: {exc}")
 
             await asyncio.sleep(30)
+
+    def update_recurring_reminder(self, item_id: str, new_reminder_at: datetime) -> bool:
+        """
+        Update the reminder datetime of a task and reset the reminded flag.
+
+        Args:
+            item_id: ID of the task item
+            new_reminder_at: New datetime for the reminder (GMT-3)
+
+        Returns:
+            True if the update was successful, False otherwise
+        """
+        result = self.db.update(
+            self.table_name,
+            {
+                "reminder_at": new_reminder_at.isoformat(),
+                "reminded": False
+            },
+            {"id": item_id}
+        )
+        return len(result) > 0
+
+    def _get_next_recurrence_datetime(self, dt: datetime, recurrence: str) -> datetime:
+        """
+        Calculates the next datetime based on the recurrence pattern.
+
+        Args:
+            dt: The original datetime
+            recurrence: The recurrence pattern ("diário", "semanal", "mensal")
+
+        Returns:
+            The next scheduled datetime
+        """
+        rec = recurrence.lower()
+        if rec in ("diário", "diario", "diária", "diaria"):
+            return dt + timedelta(days=1)
+        elif rec in ("semanal", "semanais"):
+            return dt + timedelta(days=7)
+        elif rec in ("mensal", "mensais"):
+            # Get next month and year
+            next_month = dt.month + 1
+            next_year = dt.year
+            if next_month > 12:
+                next_month = 1
+                next_year += 1
+            
+            # Find the same day in the next month, roll back if invalid (e.g. 31st of Jan -> Feb)
+            day = dt.day
+            while True:
+                try:
+                    return dt.replace(year=next_year, month=next_month, day=day)
+                except ValueError:
+                    day -= 1
+        
+        # Default fallback
+        return dt + timedelta(days=1)
 
     def _dict_to_task(self, data: Dict[str, Any]) -> TaskItem:
         """
@@ -264,6 +329,7 @@ class TaskListManager:
             for_chat=data["for_chat"],
             is_group_task=data["is_group_task"],
             reminder_at=reminder_at,
+            recurrence=data.get("recurrence"),
             username=data.get("username"),
             message_id=data.get("message_id"),
             reminded=data.get("reminded", False)
