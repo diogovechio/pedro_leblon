@@ -114,7 +114,11 @@ async def run_agent_reaction(
 
                     user_display_name = create_username(user_opinion.first_name, user_opinion.username)
                     user_display_name = f"{user_opinion.first_name} - {user_display_name}"
-                    user_opinions_text = "\n".join([f"Sobre {user_display_name}: {opinion[:100]}" for opinion in user_opinion.opinions])
+                    user_opinions_text = "\n".join([f"- {opinion[:100]}" for opinion in user_opinion.opinions])
+
+                    if user_opinion.long_term_opinion:
+                        user_opinions_text = f"- {user_opinion.long_term_opinion}\n{user_opinions_text}"
+
                     opinions_text += f"### RESPONDA COM BASE NAS INFORMAÇÕES A SEGUIR SE FOR PERGUNTADO SOBRE ***{user_display_name}*** ### \n{user_opinions_text}\n\n"
 
         memory_context = ""

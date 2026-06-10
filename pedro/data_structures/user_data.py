@@ -12,6 +12,7 @@ class UserData:
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     opinions: List[str] = None
+    long_term_opinion: Optional[str] = None
     tease_messages: Optional[List[str]] = None
     relationship_sentiment: float = 0.0
     last_weather_location: Optional[str] = None

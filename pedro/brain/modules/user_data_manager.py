@@ -379,6 +379,60 @@ class UserDataManager:
 
         return user_opinion
 
+    async def _update_long_term_opinion(self, user: "UserData") -> None:
+        """
+        Create or subtly update the long_term_opinion for a user based on their current opinions list.
+
+        If long_term_opinion is None, generates a fresh summarized opinion from all opinions.
+        If it already exists, asks the LLM to subtly incorporate any new relevant information
+        without drastically changing the existing opinion. The result is always capped at 500 characters.
+
+        Args:
+            user (UserData): The user whose long_term_opinion should be updated.
+        """
+        if not user.opinions:
+            logging.info(f"User {user.user_id} has no opinions yet, skipping long_term_opinion update")
+            return
+
+        opinions_text = "\n".join(f"- {op}" for op in user.opinions)
+
+        try:
+            if not user.long_term_opinion:
+                # First time: create a summarized opinion from all opinions
+                prompt = (
+                    f"Com base nas seguintes observações sobre um usuário:\n\n{opinions_text}\n\n"
+                    f"Escreva um resumo coeso e conciso sobre essa pessoa, em no máximo 500 caracteres. "
+                    f"Seja direto, informal e use português. Não use introduções como 'O usuário...' ou 'Com base nisso...'. "
+                    f"Apenas descreva a pessoa de forma natural."
+                )
+                logging.info(f"Generating initial long_term_opinion for user {user.user_id}")
+            else:
+                # Update existing opinion subtly
+                prompt = (
+                    f"Opinião atual sobre o usuário:\n\"{user.long_term_opinion}\"\n\n"
+                    f"Observações recentes sobre ele:\n{opinions_text}\n\n"
+                    f"Atualize sutilmente a opinião atual incorporando apenas o que for suficientemente relevante e consistente "
+                    f"com o que já se sabe. Não mude drasticamente a opinião existente: contradições pontuais não devem substituir "
+                    f"características já consolidadas, apenas podem ser mencionadas levemente se relevantes (ex: 'apesar disso, ultimamente...'). "
+                    f"Mantenha o tom informal e direto. Máximo de 500 caracteres. Retorne apenas a opinião atualizada, sem explicações."
+                )
+                logging.info(f"Updating long_term_opinion for user {user.user_id}")
+
+            new_opinion = await self.llm.generate_text(prompt)
+
+            # Sanitize and cap at 500 characters
+            new_opinion = new_opinion.strip()[:500]
+
+            if new_opinion:
+                self.database.update(
+                    self.table_name,
+                    {"long_term_opinion": new_opinion},
+                    {"user_id": user.user_id}
+                )
+                logging.info(f"long_term_opinion updated for user {user.user_id}")
+        except Exception as e:
+            logging.exception(f"Error updating long_term_opinion for user {user.user_id}: {e}")
+
     async def get_opinion_by_historical_messages(self):
         """
         Process historical messages for all users and generate opinions based on their past conversations.
@@ -389,6 +443,7 @@ class UserDataManager:
         3. Randomly selects up to 10 messages per user
         4. Generates an opinion about each user based on their messages
         5. For users with no recent messages, adds a generic "absent" opinion
+        6. Creates or subtly updates the long_term_opinion field for each user
 
         Note:
             Requires chat_history to be available. If not, the method will log a warning and return.
@@ -448,7 +503,7 @@ class UserDataManager:
             if user_messages:
                 logging.info(f"Found {len(user_messages)} messages for user {user_id} across all chats")
 
-                # Randomly select up to 10 messages
+                # Randomly select up to 30 messages
                 if len(user_messages) > 30:
                     selected_messages = random.sample(user_messages, 30)
                 else:
@@ -487,6 +542,14 @@ class UserDataManager:
                         logging.error(f"Error processing messages for user {user_id}: {e}")
             else:
                 self.add_opinion(user_id=user_id, opinion=random.choice(["Sumido.", "Desaparecido.", "Ausente.", "Não presente.", "Inexistente."]))
+
+            # Refresh user data after potential opinion update, then update long_term_opinion
+            try:
+                refreshed_user = self.get_user_data(user_id)
+                if refreshed_user:
+                    await self._update_long_term_opinion(refreshed_user)
+            except Exception as e:
+                logging.exception(f"Error updating long_term_opinion for user {user_id}: {e}")
 
         logging.info("Finished processing historical messages for all users")
 
