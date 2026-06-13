@@ -24,7 +24,7 @@ class UserDataManager:
     This class handles storing and retrieving user information, tracking relationship sentiment,
     analyzing message tone, and managing user opinions based on their interactions.
     """
-    def __init__(self, database: Database, llm: LLM, telegram: Telegram, chat_history=None, max_opinions: int = 7):
+    def __init__(self, database: Database, llm: LLM, telegram: Telegram, chat_history=None, max_opinions: int = 4):
         """
         Initialize the UserDataManager with necessary dependencies.
 
@@ -190,8 +190,10 @@ class UserDataManager:
         # Adjust the sentiment
         user_opinion.relationship_sentiment += sentiment_adjust
 
-        if user_opinion.relationship_sentiment < 0.0:
-            user_opinion.relationship_sentiment = 0.0
+        min_sentiment = user_opinion.min_relationship_sentiment or 0.0
+
+        if user_opinion.relationship_sentiment < min_sentiment:
+            user_opinion.relationship_sentiment = min_sentiment
 
         # Update the user opinion in the database
         self.database.update(
@@ -573,7 +575,9 @@ class UserDataManager:
 
                 # For each user with relationship_sentiment > 0.0, decrease it by 0.2
                 for user in all_users:
-                    if user.relationship_sentiment > 0.0:
+                    min_sentiment = user.min_relationship_sentiment or 0.0
+
+                    if user.relationship_sentiment > min_sentiment:
                         # Decrease by 0.1, but not below 0.0
                         self.adjust_sentiment_by_user_id(user.user_id, -0.1)
                         logging.info(f"Decreased sentiment for user {user.user_id} by 0.1")

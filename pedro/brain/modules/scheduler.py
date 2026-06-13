@@ -130,7 +130,7 @@ class Scheduler:
             return
 
         schedule.every().day.at(
-            _convert_hour_if_needed("11:55")).do(
+            _convert_hour_if_needed("12:20")).do(
                 call_async_function,
                 self._run_process_historical_messages
         )

@@ -15,6 +15,7 @@ class UserData:
     long_term_opinion: Optional[str] = None
     tease_messages: Optional[List[str]] = None
     relationship_sentiment: float = 0.0
+    min_relationship_sentiment: float = 0.0
     last_weather_location: Optional[str] = None
     access_level: int = 1
 

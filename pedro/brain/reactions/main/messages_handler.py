@@ -137,4 +137,3 @@ async def messages_handler(
         )
 
         await telegram.leave_chat(message.chat.id)
-

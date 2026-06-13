@@ -12,6 +12,7 @@ from pedro.brain.modules.telegram import Telegram
 from pedro.brain.modules.user_data_manager import UserDataManager
 from pedro.data_structures.daily_flags import Flags
 from pedro.data_structures.telegram_message import Message
+from pedro.data_structures.user_data import UserData
 from pedro.utils.text_utils import create_username
 
 logger = logging.getLogger(__name__)
@@ -36,11 +37,15 @@ async def misc_commands_reaction(
         elif message.text.startswith('/data'):
             await handle_data_command(telegram)
         elif message.text.startswith('/puto'):
-            await handle_puto_command(message, telegram, user_data, llm)
+            await handle_puto_command(message, telegram, user_data, llm, history)
         elif message.text.startswith('/version'):
             await handle_version_command(message, telegram)
         elif message.text.startswith('/dorme'):
             await handle_freeze_command(message, telegram, flags)
+        elif message.text.startswith("/oi"):
+            await handle_oi_command(message, telegram)
+        elif message.text.startswith("/ei"):
+            await handle_ei_command(message, telegram)
 
 async def handle_freeze_command(
         message: Message,
@@ -79,7 +84,13 @@ async def handle_me_command(
         user_name = create_username(user_opinion.first_name, user_opinion.username)
         if username == user_name:
             user_sentiment = round(user_opinion.relationship_sentiment, 2)
-            user_opinions = user_opinion.opinions
+            user_opinions = []
+
+            if user_opinion.long_term_opinion:
+                user_opinions.append(user_opinion.long_term_opinion)
+
+            if user_opinion.opinions:
+                user_opinions.extend(user_opinion.opinions)
 
     opinion_message = "Nada."
     if user_opinions and llm:
@@ -97,7 +108,7 @@ async def handle_me_command(
         message_text=f"*ID:* `{user_info.id}`\n"
                      f"*Chat ID:* `{message.chat.id}`\n"
                      f"*Meu ódio por você:* `{user_sentiment}`\n"
-                     f"*O que penso e sei sobre você:* `{opinion_message}`",
+                     f"*O que penso sobre você:* `{opinion_message}`",
         chat_id=message.chat.id,
         reply_to=message.message_id,
         parse_mode="Markdown"
@@ -132,10 +143,6 @@ async def handle_del_command(
         logger.info(f"{message.from_.first_name},{message.text},{message.reply_to_message.text}")
     else:
         with sending_action(chat_id=message.chat.id, telegram=telegram, user=message.from_.username):
-            from_username = create_username(
-                first_name=message.from_.first_name,
-                username=message.from_.username
-            )
             reply_username = create_username(
                 first_name=message.reply_to_message.from_.first_name,
                 username=message.reply_to_message.from_.username
@@ -143,7 +150,7 @@ async def handle_del_command(
 
             response = await llm.generate_text(
                 f'critique duramente o '
-                f'{from_username} '
+                f'{reply_username} '
                 f'por ter tentado deletar a mensagem "{message.reply_to_message.text}" enviada por'
                 f" {reply_username}. 'diga que pretende baní-lo do {message.chat.title}.\n\n"
                 f"pedro:",
@@ -187,11 +194,24 @@ async def handle_version_command(
     )
 
 
+def _format_user_opinions_context(user_opinion: UserData, display_name: str) -> str:
+    """Format the long-term and recent opinions of a user for the LLM context."""
+    opinions_details = []
+    if user_opinion.long_term_opinion:
+        opinions_details.append(f"sua opinião consolidada sobre {display_name}: {user_opinion.long_term_opinion}")
+    if user_opinion.opinions:
+        opinions_list = "\n".join(f"- {op}" for op in user_opinion.opinions)
+        opinions_details.append(f"outras opiniões e fatos sobre {display_name}:\n{opinions_list}")
+    
+    return "\n".join(opinions_details)
+
+
 async def handle_puto_command(
     message: Message,
     telegram: Telegram,
     user_data: UserDataManager,
     llm: LLM,
+    history: ChatHistory,
 ) -> None:
     # Use user info from reply_to_message if it exists, otherwise use the message sender
     user_info = message.reply_to_message.from_ if message.reply_to_message else message.from_
@@ -200,41 +220,62 @@ async def handle_puto_command(
 
     # Get user sentiment
     user_sentiment = 0
+    target_user_opinion = None
     for user_opinion in user_data.get_all_user_opinions():
         user_name = create_username(user_opinion.first_name, user_opinion.username)
         if username == user_name:
             user_sentiment = round(user_opinion.relationship_sentiment, 2)
+            target_user_opinion = user_opinion
+            break
 
     if user_sentiment < 0:
         user_sentiment = 0
 
     with sending_action(chat_id=message.chat.id, telegram=telegram, user=message.from_.username):
-        prompt = f"considere que você é o pedro.\nem uma escala de 0 a {MAX_SENTIMENT}, " \
+        prompt = f"considere que você é o pedro.\n\nem uma escala de 0 a {MAX_SENTIMENT}, " \
                  f"onde:\n" \
                  f"0 = extremamente contente, melhores amigos\n" \
-                 f"1 = contente" \
+                 f"1 = irritado" \
                  f"\n...\n" \
-                 f"5 = neutro" \
+                 f"5 = muito puto" \
                  f"\n...\n" \
-                 f"{MAX_SENTIMENT - 1} = puto" \
-                 f"\n{MAX_SENTIMENT} = extremamente puto:\n"
+                 f"{MAX_SENTIMENT} = extremamente puto:\n"
 
         if message.text.startswith('/putos'):
+            # Get users who sent messages in the current chat in the last 3 days
+            recent_messages = history.get_messages(chat_id=message.chat.id, days_limit=7)
+            recent_user_ids = set()
+            for day_logs in recent_messages.values():
+                for log in day_logs:
+                    try:
+                        uid = int(log.user_id)
+                        if uid != 0:
+                            recent_user_ids.add(uid)
+                    except ValueError:
+                        continue
+
             persons = ""
             for user_opinion in user_data.get_all_user_opinions():
-                sentiment = user_opinion.relationship_sentiment
-                if sentiment > 2:
+                if user_opinion.user_id in recent_user_ids:
+                    sentiment = user_opinion.relationship_sentiment
                     user_name = create_username(user_opinion.first_name, user_opinion.username)
-                    persons += f"{user_name.split(' ')[0]}: {int(sentiment)}\n"
+                    display_name = user_name.split(' ')[0]
+                    persons += f"{display_name}: {int(sentiment)}\n"
 
             if persons:
                 prompt += f"temos as seguintes pessoas seguidas da escala do quanto você está puto com elas:\n\n{persons}\n\n" \
                           f"descreva de maneira como você, pedro, se sente com cada uma dessas pessoas, sem dizer o valor da escala. " \
-                          f"reclame grosseiramente com aqueles que te deixaram puto, lembrando de alguma situação que essa pessoa fez com você.\npedro:"
+                          f"reclame grosseiramente com aqueles que te deixaram puto.\npedro:"
             else:
                 prompt = "diga que não está irritado com ninguém.\npedro:"
         else:
-            prompt += f"temos o seguinte valor:\n\n{user_sentiment}\n\nentão, dentro da escala, " \
+            opinions_context = ""
+            if target_user_opinion:
+                formatted_ops = _format_user_opinions_context(target_user_opinion, username)
+                if formatted_ops:
+                    opinions_context = f"\ne considerando:\n{formatted_ops}\n\n"
+
+            prompt += f"{opinions_context}temos o seguinte valor:\n\n{user_sentiment}\n\nentão, dentro da escala, " \
                  f"diga para o {username} o quanto você " \
                  f"está contente ou puto com ele. sem dizer exatamente os valores e nem revelar a escala." \
                  f"\n{'dê um exemplo de como você se sente com isso.' if round(random.random()) else 'faça uma curta poesia sobre isso.'}\n\n" \
@@ -251,3 +292,26 @@ async def handle_puto_command(
             chat_id=message.chat.id,
             reply_to=message.message_id,
         )
+
+
+async def handle_oi_command(
+    message: Message,
+    telegram: Telegram,
+) -> None:
+    """Handle the /oi command."""
+    await telegram.send_message(
+        message_text="oi",
+        chat_id=message.chat.id,
+        reply_to=message.message_id,
+    )
+
+async def handle_ei_command(
+    message: Message,
+    telegram: Telegram,
+) -> None:
+    """Handle the /ei command."""
+    await telegram.send_message(
+        message_text="ei",
+        chat_id=message.chat.id,
+        reply_to=message.message_id,
+    )

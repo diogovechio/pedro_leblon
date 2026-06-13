@@ -264,7 +264,7 @@ class LLM:
             "model": model,
             "prompt": prompt[:3000],
             "temperature": temperature,
-            "max_tokens": 1024,
+            "max_tokens": 3072,
         }
         return endpoint, request_data
 
