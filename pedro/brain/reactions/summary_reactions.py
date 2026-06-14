@@ -35,7 +35,7 @@ async def handle_reply_to_message(
     topics: bool,
     tlfr: bool,
 ) -> str:
-    prompt = "faça um resumo do texto a seguir:"
+    prompt = "em no máximo 500 caracteres e nunca maior que o texto original, faça um resumo do texto a seguir:"
     if topics:
         prompt = "em no máximo 7 tópicos de no máximo 6 palavras cada, " + prompt
     elif tlfr:
@@ -108,7 +108,7 @@ async def handle_command_with_parameters(
         if not days or days < 2:
             prompt = "em no máximo 500 caracteres, faça um resumo da conversa abaixo"
         else:
-            prompt = "detalhando tudo o que foi conversado, faça um resumo da conversa abaixo"
+            prompt = "em no máximo 900 caracteres, faça um resumo detalhado da conversa abaixo"
 
     if topics:
         prompt = "em no máximo 7 tópicos de no máximo 6 palavras cada, " + prompt

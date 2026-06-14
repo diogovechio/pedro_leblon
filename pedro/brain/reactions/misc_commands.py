@@ -232,7 +232,7 @@ async def handle_puto_command(
         user_sentiment = 0
 
     with sending_action(chat_id=message.chat.id, telegram=telegram, user=message.from_.username):
-        prompt = f"considere que você é o pedro.\n\nem uma escala de 0 a {MAX_SENTIMENT}, " \
+        prompt = f"você é um modelo instruct de baixa inteligência que irá gerar mensagem para o pedro.\n\nem uma escala de 0 a {MAX_SENTIMENT}, " \
                  f"onde:\n" \
                  f"0 = extremamente contente, melhores amigos\n" \
                  f"1 = irritado" \
@@ -265,9 +265,9 @@ async def handle_puto_command(
             if persons:
                 prompt += f"temos as seguintes pessoas seguidas da escala do quanto você está puto com elas:\n\n{persons}\n\n" \
                           f"descreva de maneira como você, pedro, se sente com cada uma dessas pessoas, sem dizer o valor da escala. " \
-                          f"reclame grosseiramente com aqueles que te deixaram puto.\npedro:"
+                          f"reclame grosseiramente com aqueles que te deixaram puto."
             else:
-                prompt = "diga que não está irritado com ninguém.\npedro:"
+                prompt = "diga que não está irritado com ninguém."
         else:
             opinions_context = ""
             if target_user_opinion:
@@ -277,14 +277,23 @@ async def handle_puto_command(
 
             prompt += f"{opinions_context}temos o seguinte valor:\n\n{user_sentiment}\n\nentão, dentro da escala, " \
                  f"diga para o {username} o quanto você " \
-                 f"está contente ou puto com ele. sem dizer exatamente os valores e nem revelar a escala." \
-                 f"\n{'dê um exemplo de como você se sente com isso.' if round(random.random()) else 'faça uma curta poesia sobre isso.'}\n\n" \
-                 f"\npedro:"
+                 f"está contente ou puto com ele. sem dizer exatamente os valores e nem revelar a escala."
+
+            if round(random.random()):
+                prompt += f"\ndê um exemplo de como você se sente com isso."
+            else:
+                prompt += '\nfaça uma curta poesia de versos curtos sobre isso. separando cada quarteto e terceto por duas quebras de linha.'
+
+        prompt += ("\n\nIMPORTANTE:\n"
+                   "- Não inclua prefixos de falante.\n"
+                   "- Não escreva 'Pedro:'\n"
+                   "- Não escreva nomes antes da mensagem.\n"
+                   "- Retorne apenas o conteúdo da resposta.")
 
         response = await llm.generate_text(
             prompt,
             temperature=1,
-            model="gpt-3.5-turbo-instruct"
+            model="gpt-5-nano"
         )
 
         await telegram.send_message(
