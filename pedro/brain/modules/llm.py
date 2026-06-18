@@ -54,6 +54,7 @@ class LLM:
             image: 'MessageImage' = None,
             document: 'MessageDocument' = None,
             web_search: bool = False,
+            reasoning_effort: Optional[str] = None,
     ) -> str:
         """
         Generate text using OpenAI's API.
@@ -65,6 +66,7 @@ class LLM:
             image: Optional image to include with the prompt for multimodal models
             document: Optional PDF document to include with the prompt for multimodal models
             web_search: Whether to use web search capabilities
+            reasoning_effort: Optional reasoning effort (e.g., "low", "medium", "high") for reasoning models
 
         Returns:
             The generated text response
@@ -92,7 +94,7 @@ class LLM:
                             prompt += f"\n\n[Documento anexado: {document.file_name}. Processamento de PDF ainda não é suportado.]"
 
                         endpoint, request_data = self._prepare_chat_model_request(
-                            prompt, model, temperature, image, file_id
+                            prompt, model, temperature, image, file_id, reasoning_effort
                         )
                     else:
                         endpoint, request_data = self._prepare_completion_model_request(
@@ -195,7 +197,8 @@ class LLM:
             model: str, 
             temperature: float, 
             image: Optional['MessageImage'] = None,
-            file_id: Optional[str] = None
+            file_id: Optional[str] = None,
+            reasoning_effort: Optional[str] = None
     ) -> Tuple[str, Dict[str, Any]]:
         """
         Prepare request data for chat models.
@@ -206,6 +209,7 @@ class LLM:
             temperature: Controls randomness in the response
             image: Optional image to include with the prompt for multimodal models
             file_id: Optional uploaded Doc ID to include with the prompt for multimodal models
+            reasoning_effort: Optional reasoning effort (e.g., "low", "medium", "high") for reasoning models
 
         Returns:
             Tuple containing the endpoint URL and request data dictionary
@@ -237,6 +241,10 @@ class LLM:
             "messages": [{"role": "user", "content": content}],
             "temperature": temperature,
         }
+
+        if reasoning_effort:
+            request_data["reasoning_effort"] = reasoning_effort
+
         return endpoint, request_data
 
     @staticmethod

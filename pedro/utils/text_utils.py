@@ -13,11 +13,18 @@ from pedro.brain.constants.constants import DATE_FULL_FORMAT, HOUR_FORMAT, DATE_
 from pedro.data_structures.chat_log import ChatLog
 
 
-def create_username(first_name: str, username: str | None) -> str:
+def create_username(first_name: str, username: str | None, last_name: str | None = None) -> str:
     if username:
         return f"@{username}"
 
-    return first_name.lower()
+    if last_name:
+        last_name = f" {last_name}"
+    else:
+        last_name = ""
+
+    name = f"{first_name}{last_name}"
+
+    return name.lower()
 
 
 def remove_hashtags(text: str) -> str:

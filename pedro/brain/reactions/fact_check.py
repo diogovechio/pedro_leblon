@@ -35,7 +35,7 @@ async def fact_check(
     user_data: UserDataManager,
     llm: LLM,
 ) -> None:
-    model = "gpt-4.1-mini"
+    model = "gpt-5-mini"
     training_counterpoint = """Como especialista em verificação de fatos e jornalista com 
     uma perspectiva marxista materialista e dialética, examine 'Argumento' a 
     partir de uma perspectiva de defesa da classe trabalhadora. Identifique 
@@ -67,7 +67,6 @@ async def fact_check(
 
             fact_check_text = await llm.generate_text(
                 prompt=f"{prompt}",
-                temperature=0.6,
                 model=model
             )
 
@@ -79,7 +78,6 @@ async def fact_check(
 
             message_text = await llm.generate_text(
                 prompt=prompt_fact_checked,
-                temperature=0.7,
                 model=model
             )
 
@@ -91,11 +89,19 @@ async def fact_check(
             message_text = await adjust_pedro_casing(message_text)
 
             message_text = message_text.replace(";",".").replace(",",".")
-            messages = message_text.split(".")
+            parts = [p.strip() for p in message_text.split(".") if p.strip()]
+
+            k = min(3, len(parts))
+            messages = []
+            if k > 0:
+                idx = 0
+                for i in range(k):
+                    group_size = (len(parts) // k) + (1 if i < (len(parts) % k) else 0)
+                    group_parts = parts[idx : idx + group_size]
+                    messages.append(". ".join(group_parts))
+                    idx += group_size
 
             for i, single_message in enumerate(messages):
-                single_message = single_message.strip()
-
                 if random.random() < 0.15:
                     single_message = single_message.upper()
 

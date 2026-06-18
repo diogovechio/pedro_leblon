@@ -112,7 +112,7 @@ async def run_agent_reaction(
                     if user_opinion.username and "pedroleblonbot" in user_opinion.username:
                         continue
 
-                    user_display_name = create_username(user_opinion.first_name, user_opinion.username)
+                    user_display_name = create_username(user_opinion.first_name, user_opinion.username, user_opinion.last_name)
                     user_display_name = f"{user_opinion.first_name} - {user_display_name}"
                     user_opinions_text = "\n".join([f"- {opinion[:100]}" for opinion in user_opinion.opinions])
 

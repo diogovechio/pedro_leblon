@@ -100,9 +100,9 @@ async def messages_handler(
                     active_records.sort(key=lambda x: x["timestamp"])
                     t_old = active_records[0]["timestamp"]
                     remaining_seconds = t_old + 600 - current_time
-                    remaining_minutes = max(1, math.ceil(remaining_seconds / 60))
+                    remaining_minutes = int(max(1, math.ceil(remaining_seconds / 60)))
 
-                    response_text = f"já deu de conversar agora, voltamos a falar em {remaining_minutes} minutos"
+                    response_text = f"já deu de conversar agora, voltamos a falar em {remaining_minutes} minuto{'s' if remaining_minutes != 1 else ''}"
                     await history.add_message(response_text, chat_id=updated_message.chat.id, is_pedro=True)
                     await telegram.send_message(
                         message_text=response_text,

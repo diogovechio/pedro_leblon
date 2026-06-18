@@ -148,9 +148,14 @@ async def handle_del_command(
                 username=message.reply_to_message.from_.username
             )
 
+            user = create_username(
+                first_name=message.from_.first_name,
+                username=message.from_.username
+            )
+
             response = await llm.generate_text(
                 f'critique duramente o '
-                f'{reply_username} '
+                f'{user} '
                 f'por ter tentado deletar a mensagem "{message.reply_to_message.text}" enviada por'
                 f" {reply_username}. 'diga que pretende baní-lo do {message.chat.title}.\n\n"
                 f"pedro:",

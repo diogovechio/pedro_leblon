@@ -14,6 +14,7 @@ class UserData:
     opinions: List[str] = None
     long_term_opinion: Optional[str] = None
     tease_messages: Optional[List[str]] = None
+    watched_words: List[str] = None
     relationship_sentiment: float = 0.0
     min_relationship_sentiment: float = 0.0
     last_weather_location: Optional[str] = None
@@ -22,3 +23,5 @@ class UserData:
     def __post_init__(self):
         if self.opinions is None:
             self.opinions = []
+        if self.watched_words is None:
+            self.watched_words = []
