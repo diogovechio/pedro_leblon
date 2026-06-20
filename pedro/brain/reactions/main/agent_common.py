@@ -156,6 +156,10 @@ async def run_agent_reaction(
 
         if message.reply_to_message:
             reply_text = message.reply_to_message.text or message.reply_to_message.caption
+
+            if message.reply_to_message.from_.is_bot:
+                reply_text = reply_text[:50] + "... (...) "
+
             if reply_text:
                 if clean_message:
                     clean_message += f"\n\n[Respondendo a: {reply_text}]"
