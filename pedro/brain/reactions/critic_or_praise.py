@@ -1,6 +1,7 @@
 # Internal
 import random
 import re
+import time
 
 # Project
 from pedro.brain.modules.chat_history import ChatHistory
@@ -13,6 +14,9 @@ from pedro.utils.prompt_utils import get_photo_description
 
 # Constants
 OPENAI_TRASH_LIST = ["pedro:", "pedro", "pedro leblon:", "pedro leblon"]
+
+# Track last critique times (user_id -> float timestamp)
+LAST_CRITIQUES = {}
 
 async def critic_or_praise_reaction(
         message: Message,
@@ -38,6 +42,23 @@ async def critic_or_praise_reaction(
             for word in user.watched_words:
                 normalized_word = re.sub(r'([a-zà-úç])\1+', r'\1', word.lower()).replace(" ", "")
                 if normalized_word in normalized_message:
+                    current_time = time.time()
+                    last_critique = LAST_CRITIQUES.get(message.from_.id, 0.0)
+                    if current_time - last_critique < 600.0:
+                        break
+
+                    if not user.username and user.tease_messages:
+                        if random.random() < 0.25:
+                            tease_msg = random.choice(user.tease_messages)
+                            await telegram.send_message(
+                                message_text=tease_msg,
+                                chat_id=message.chat.id,
+                                reply_to=message.message_id
+                            )
+                            await history.add_message(tease_msg, chat_id=message.chat.id, is_pedro=True)
+                            LAST_CRITIQUES[message.from_.id] = current_time
+                            break
+
                     from_user = From(
                         id=message.from_.id,
                         is_bot=message.from_.is_bot,
@@ -91,6 +112,7 @@ async def _critic_or_praise(
 
         if message.text.startswith("/critique"):
             prompt = f"Em no máximo 300 caracteres, dê uma bronca dura em {user_name} por ter dito isso: '''{text}'''"
+            LAST_CRITIQUES[user_id] = time.time()
         elif message.text.startswith("/elogie"):
             prompt = f"{'Elogie o' if round(random.random()) else 'Parabenize o'} {user_name} por ter dito isso: " \
                      f"'{text}'"

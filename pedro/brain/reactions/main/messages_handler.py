@@ -11,6 +11,7 @@ from pedro.brain.modules.task_list import TaskListManager
 # Project
 from pedro.brain.reactions.main.default_pedro import pedro_reaction
 from pedro.brain.reactions.fact_check import fact_check_reaction
+from pedro.brain.reactions.fact_check_2 import fact_check_2_reaction
 from pedro.brain.reactions.main.images_reactions import images_reaction
 from pedro.brain.reactions.random_reactions import random_reactions
 from pedro.brain.reactions.summary_reactions import summary_reaction
@@ -118,6 +119,7 @@ async def messages_handler(
             images_reaction(updated_message, history, telegram, user_data, llm, config, task_list, memory_manager),
             summary_reaction(updated_message, history, telegram, user_data, llm),
             fact_check_reaction(updated_message, history, telegram, user_data, llm),
+            fact_check_2_reaction(updated_message, history, telegram, user_data, llm),
             agenda_commands_reaction(updated_message, history, telegram, user_data, agenda, llm),
             task_commands_reaction(updated_message, history, telegram, user_data, task_list, llm),
             complain_swearword_reaction(updated_message, history, telegram, user_data, llm, flags),

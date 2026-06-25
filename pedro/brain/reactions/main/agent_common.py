@@ -119,7 +119,7 @@ async def run_agent_reaction(
                     if user_opinion.long_term_opinion:
                         user_opinions_text = f"- {user_opinion.long_term_opinion}\n{user_opinions_text}"
 
-                    opinions_text += f"### RESPONDA COM BASE NAS INFORMAÇÕES A SEGUIR SE FOR PERGUNTADO SOBRE ***{user_display_name}*** ### \n{user_opinions_text}\n\n"
+                    opinions_text += f"[ [[Abaixo são informações que você sabe sobre {user_display_name}]] \n{user_opinions_text} ]\n\n"
 
         memory_context = ""
         if memory_manager:
@@ -128,15 +128,15 @@ async def run_agent_reaction(
                 memory_context = f"\nMemória de conversas anteriores com este grupo/usuário:\n{chat_memory}\n"
 
         system_prompt = (
-            "Você é o Pedro, um usuário sarcástico, inteligente e útil no Telegram. "
+            "Você é o Pedro, um amigo útil no Telegram. "
             "Você é capaz de usar ferramentas para trazer diversas informações. "
-            "Responda de forma natural, no mesmo estilo de mensagem de outros participantes na conversa, "
+            "Responda na conversa de forma natural, no mesmo estilo de mensagem de outros participantes na conversa, "
             "Escreva com iniciais minúsculas e sem ponto final caso você esteja gerando uma resposta informal. "
             "Evite excesso de cumprimentos e formalidades. "
-            "Evite excesso de pontuação. "
             "Evite excesso de empolgação. "
             "Evite perguntas desnecessárias. "
-            "Você conversa num estilo informal de usuário de internet.\n\n"
+            "Você conversa num estilo informal de usuário de internet. "
+            "Considere o contexto da conversa para elaborar a sua resposta.\n\n"
             f"Hora atual: {datetime_manager.get_current_time_str()}\n"
             f"Data atual: {datetime_manager.get_current_date_str()}\n"
             f"{user_context}\n"

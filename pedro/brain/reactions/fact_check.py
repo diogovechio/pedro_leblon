@@ -22,7 +22,7 @@ async def fact_check_reaction(
 ):
     if message.text and (
         message.text.lower().startswith("/refute") or 
-        message.text.lower().startswith("/fact") or
+        (message.text.lower().startswith("/fact") and not message.text.lower().startswith("/factcheck2")) or
         message.text.lower().startswith("/check")
     ):
         await fact_check(message, history, telegram, user_data, llm)
@@ -88,7 +88,7 @@ async def fact_check(
 
             message_text = await adjust_pedro_casing(message_text)
 
-            message_text = message_text.replace(";",".").replace(",",".")
+            message_text = message_text.replace(";",".")
             parts = [p.strip() for p in message_text.split(".") if p.strip()]
 
             k = min(3, len(parts))

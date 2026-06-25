@@ -19,6 +19,7 @@ class UserData:
     min_relationship_sentiment: float = 0.0
     last_weather_location: Optional[str] = None
     access_level: int = 1
+    allow_to_delete_messages: Optional[bool] = None
 
     def __post_init__(self):
         if self.opinions is None:

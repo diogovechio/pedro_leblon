@@ -33,7 +33,7 @@ async def misc_commands_reaction(
         if message.text.startswith("/me"):
             await handle_me_command(message, telegram, user_data, llm)
         elif message.text.startswith('/del') and message.reply_to_message:
-            await handle_del_command(message, telegram, llm)
+            await handle_del_command(message, telegram, user_data, llm)
         elif message.text.startswith('/data'):
             await handle_data_command(telegram)
         elif message.text.startswith('/puto'):
@@ -118,17 +118,25 @@ async def handle_me_command(
 async def handle_del_command(
     message: Message,
     telegram: Telegram,
+    user_data: UserDataManager,
     llm: LLM,
 ) -> None:
     """Handle the /del command, which deletes messages or responds with criticism."""
     if message.reply_to_message.from_.username is None:
         message.reply_to_message.from_.username = ""
 
-    if (
-            message.reply_to_message.from_.id == message.from_.id
-            or "pedroleblon" in message.reply_to_message.from_.username
-            or message.reply_to_message.from_.is_bot
-    ):
+    sender_data = user_data.get_user_data(message.from_.id)
+    allow_to_delete = True
+    if sender_data is not None and sender_data.allow_to_delete_messages is False:
+        allow_to_delete = False
+
+    is_reply_to_bot = (
+        message.reply_to_message.from_.is_bot
+        or "pedroleblon" in message.reply_to_message.from_.username.lower()
+    )
+    is_reply_to_self = message.reply_to_message.from_.id == message.from_.id
+
+    if allow_to_delete and (is_reply_to_self or is_reply_to_bot):
         await telegram.delete_message(
             chat_id=message.chat.id,
             message_id=message.reply_to_message.message_id
@@ -143,25 +151,42 @@ async def handle_del_command(
         logger.info(f"{message.from_.first_name},{message.text},{message.reply_to_message.text}")
     else:
         with sending_action(chat_id=message.chat.id, telegram=telegram, user=message.from_.username):
-            reply_username = create_username(
-                first_name=message.reply_to_message.from_.first_name,
-                username=message.reply_to_message.from_.username
-            )
-
             user = create_username(
                 first_name=message.from_.first_name,
                 username=message.from_.username
             )
 
-            response = await llm.generate_text(
-                f'critique duramente o '
-                f'{user} '
-                f'por ter tentado deletar a mensagem "{message.reply_to_message.text}" enviada por'
-                f" {reply_username}. 'diga que pretende baní-lo do {message.chat.title}.\n\n"
-                f"pedro:",
-                temperature=1,
-                model="gpt-3.5-turbo-instruct"
-            )
+            if is_reply_to_bot:
+                # Scolding about the attempt at censorship
+                response = await llm.generate_text(
+                    f'critique duramente o {user} por ter tentado deletar a sua mensagem (que era: "pedro: {message.reply_to_message.text}"). '
+                    f'reclame muito com ele pela tentativa de censura no chat {message.chat.title}.\n\n'
+                    f'pedro:',
+                    temperature=1,
+                    model="gpt-3.5-turbo-instruct"
+                )
+            elif is_reply_to_self:
+                # Scolding telling the user to delete themselves
+                response = await llm.generate_text(
+                    f'responda sarcasticamente ao {user} que tentou deletar a sua própria mensagem (que era: "{message.reply_to_message.text}"). '
+                    f'diga para o usuário se deletar (ou se apagar / sumir do grupo) em vez de tentar deletar a mensagem.\n\n'
+                    f'pedro:',
+                    temperature=1,
+                    model="gpt-3.5-turbo-instruct"
+                )
+            else:
+                # Standard scolding for deleting someone else's message
+                reply_username = create_username(
+                    first_name=message.reply_to_message.from_.first_name,
+                    username=message.reply_to_message.from_.username
+                )
+                response = await llm.generate_text(
+                    f'critique duramente o {user} por ter tentado deletar a mensagem "{message.reply_to_message.text}" enviada por '
+                    f'{reply_username}. diga que pretende baní-lo do {message.chat.title}.\n\n'
+                    f"pedro:",
+                    temperature=1,
+                    model="gpt-3.5-turbo-instruct"
+                )
 
             await telegram.send_message(
                 message_text=response.upper(),

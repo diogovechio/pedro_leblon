@@ -69,7 +69,7 @@ class Agent:
         messages.append({"role": "user", "content": current_content})
 
         # 2. ReAct Loop
-        max_turns = 5
+        max_turns = 10
         for _ in range(max_turns):
             response_data = await self.llm.chat(
                 messages=messages,
