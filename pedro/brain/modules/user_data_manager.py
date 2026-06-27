@@ -24,7 +24,7 @@ class UserDataManager:
     This class handles storing and retrieving user information, tracking relationship sentiment,
     analyzing message tone, and managing user opinions based on their interactions.
     """
-    def __init__(self, database: Database, llm: LLM, telegram: Telegram, chat_history=None, max_opinions: int = 4):
+    def __init__(self, database: Database, llm: LLM, telegram: Telegram, chat_history=None, max_opinions: int = 7):
         """
         Initialize the UserDataManager with necessary dependencies.
 
@@ -308,7 +308,7 @@ class UserDataManager:
         """
         prompt = (f"Considerando as mensagens:\n\n{text}\n\nEnviadas por "
                   f"{create_username(first_name=message.from_.first_name, username=message.from_.username)} "
-                  f"em diversas conversas e em diferentes momentos, resuma de maneira sucinta, em no máximo 8 palavras, "
+                  f"em diversas conversas e em diferentes momentos, resuma de maneira sucinta, em no máximo 5 palavras, "
                   f"o que identificou sobre ele. Caso seja incapaz de gerar alguma observação com base na"
                   f" mensagem fornecida, não peça mais informações, apenas retorne '###NONE###'.")
 

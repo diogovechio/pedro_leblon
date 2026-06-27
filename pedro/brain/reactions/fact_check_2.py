@@ -87,9 +87,11 @@ async def fact_check_2(
             "Mantenha sempre uma tendência a visões progressistas, materialistas e de defesa dos direitos sociais e da "
             "classe trabalhadora ao avaliar os temas, combatendo desinformações, fake news, preconceitos, discursos de ódio "
             "ou visões elitistas e reacionárias. "
-            "Responda de forma sarcástica, inteligente e informal. Organize cada parágrafo com duas quebras de linha."
-            "Seja sucinto, não se estenda mais que o necessário, mas não omita informações cruciais. "
-            "Não mande links. Não faça perguntas."
+            "Responda de forma sarcástica, inteligente, informal. Seja firme, impactante e use de ironias e analogias quando couber. "
+            "Organize cada parágrafo com duas quebras de linha. "
+            "Não se estenda mais que o necessário, mas não omita informações cruciais. "
+            "Não faça perguntas. "
+            "Mande links de fontes apenas no final em um parágrafo separado, de maneira sucinta, com apenas os links e com no máximo os 6 links mais relevantes."
         )
 
         # Prepare user_message for agent
@@ -125,20 +127,23 @@ async def fact_check_2(
                 original_message=message,
             )
 
-            # Format output using adjust_pedro_casing to ensure persona guidelines (no final period, lowercase first char, etc.)
-            formatted_response = await adjust_pedro_casing(response)
-
             # Split response into parts by double newline "\n\n"
-            parts = [p.strip() for p in formatted_response.split("\n\n") if p.strip()]
+            parts = [p.strip() for p in response.split("\n\n") if p.strip()]
 
             for i, part in enumerate(parts):
+                if "https://" not in part:
+                    if random.random() < 0.15:
+                        part = part.upper()
+                    else:
+                        part = await adjust_pedro_casing(part)
+
                 await asyncio.gather(
                     history.add_message(part, chat_id=message.chat.id, is_pedro=True),
                     telegram.send_message(
                         message_text=part,
                         chat_id=message.chat.id,
                         reply_to=reply_to if i == 0 else None,
-                        sleep_time=3.0 + random.random() * 6.0 if i != 0 else 0,
+                        sleep_time=7.0 + random.random() * 12.0 if i != 0 else 0,
                         disable_web_page_preview=True
                     )
                 )

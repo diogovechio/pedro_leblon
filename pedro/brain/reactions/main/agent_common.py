@@ -13,6 +13,8 @@ from pedro.brain.agent.tools.birthdays import BirthdaySearchTool
 from pedro.brain.agent.tools.political_opinions import PoliticalOpinionsTool
 from pedro.brain.agent.tools.web_search import WebSearchTool
 from pedro.brain.agent.tools.task_list import TaskListTool
+from pedro.brain.agent.tools.custom_behavior import ManageCustomBehaviorTool
+from pedro.brain.agent.tools.remember_opinion import RememberOpinionTool
 from pedro.brain.modules.chat_history import ChatHistory
 from pedro.brain.modules.feedback import sending_action, FeedbackState
 from pedro.brain.modules.llm import LLM
@@ -86,9 +88,20 @@ async def run_agent_reaction(
         web_search_tool = WebSearchTool()
         task_list_tool = TaskListTool(message.from_.id, message.chat.id, task_list,
                                       username=message.from_.username, message_id=message.message_id)
+        custom_behavior_tool = ManageCustomBehaviorTool(message.from_.id, user_data)
+        remember_opinion_tool = RememberOpinionTool(message.from_.id, user_data)
 
         # 2. Initialize Agent
-        agent = Agent(llm=llm, tools=[weather_tool, chat_history_tool, birthday_tool, politics_tool, web_search_tool, task_list_tool])
+        agent = Agent(llm=llm, tools=[
+            weather_tool,
+            chat_history_tool,
+            birthday_tool,
+            politics_tool,
+            web_search_tool,
+            task_list_tool,
+            custom_behavior_tool,
+            remember_opinion_tool
+        ])
 
         # 3. Build System Prompt
         datetime_manager = DatetimeManager()
@@ -101,6 +114,9 @@ async def run_agent_reaction(
         # Get opinions about other users mentioned in the conversation
         if user_data:
             sentiment = user_data.get_sentiment_level_prompt(message.from_.id)
+            sender_data = user_data.get_user_data(message.from_.id)
+            if sender_data and sender_data.custom_behavior:
+                sentiment = f"{sentiment}\n\nVocê também deve, obrigatoriamente, gerar sua mensagem de maneira criativa, agindo dessa maneira: {sender_data.custom_behavior}"
             user_context = f"\nAja dessa forma com {user_name}: {sentiment}\n"
             # Get chat history to find mentioned users
             chat_history_text = history.get_friendly_last_messages(chat_id=message.chat.id, limit=10)

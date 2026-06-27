@@ -27,7 +27,7 @@ class MemoryManager:
                 f"{chat_history}\n\n"
                 f"Crie um pequeno resumo da lembrança sobre o que foi conversado. "
                 f"Foque nos pontos principais e no contexto da interação. "
-                f"Responda diretamente com o resumo em no máximo 2 parágrafos curtos, sem introduções ou prefácios."
+                f"Responda diretamente com o resumo em no máximo 1 parágrafo curto, sem introduções ou prefácios."
             )
             memory_text = await self.llm.generate_text(prompt=prompt, model="gpt-5-nano")
             memory_text = memory_text.strip()

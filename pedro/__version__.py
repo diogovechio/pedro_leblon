@@ -1,6 +1,6 @@
 """Version information."""
 
-__version__ = '0.47.7'
+__version__ = '0.50.1'
 
 def get_version():
     """Return the current version of the bot."""

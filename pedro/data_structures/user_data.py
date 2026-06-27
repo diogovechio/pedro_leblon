@@ -20,6 +20,7 @@ class UserData:
     last_weather_location: Optional[str] = None
     access_level: int = 1
     allow_to_delete_messages: Optional[bool] = None
+    custom_behavior: Optional[str] = None
 
     def __post_init__(self):
         if self.opinions is None:
